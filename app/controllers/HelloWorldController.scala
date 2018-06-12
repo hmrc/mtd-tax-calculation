@@ -14,12 +14,21 @@
  * limitations under the License.
  */
 
-import sbt.{ForkOptions, TestDefinition}
-import sbt.Tests.{Group, SubProcess}
+package controllers
 
-object TestPhases {
-  def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] =
-    tests map {
-      test => Group(test.name, Seq(test), SubProcess(ForkOptions(runJVMOptions = Seq("-Dtest.name=" + test.name, "-Dlogger.resource=logback-test.xml"))))
-    }
+import javax.inject.{Inject, Singleton}
+import play.api.mvc._
+import services.EnrolmentsAuthService
+
+import scala.concurrent.Future
+
+
+@Singleton()
+class HelloWorldController @Inject()(val authService: EnrolmentsAuthService)
+  extends AuthorisedController {
+
+  def hello(): Action[AnyContent] = authorisedAction() { implicit request =>
+    Future.successful(Ok("Hello world"))
+  }
+
 }

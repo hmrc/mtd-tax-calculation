@@ -14,12 +14,26 @@
  * limitations under the License.
  */
 
-import sbt.{ForkOptions, TestDefinition}
-import sbt.Tests.{Group, SubProcess}
+import sbt.Setting
+import scoverage.ScoverageKeys
 
-object TestPhases {
-  def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] =
-    tests map {
-      test => Group(test.name, Seq(test), SubProcess(ForkOptions(runJVMOptions = Seq("-Dtest.name=" + test.name, "-Dlogger.resource=logback-test.xml"))))
-    }
+object CodeCoverageSettings {
+
+  private val excludedPackages: Seq[String] = Seq(
+    "<empty>",
+    "Reverse.*",
+    "uk.gov.hmrc.BuildInfo",
+    "app.*",
+    "prod.*",
+    "config.*",
+    "testOnly.*",
+    "testOnlyDoNotUseInAppConf.*"
+  )
+
+  val settings: Seq[Setting[_]] = Seq(
+    ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
+    ScoverageKeys.coverageMinimum := 95,
+    ScoverageKeys.coverageFailOnMinimum := true,
+    ScoverageKeys.coverageHighlighting := true
+  )
 }
