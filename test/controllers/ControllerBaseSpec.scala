@@ -16,17 +16,16 @@
 
 package controllers
 
-import org.scalamock.scalatest.MockFactory
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.http.HeaderNames
-import play.api.inject.Injector
+import play.api.http.{HeaderNames, MimeTypes, Status}
 import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
-import uk.gov.hmrc.play.test.UnitSpec
+import play.api.test.{FakeRequest, ResultExtractors}
+import support.UnitSpec
 
-class ControllerBaseSpec extends UnitSpec with MockFactory with GuiceOneAppPerSuite {
-
-  lazy val injector: Injector = app.injector
+class ControllerBaseSpec extends UnitSpec
+  with Status
+  with MimeTypes
+  with HeaderNames
+  with ResultExtractors {
 
   implicit lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 

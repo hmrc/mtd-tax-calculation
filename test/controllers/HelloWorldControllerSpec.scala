@@ -18,7 +18,6 @@ package controllers
 
 import models.ServiceResponse
 import models.errors.AuthError
-import play.api.http.Status
 import services.EnrolmentsAuthService
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.http.HeaderCarrier
@@ -47,7 +46,7 @@ class HelloWorldControllerSpec extends ControllerBaseSpec {
   "GET /" should {
     "return 200" in new Test {
       private val result = target.hello()(fakeRequest)
-      status(result) shouldBe Status.OK
+      status(result) shouldBe OK
     }
   }
 
