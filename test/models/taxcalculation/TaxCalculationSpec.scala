@@ -16,17 +16,18 @@
 
 package models.taxcalculation
 
+import models.TaxCalculation
 import play.api.libs.json.Json
 import uk.gov.hmrc.play.test.UnitSpec
 
 class TaxCalculationSpec extends UnitSpec {
 
   "A tax calculation" should {
-    import fixtures.TaxCalculationFixture._
+    import fixtures.{TaxCalculationFixture => TestData}
 
     "be parsed from correct JSON" in {
-      val result = Json.parse(testTaxCalcString).as[TaxCalculation]
-      result shouldEqual testTaxCalc
+      val result = Json.parse(TestData.testTaxCalcString).as[TaxCalculation]
+      result shouldEqual TestData.testTaxCalc
     }
   }
 }
