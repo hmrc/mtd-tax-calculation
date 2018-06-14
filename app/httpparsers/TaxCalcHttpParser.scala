@@ -14,14 +14,31 @@
  * limitations under the License.
  */
 
-package fixtures
+package httpparsers
 
+import javax.inject.Singleton
 import models._
-import play.api.libs.json.Json
+import outcomes.TaxCalcOutcome
+import outcomes.TaxCalcOutcome.TaxCalcOutcome
+import uk.gov.hmrc.http.{HttpReads, HttpResponse}
+import play.api.http.Status.OK
 
-object TaxCalculationFixture {
+object TaxCalcHttpParser extends HttpParser {
+  implicit val taxCalcHttpReads: HttpReads[TaxCalcOutcome] = new HttpReads[TaxCalcOutcome] {
+    override def read(method: String, url: String, response: HttpResponse): TaxCalcOutcome = {
+      response.status match {
+        case _ => Right(TestTaxCalc.taxCalc)
+        //      case OK => validateJson[TaxCalculation](response) match {
+        //        case Some(taxCalc) => Right(taxCalc)
+        //        case None => Left(TaxCalcOutcome.NotFound)
+        //      }
+      }
+    }
+  }
+}
 
-  val testTaxCalc =
+object TestTaxCalc {
+  val taxCalc =
     TaxCalculation(
       year = "2016-17",
       intentToCrystallise = Some(false),
@@ -210,198 +227,4 @@ object TaxCalculationFixture {
         giftAidExtender = Some(99999999)
       )
     )
-
-  val testTaxCalcString: String =
-    """
-      |{
-      | "year": "2016-17",
-      |	"intentToCrystallise": false,
-      |	"crystallised": false,
-      | "validationMessageCount":10,
-      |	"incomeTaxAndNicYTD": 1000.25,
-      |	"nationalRegime": "UK",
-      |	"taxableIncome": {
-      |		"employments": {
-      |			"totalIncome": 1000.25,
-      |			"totalPay": 1000.25,
-      |			"totalBenefitsAndExpenses": 1000.25,
-      |			"totalAllowableExpenses": 1000.25,
-      |			"employment": [
-      |				{
-      |					"employmentId": "ABIS10000000001",
-      |					"netPay": 1000.25,
-      |					"benefitsAndExpenses": 1000.25,
-      |					"allowableExpenses": 1000.25
-      |				}
-      |			]
-      |		},
-      |		"selfEmployments" : {
-      |			"totalIncome": 1000.25,
-      |			"selfEmployment": [
-      |				{
-      |					"selfEmploymentId": "XKIS00000000988",
-      |					"taxableIncome": 1000.25,
-      |					"finalised": true,
-      |					"losses": 1000.25
-      |				}
-      |			]
-      |		},
-      |		"ukProperty": {
-      |			"totalIncome": 1000.25,
-      |			"nonFurnishedHolidayLettingsTaxableProfit": 1000.25,
-      |			"nonFurnishedHolidayLettingsLoss": 1000.25,
-      |			"furnishedHolidayLettingsTaxableProfit": 1000.25,
-      |			"furnishedHolidayLettingsLoss": 1000.25,
-      |			"finalised": true
-      |		},
-      |		"ukDividends": {
-      |			"totalIncome": 1000.25
-      |		},
-      |		"totalIncomeReceived": 1000.25,
-      |		"allowancesAndDeductions": {
-      |			"totalAllowancesAndDeductions": 1000.25,
-      |			"giftOfInvestmentsAndPropertyToCharity": 1000.25,
-      |			"apportionedPersonalAllowance": 1000.25
-      |		},
-      |		"totalTaxableIncome": 1000.25
-      |	},
-      |	"incomeTax": {
-      |		"payPensionsProfit": {
-      |			"totalAmount": 1000.25,
-      |			"band": [
-      |				{
-      |					"name": "ZRT",
-      |					"rate": 99.99,
-      |					"threshold": 99999999,
-      |					"apportionedThreshold": 99999999,
-      |					"income": 1000.25,
-      |					"taxAmount": 1000.25
-      |				}
-      |			],
-      |			"personalAllowanceUsed": 1000.25,
-      |			"taxableIncome": 1000.25
-      |		},
-      |		"savingsAndGains": {
-      |			"totalAmount": 1000.25,
-      |			"band": [
-      |				{
-      |					"name": "BRT",
-      |					"rate": 99.99,
-      |					"threshold": 99999999,
-      |					"apportionedThreshold": 99999999,
-      |					"income": 1000.25,
-      |					"taxAmount": 1000.25
-      |				}
-      |			],
-      |			"personalAllowanceUsed": 1000.25,
-      |			"taxableIncome": 1000.25
-      |		},
-      |		"dividends": {
-      |			"totalAmount": 1000.25,
-      |			"band": [
-      |				{
-      |					"name": "BRT",
-      |					"rate": 99.99,
-      |					"threshold": 99999999,
-      |					"apportionedThreshold": 99999999,
-      |					"income": 1000.25,
-      |					"taxAmount": 1000.25
-      |				}
-      |			],
-      |			"personalAllowanceUsed": 1000.25,
-      |			"taxableIncome": 1000.25
-      |		},
-      |		"totalBeforeReliefs": 1000.25,
-      |		"allowancesAndReliefs": {
-      |			"propertyFinanceRelief": 1000.25,
-      |			"totalAllowancesAndReliefs": 1000.25
-      |		},
-      |		"totalAfterReliefs": 1000.25,
-      |		"giftAid": {
-      |			"paymentsMade": 1000.25,
-      |			"rate": 99.99,
-      |			"taxableAmount": 1000.25
-      |		},
-      |		"totalAfterGiftAid": 1000.25,
-      |		"totalIncomeTax": 1000.25
-      |	},
-      |	"nic": {
-      |		"totalNic": 1000.25,
-      |		"class2": {
-      |			"amount": 1000.25,
-      |			"weekRate": 1000.25,
-      |			"weeks": 1.1,
-      |			"limit": 99999999,
-      |			"apportionedLimit": 2
-      |		},
-      |		"class4": {
-      |			"totalAmount": 1000.25,
-      |			"band": [
-      |				{
-      |					"name": "BRT",
-      |					"rate": 99.99,
-      |					"threshold": 99999999,
-      |					"apportionedThreshold": 99999999,
-      |					"income": 1000.25,
-      |					"amount": 1000.25
-      |				}
-      |			]
-      |		}
-      |	},
-      |	"totalBeforeTaxDeducted": 1000.25,
-      |	"taxDeducted": {
-      |		"ukLandAndProperty": 1000.25,
-      |		"totalTaxDeducted": 1000.25
-      |	},
-      |	"eoyEstimate": {
-      |		"employments": [
-      |			{
-      |				"employmentId": "ABIS10000000001",
-      |				"taxableIncome": 99999999.99,
-      |				"supplied": false,
-      |				"finalised": false
-      |			}
-      |		],
-      |		"selfEmployments": [
-      |			{
-      |				"selfEmploymentId": "XKIS00000000988",
-      |				"taxableIncome": 99999999.99,
-      |				"supplied": false,
-      |				"finalised": false
-      |			}
-      |		],
-      |		"ukProperty": {
-      |			"taxableIncome": 99999999.99,
-      |			"supplied": false,
-      |			"finalised": false
-      |		},
-      |		"ukDividends" : {
-      |			"taxableIncome": 99999999.99,
-      |			"supplied": false,
-      |			"finalised": false
-      |		},
-      |		"totalTaxableIncome": 99999999.99,
-      |		"incomeTaxAmount": 99999999.99,
-      |		"nic2": 99999999,
-      |		"nic4": 99999999,
-      |		"totalNicAmount": 99999999.99,
-      |		"incomeTaxAndNicAmount": 99999999.99
-      |	},
-      |	"calculationMessageCount": 1,
-      |	"calculationMessages": [
-      |		{
-      |			"type": "warning",
-      |			"text": "abcdefghijklm"
-      |		}
-      |	],
-      |	"annualAllowances": {
-      |		"personalAllowance": 99999999,
-      |		"personalAllowanceThreshold": 99999999,
-      |		"reducedPersonalisedAllowance": 99999999,
-      |		"giftAidExtender": 99999999
-      |	}
-      |}
-    """.stripMargin
-
-  val testTaxCalcJson = Json.toJson(testTaxCalcString)
 }
