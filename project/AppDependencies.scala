@@ -22,20 +22,20 @@ object AppDependencies {
 
   val compile = Seq(
     ws,
-    "uk.gov.hmrc" %% "bootstrap-play-25" % "1.6.0"
+    "uk.gov.hmrc" %% "bootstrap-play-25" % "1.6.0",
+    "org.typelevel" %% "cats-core" % "1.1.0"
   )
 
   def test(scope: String = "test, it"): Seq[sbt.ModuleID] = Seq(
     "uk.gov.hmrc" %% "hmrctest" % "3.0.0" % scope,
     "org.scalatest" %% "scalatest" % "3.0.4" % scope,
+    "org.scalamock" %% "scalamock" % "4.1.0" % scope,
     "org.pegdown" % "pegdown" % "1.6.0" % scope,
 
     "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
 
     "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % scope,
-    "org.scalamock" %% "scalamock-scalatest-support" % "3.6.0" % scope,
 
     "com.github.tomakehurst" % "wiremock" % "2.6.0" % scope
   )
-
 }
