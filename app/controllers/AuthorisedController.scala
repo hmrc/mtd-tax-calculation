@@ -18,7 +18,7 @@ package controllers
 
 import models.errors.AuthError
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, Request, Result}
+import play.api.mvc._
 import services.EnrolmentsAuthService
 import uk.gov.hmrc.auth.core.authorise.{EmptyPredicate, Predicate}
 import uk.gov.hmrc.play.bootstrap.controller.BaseController
@@ -29,6 +29,16 @@ import scala.concurrent.Future
 abstract class AuthorisedController extends BaseController {
 
   val authService: EnrolmentsAuthService
+
+  def authorisedAction(nino: String): ActionBuilder[MtdIdRequest] = {
+    new ActionBuilder[MtdIdRequest] {
+      override def invokeBlock[A](request: Request[A], block: MtdIdRequest[A] => Future[Result]): Future[Result] = {
+        block(MtdIdRequest("test-mtd-id", request))
+      }
+    }
+  }
+
+  case class MtdIdRequest[A](mtdId: String, request: Request[A]) extends WrappedRequest[A](request)
 
   def authorisedAction(predicate: Predicate = EmptyPredicate)
                       (block: Request[AnyContent] => Future[Result]): Action[AnyContent] = Action.async {
