@@ -14,26 +14,18 @@
  * limitations under the License.
  */
 
-import sbt.Setting
-import scoverage.ScoverageKeys
+package v2.mocks
 
-object CodeCoverageSettings {
+import v2.config.AppConfig
+import org.scalamock.handlers.CallHandler
+import org.scalamock.scalatest.MockFactory
 
-  private val excludedPackages: Seq[String] = Seq(
-    "<empty>",
-    "Reverse.*",
-    "uk.gov.hmrc.BuildInfo",
-    "app.*",
-    "prod.*",
-    "v1.config.*",
-    "testOnly.*",
-    "testOnlyDoNotUseInAppConf.*"
-  )
+trait MockAppConfig extends MockFactory {
 
-  val settings: Seq[Setting[_]] = Seq(
-    ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
-    ScoverageKeys.coverageMinimum := 95,
-    ScoverageKeys.coverageFailOnMinimum := true,
-    ScoverageKeys.coverageHighlighting := true
-  )
+  val mockAppConfig: AppConfig = mock[AppConfig]
+
+  object MockedAppConfig {
+    def desBaseUrl: CallHandler[String] = (mockAppConfig.desBaseUrl _: () => String).expects()
+    def mtdIdBaseUrl: CallHandler[String] = (mockAppConfig.mtdIdBaseUrl _: () => String).expects()
+  }
 }

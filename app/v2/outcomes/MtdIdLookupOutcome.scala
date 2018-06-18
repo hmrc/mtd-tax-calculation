@@ -14,26 +14,14 @@
  * limitations under the License.
  */
 
-import sbt.Setting
-import scoverage.ScoverageKeys
+package v2.outcomes
 
-object CodeCoverageSettings {
+object MtdIdLookupOutcome {
 
-  private val excludedPackages: Seq[String] = Seq(
-    "<empty>",
-    "Reverse.*",
-    "uk.gov.hmrc.BuildInfo",
-    "app.*",
-    "prod.*",
-    "v1.config.*",
-    "testOnly.*",
-    "testOnlyDoNotUseInAppConf.*"
-  )
+  type MtdIdLookupOutcome = Either[MtdIdLookupError, String]
 
-  val settings: Seq[Setting[_]] = Seq(
-    ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
-    ScoverageKeys.coverageMinimum := 95,
-    ScoverageKeys.coverageFailOnMinimum := true,
-    ScoverageKeys.coverageHighlighting := true
-  )
+  sealed trait MtdIdLookupError
+  object InvalidNino extends MtdIdLookupError
+  object NotAuthorised extends MtdIdLookupError
+  object DownstreamError extends MtdIdLookupError
 }

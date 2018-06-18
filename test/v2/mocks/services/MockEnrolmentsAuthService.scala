@@ -14,26 +14,12 @@
  * limitations under the License.
  */
 
-import sbt.Setting
-import scoverage.ScoverageKeys
+package v2.mocks.services
 
-object CodeCoverageSettings {
+import org.scalamock.scalatest.MockFactory
+import v2.services.EnrolmentsAuthService
 
-  private val excludedPackages: Seq[String] = Seq(
-    "<empty>",
-    "Reverse.*",
-    "uk.gov.hmrc.BuildInfo",
-    "app.*",
-    "prod.*",
-    "v1.config.*",
-    "testOnly.*",
-    "testOnlyDoNotUseInAppConf.*"
-  )
+trait MockEnrolmentsAuthService extends MockFactory {
 
-  val settings: Seq[Setting[_]] = Seq(
-    ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
-    ScoverageKeys.coverageMinimum := 95,
-    ScoverageKeys.coverageFailOnMinimum := true,
-    ScoverageKeys.coverageHighlighting := true
-  )
+  val mockEnrolmentsAuthService: EnrolmentsAuthService = mock[EnrolmentsAuthService]
 }

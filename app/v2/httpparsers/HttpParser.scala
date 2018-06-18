@@ -14,26 +14,21 @@
  * limitations under the License.
  */
 
-import sbt.Setting
-import scoverage.ScoverageKeys
+package v2.httpparsers
 
-object CodeCoverageSettings {
+import play.api.libs.json.{JsValue, Reads}
+import uk.gov.hmrc.http.HttpResponse
 
-  private val excludedPackages: Seq[String] = Seq(
-    "<empty>",
-    "Reverse.*",
-    "uk.gov.hmrc.BuildInfo",
-    "app.*",
-    "prod.*",
-    "v1.config.*",
-    "testOnly.*",
-    "testOnlyDoNotUseInAppConf.*"
-  )
+import scala.util.{Success, Try}
 
-  val settings: Seq[Setting[_]] = Seq(
-    ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
-    ScoverageKeys.coverageMinimum := 95,
-    ScoverageKeys.coverageFailOnMinimum := true,
-    ScoverageKeys.coverageHighlighting := true
-  )
+trait HttpParser {
+
+  implicit class HttpResponseOps(response: HttpResponse) {
+    def validateJson[T](implicit reads: Reads[T]): Option[T] = {
+      Try(response.json) match {
+        case Success(js: JsValue) => js.asOpt
+        case _ => None
+      }
+    }
+  }
 }

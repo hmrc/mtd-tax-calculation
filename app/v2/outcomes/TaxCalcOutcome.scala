@@ -14,26 +14,14 @@
  * limitations under the License.
  */
 
-import sbt.Setting
-import scoverage.ScoverageKeys
+package v2.outcomes
 
-object CodeCoverageSettings {
+import v2.models.TaxCalculation
 
-  private val excludedPackages: Seq[String] = Seq(
-    "<empty>",
-    "Reverse.*",
-    "uk.gov.hmrc.BuildInfo",
-    "app.*",
-    "prod.*",
-    "v1.config.*",
-    "testOnly.*",
-    "testOnlyDoNotUseInAppConf.*"
-  )
+object TaxCalcOutcome {
 
-  val settings: Seq[Setting[_]] = Seq(
-    ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
-    ScoverageKeys.coverageMinimum := 95,
-    ScoverageKeys.coverageFailOnMinimum := true,
-    ScoverageKeys.coverageHighlighting := true
-  )
+  type TaxCalcOutcome = Either[TaxCalcError, TaxCalculation]
+
+  sealed trait TaxCalcError
+  object NotFound extends TaxCalcError
 }

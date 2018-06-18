@@ -1,5 +1,5 @@
 # Add all the application routes to the app.routes file
-->         /mtd-tax-calculation           app.Routes
+->         /2.0                  v2.Routes
 ->         /                     health.Routes
 
 GET        /admin/metrics        com.kenshoo.play.metrics.MetricsController.metrics
