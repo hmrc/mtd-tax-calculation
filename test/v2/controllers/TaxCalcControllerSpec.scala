@@ -14,26 +14,44 @@
  * limitations under the License.
  */
 
-package v2.controllers
+package controllers
 
-import v2.mocks.services.MockEnrolmentsAuthService
+import mocks.services.MockEnrolmentsAuthService
 import play.api.mvc.Result
+import services.MtdIdLookupService
+import uk.gov.hmrc.auth.core.authorise.Predicate
+import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class TaxCalcControllerSpec extends ControllerBaseSpec {
 
   class Test extends MockEnrolmentsAuthService {
-    val controller = new TaxCalcController(
-      authService = mockEnrolmentsAuthService
-    )
+    val hc = HeaderCarrier()
+    val mockLookupService = mock[MtdIdLookupService]
+
+
+    def controller: TaxCalcController = {
+      (mockLookupService.lookup(_:String)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(nino, *, *)
+        .returns(Future.successful(Right("test-mtd-id")))
+
+      (mockEnrolmentsAuthService.authorised(_: Predicate)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(*, *, *)
+        .returns(Future.successful(Right(true)))
+
+      new TaxCalcController(
+        authService = mockEnrolmentsAuthService,
+        lookupService = mockLookupService
+      )
+    }
   }
 
   val nino = "test-nino"
 
   "getTaxCalculation" should {
     "return a 200" in new Test {
-      val result: Future[Result] = controller.getTaxCalculation(nino, "")(fakeRequest)
+      val result: Future[Result] = controller.getTaxCalculation(nino)(hc)(fakeRequest)
       status(result) shouldBe OK
       contentAsString(result) shouldBe "test-mtd-id"
     }

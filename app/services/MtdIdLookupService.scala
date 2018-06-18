@@ -14,21 +14,24 @@
  * limitations under the License.
  */
 
-package controllers
+package services
 
+import connectors.MtdIdLookupConnector
 import javax.inject.{Inject, Singleton}
-import play.api.mvc.{Action, AnyContent}
-import services.{EnrolmentsAuthService, MtdIdLookupService}
+import outcomes.MtdIdLookupOutcome.{InvalidNino, MtdIdLookupOutcome}
+import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class TaxCalcController @Inject()(val authService: EnrolmentsAuthService,
-                                  val lookupService: MtdIdLookupService) extends AuthorisedController {
+class MtdIdLookupService @Inject()(val connector: MtdIdLookupConnector) {
 
-
-  def getTaxCalculation(nino: String)(implicit hc: HeaderCarrier): Action[AnyContent] = authorisedAction(nino).async { implicit request =>
-      Future.successful(Ok(request.mtdId))
+  def lookup(nino: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[MtdIdLookupOutcome] = {
+    if (Nino.isValid(nino)) {
+      connector.getMtdId(nino)
+    } else {
+      Future.successful(Left(InvalidNino))
+    }
   }
 }
