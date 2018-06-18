@@ -101,7 +101,7 @@ object TestTaxCalc {
               threshold = 99999999,
               apportionedThreshold = 99999999,
               income = 1000.25,
-              taxAmount = 1000.25
+              amount = 1000.25
             )
           ),
           personalAllowanceUsed = Some(1000.25),
@@ -116,7 +116,7 @@ object TestTaxCalc {
               threshold = 99999999,
               apportionedThreshold = 99999999,
               income = 1000.25,
-              taxAmount = 1000.25
+              amount = 1000.25
             )
           ),
           personalAllowanceUsed = Some(1000.25),
@@ -131,7 +131,7 @@ object TestTaxCalc {
               threshold = 99999999,
               apportionedThreshold = 99999999,
               income = 1000.25,
-              taxAmount = 1000.25
+              amount = 1000.25
             )
           ),
           personalAllowanceUsed = Some(1000.25),
@@ -163,7 +163,7 @@ object TestTaxCalc {
         class4 = Class4Nic(
           totalAmount = Some(1000.25),
           band = Seq(
-            NicBand(
+            Band(
               name = "BRT",
               rate = 99.99,
               threshold = 99999999,

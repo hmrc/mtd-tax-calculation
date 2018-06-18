@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-package config
+package connectors
 
+import config.AppConfig
 import javax.inject.{Inject, Singleton}
-import play.api.{Configuration, Environment}
-import play.api.Mode.Mode
-import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import httpparsers.MtdIdLookupHttpParser.mtdIdLookupHttpReads
+import outcomes.MtdIdLookupOutcome.MtdIdLookupOutcome
+import uk.gov.hmrc.http.HeaderCarrier
+
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AppConfig @Inject()(environment: Environment,
-                          config: Configuration) extends ServicesConfig {
+class MtdIdLookupConnector @Inject()(http: HttpClient,
+                                     appConfig: AppConfig){
 
-  override protected def mode: Mode = environment.mode
-  override protected def runModeConfiguration: Configuration = config
-
-  def desBaseUrl: String = baseUrl("des")
-  def mtdIdBaseUrl: String = baseUrl("mtd-id-lookup")
-  def desEnv: String = getString("microservice.services.des.env")
-  def desToken: String = getString("microservice.services.des.token")
+  def getMtdId(nino: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[MtdIdLookupOutcome] = {
+    http.GET[MtdIdLookupOutcome](s"${appConfig.mtdIdBaseUrl}/mtd-identifier-lookup/nino/$nino")
+    
+  }
 }

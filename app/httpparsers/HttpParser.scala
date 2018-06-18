@@ -23,10 +23,12 @@ import scala.util.{Success, Try}
 
 trait HttpParser {
 
-  def validateJson[T](response: HttpResponse)(implicit reads: Reads[T]): Option[T] = {
-    Try(response.json) match {
-      case Success(js: JsValue) => js.validate[T].asOpt
-      case _ => None
+  implicit class HttpResponseOps(response: HttpResponse) {
+    def validateJson[T](implicit reads: Reads[T]): Option[T] = {
+      Try(response.json) match {
+        case Success(js: JsValue) => js.asOpt
+        case _ => None
+      }
     }
   }
 }

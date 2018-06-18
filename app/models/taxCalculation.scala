@@ -123,7 +123,7 @@ case class Band(
                  threshold: Int,
                  apportionedThreshold: Int,
                  income: BigDecimal,
-                 taxAmount: BigDecimal
+                 amount: BigDecimal
                  )
 
 //#2
@@ -156,17 +156,8 @@ case class Class2Nic(
 //#2
 case class Class4Nic(
                     totalAmount: Option[BigDecimal],
-                    band: Seq[NicBand]
+                    band: Seq[Band]
                     )
-//#3
-case class NicBand(
-                    name: String,
-                    rate: BigDecimal,
-                    threshold: BigDecimal,
-                    apportionedThreshold: BigDecimal,
-                    income: BigDecimal,
-                    amount: BigDecimal
-                  )
 //#1
 case class TaxDeducted(
                       ukLandAndProperty: Option[BigDecimal],
@@ -212,7 +203,6 @@ case class CalculationMessage(
                               )
 //#1
 case class AnnualAllowances(
-                           //todo: is personal allowance optional?
                            personalAllowance: Option[Int],
                            personalAllowanceThreshold: Option[Int],
                            reducedPersonalisedAllowance: Option[Int],
@@ -269,9 +259,6 @@ object Class2Nic {
 }
 object Class4Nic {
   implicit val format: OFormat[Class4Nic] = Json.format[Class4Nic]
-}
-object NicBand {
-  implicit val format: OFormat[NicBand] = Json.format[NicBand]
 }
 object TaxDeducted {
   implicit val format: OFormat[TaxDeducted] = Json.format[TaxDeducted]

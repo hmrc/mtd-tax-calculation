@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package mocks
+package outcomes
 
-import config.AppConfig
-import org.scalamock.handlers.CallHandler
-import org.scalamock.scalatest.MockFactory
+object MtdIdLookupOutcome {
 
-trait MockAppConfig extends MockFactory {
+  type MtdIdLookupOutcome = Either[MtdIdLookupError, String]
 
-  val mockAppConfig: AppConfig = mock[AppConfig]
-
-  object MockedAppConfig {
-    def desBaseUrl: CallHandler[String] = (mockAppConfig.desBaseUrl _: () => String).expects()
-    def mtdIdBaseUrl: CallHandler[String] = (mockAppConfig.mtdIdBaseUrl _: () => String).expects()
-  }
+  sealed trait MtdIdLookupError
+  object InvalidNino extends MtdIdLookupError
+  object NotAuthorised extends MtdIdLookupError
+  object DownstreamError extends MtdIdLookupError
 }
