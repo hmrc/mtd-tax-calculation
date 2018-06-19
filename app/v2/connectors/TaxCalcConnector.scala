@@ -17,7 +17,6 @@
 package v2.connectors
 
 import v2.config.AppConfig
-import v2.httpparsers.TaxCalcHttpParser.taxCalcHttpReads
 import javax.inject.{Inject, Singleton}
 import v2.outcomes.TaxCalcOutcome.TaxCalcOutcome
 import uk.gov.hmrc.http.HeaderCarrier
@@ -29,7 +28,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class TaxCalcConnector @Inject()(http: HttpClient,
                                  appConfig: AppConfig){
 
-  def getTaxCalculation(nino: String, calculationId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[TaxCalcOutcome] = {
-    http.GET[TaxCalcOutcome](s"${appConfig.desBaseUrl}/income-tax/calculation-data/$nino/calcId/$calculationId")
+  def getTaxCalculation(mtdid: String, calculationId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[TaxCalcOutcome] = {
+    import v2.httpparsers.TaxCalcHttpParser.taxCalcHttpReads
+    http.GET[TaxCalcOutcome](s"${appConfig.desBaseUrl}/income-tax/calculation-data/$mtdid/calcId/$calculationId")
   }
 }

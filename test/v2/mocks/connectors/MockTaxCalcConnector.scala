@@ -14,22 +14,25 @@
  * limitations under the License.
  */
 
-package v2.connectors
+package v2.mocks.connectors
 
-import v2.config.AppConfig
-import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import v2.outcomes.MtdIdLookupOutcome.MtdIdLookupOutcome
+import org.scalamock.handlers.CallHandler
+import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
+import v2.connectors.TaxCalcConnector
+import v2.outcomes.TaxCalcOutcome.TaxCalcOutcome
 
 import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton
-class MtdIdLookupConnector @Inject()(http: HttpClient,
-                                     appConfig: AppConfig){
+trait MockTaxCalcConnector extends MockFactory {
 
-  def getMtdId(nino: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[MtdIdLookupOutcome] = {
-    import v2.httpparsers.MtdIdLookupHttpParser.mtdIdLookupHttpReads
-    http.GET[MtdIdLookupOutcome](s"${appConfig.mtdIdBaseUrl}/mtd-identifier-lookup/nino/$nino")
+  val mockTaxCalcConnector = mock[TaxCalcConnector]
+
+  object MockedTaxCalcConnector {
+    def getTaxCalculation(mtdid: String, calcId: String): CallHandler[Future[TaxCalcOutcome]] =
+    {
+      (mockTaxCalcConnector.getTaxCalculation(_:String, _:String)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(mtdid, calcId, *, *)
+    }
   }
 }

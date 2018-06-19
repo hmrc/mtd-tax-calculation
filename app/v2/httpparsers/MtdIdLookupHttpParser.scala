@@ -16,10 +16,11 @@
 
 package v2.httpparsers
 
-import v2.outcomes.MtdIdLookupOutcome.{DownstreamError, InvalidNino, MtdIdLookupOutcome}
 import play.api.http.Status.{FORBIDDEN, OK}
 import play.api.libs.json._
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
+import v2.models.errors.InvalidNino
+import v2.outcomes.MtdIdLookupOutcome.{DownstreamError, MtdIdLookupOutcome}
 
 object MtdIdLookupHttpParser extends HttpParser {
 

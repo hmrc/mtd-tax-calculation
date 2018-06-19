@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package v2.outcomes
+package v2.models.errors
 
-import v2.models.errors.MtdError
+trait MtdError
 
-object MtdIdLookupOutcome {
+case class Error(code: String, message: String) extends MtdError
 
-  type MtdIdLookupOutcome = Either[MtdError, String]
+object InvalidNino extends Error("NINO_INVALID", "The provided NINO is invalid")
+object InvalidCalcID extends Error("CALCID_INVALID", "The provided calculationId is invalid")
 
-  sealed trait MtdIdLookupError extends MtdError
-  object NotAuthorised extends MtdIdLookupError
-  object DownstreamError extends MtdIdLookupError
-}
+

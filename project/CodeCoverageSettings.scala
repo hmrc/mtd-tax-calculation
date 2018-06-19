@@ -25,7 +25,8 @@ object CodeCoverageSettings {
     "uk.gov.hmrc.BuildInfo",
     "app.*",
     "prod.*",
-    "v1.config.*",
+    ".*Routes.*",
+    "v2.config.*",
     "testOnly.*",
     "testOnlyDoNotUseInAppConf.*"
   )

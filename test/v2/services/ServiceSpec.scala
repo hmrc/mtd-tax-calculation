@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package v2.outcomes
+package v2.services
 
-import v2.models.errors.MtdError
+import play.api.http.{HeaderNames, MimeTypes, Status}
+import support.UnitSpec
+import uk.gov.hmrc.http.HeaderCarrier
 
-object MtdIdLookupOutcome {
+import scala.concurrent.ExecutionContext
 
-  type MtdIdLookupOutcome = Either[MtdError, String]
+trait ServiceSpec extends UnitSpec
+  with Status
+  with MimeTypes
+  with HeaderNames {
 
-  sealed trait MtdIdLookupError extends MtdError
-  object NotAuthorised extends MtdIdLookupError
-  object DownstreamError extends MtdIdLookupError
+  implicit val hc: HeaderCarrier = HeaderCarrier()
+  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.global
+
 }

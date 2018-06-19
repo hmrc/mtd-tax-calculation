@@ -14,22 +14,29 @@
  * limitations under the License.
  */
 
-package v2.connectors
+package v2.services
 
-import v2.config.AppConfig
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import v2.outcomes.MtdIdLookupOutcome.MtdIdLookupOutcome
+import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
+import v2.connectors.TaxCalcConnector
+import v2.models.errors.InvalidCalcID
+import v2.outcomes.TaxCalcOutcome.TaxCalcOutcome
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class MtdIdLookupConnector @Inject()(http: HttpClient,
-                                     appConfig: AppConfig){
+class TaxCalcService @Inject()(connector: TaxCalcConnector) {
 
-  def getMtdId(nino: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[MtdIdLookupOutcome] = {
-    import v2.httpparsers.MtdIdLookupHttpParser.mtdIdLookupHttpReads
-    http.GET[MtdIdLookupOutcome](s"${appConfig.mtdIdBaseUrl}/mtd-identifier-lookup/nino/$nino")
+  private val calcIdRegex = "^[0-9]{8}$|^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+
+  def getTaxCalculation(mtdid: String, calcId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[TaxCalcOutcome] = {
+    if (!calcId.matches(calcIdRegex)) {
+      Logger.warn(s"[TaxCalcService] [getTaxCalculation] Invalid CalculationID supplied.")
+      Future.successful(Left(InvalidCalcID))
+    }
+    else {
+      connector.getTaxCalculation(mtdid, calcId)
+    }
   }
 }
