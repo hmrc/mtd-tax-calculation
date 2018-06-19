@@ -20,6 +20,9 @@ import uk.gov.hmrc.http.HeaderCarrier
 import v2.mocks.services.{MockEnrolmentsAuthService, MockMtdIdLookupService}
 
 import scala.concurrent.Future
+import play.api.mvc.Results.BadRequest
+import v2.models.errors.InvalidNino
+import v2.outcomes.MtdIdLookupOutcome.NotAuthorised
 
 class TaxCalcControllerSpec extends ControllerBaseSpec {
 
@@ -45,6 +48,28 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
       private val result = target.getTaxCalculation(nino, "calcId")(fakeGetRequest)
       status(result) shouldBe OK
       contentAsString(result) shouldBe "test-mtd-id"
+    }
+
+    "return a 400" when {
+      "a invalid NI number is passed" in new Test {
+
+        MockedMtdIdLookupService.lookup(nino)
+          .returns(Future.successful(Left(InvalidNino)))
+
+        private val result = target.getTaxCalculation(nino, "calcId")(fakeGetRequest)
+        status(result) shouldBe BAD_REQUEST
+      }
+    }
+
+    "return a 500" when {
+      "the details passed or not authorised" in new Test {
+
+        MockedMtdIdLookupService.lookup(nino)
+          .returns(Future.successful(Left(NotAuthorised)))
+
+        private val result = target.getTaxCalculation(nino, "calcId")(fakeGetRequest)
+        status(result) shouldBe FORBIDDEN
+      }
     }
   }
 }

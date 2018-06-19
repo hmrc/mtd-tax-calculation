@@ -19,6 +19,7 @@ package v2.services
 import v2.mocks.connectors.MockMtdIdLookupConnector
 import support.UnitSpec
 import uk.gov.hmrc.http.HeaderCarrier
+import v2.models.errors.InvalidNino
 import v2.outcomes.MtdIdLookupOutcome._
 
 import scala.concurrent.ExecutionContext.Implicits.global
