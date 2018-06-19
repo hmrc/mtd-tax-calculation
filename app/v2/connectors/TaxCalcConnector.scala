@@ -16,11 +16,11 @@
 
 package v2.connectors
 
-import v2.config.AppConfig
 import javax.inject.{Inject, Singleton}
-import v2.outcomes.TaxCalcOutcome.TaxCalcOutcome
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import v2.config.AppConfig
+import v2.outcomes.TaxCalcOutcome.TaxCalcOutcome
 
 import scala.concurrent.{ExecutionContext, Future}
 
