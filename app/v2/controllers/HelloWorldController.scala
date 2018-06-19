@@ -14,26 +14,21 @@
  * limitations under the License.
  */
 
-import sbt.Setting
-import scoverage.ScoverageKeys
+package v2.controllers
 
-object CodeCoverageSettings {
+import javax.inject.{Inject, Singleton}
+import play.api.mvc._
+import v2.services.EnrolmentsAuthService
 
-  private val excludedPackages: Seq[String] = Seq(
-    "<empty>",
-    "Reverse.*",
-    "uk.gov.hmrc.BuildInfo",
-    "app.*",
-    "prod.*",
-    "v1.config.*",
-    "testOnly.*",
-    "testOnlyDoNotUseInAppConf.*"
-  )
+import scala.concurrent.Future
 
-  val settings: Seq[Setting[_]] = Seq(
-    ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
-    ScoverageKeys.coverageMinimum := 95,
-    ScoverageKeys.coverageFailOnMinimum := true,
-    ScoverageKeys.coverageHighlighting := true
-  )
+
+@Singleton()
+class HelloWorldController @Inject()(val authService: EnrolmentsAuthService)
+  extends AuthorisedController {
+
+  def hello(): Action[AnyContent] = authorisedAction() { implicit request =>
+    Future.successful(Ok("Hello world"))
+  }
+
 }

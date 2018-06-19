@@ -14,26 +14,20 @@
  * limitations under the License.
  */
 
-import sbt.Setting
-import scoverage.ScoverageKeys
+package v2.models.taxcalculation
 
-object CodeCoverageSettings {
+import play.api.libs.json.Json
+import uk.gov.hmrc.play.test.UnitSpec
+import v2.models.TaxCalculation
 
-  private val excludedPackages: Seq[String] = Seq(
-    "<empty>",
-    "Reverse.*",
-    "uk.gov.hmrc.BuildInfo",
-    "app.*",
-    "prod.*",
-    "v1.config.*",
-    "testOnly.*",
-    "testOnlyDoNotUseInAppConf.*"
-  )
+class TaxCalculationSpec extends UnitSpec {
 
-  val settings: Seq[Setting[_]] = Seq(
-    ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
-    ScoverageKeys.coverageMinimum := 95,
-    ScoverageKeys.coverageFailOnMinimum := true,
-    ScoverageKeys.coverageHighlighting := true
-  )
+  "A tax calculation" should {
+    import v2.fixtures.{TaxCalculationFixture => TestData}
+
+    "be parsed from correct JSON" in {
+      val result = Json.parse(TestData.testTaxCalcString).as[TaxCalculation]
+      result shouldEqual TestData.testTaxCalc
+    }
+  }
 }

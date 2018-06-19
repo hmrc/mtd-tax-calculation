@@ -14,26 +14,24 @@
  * limitations under the License.
  */
 
-import sbt.Setting
-import scoverage.ScoverageKeys
+package v2.controllers
 
-object CodeCoverageSettings {
+import javax.inject.{Inject, Singleton}
+import play.api.mvc.{Action, AnyContent}
+import v2.services.EnrolmentsAuthService
 
-  private val excludedPackages: Seq[String] = Seq(
-    "<empty>",
-    "Reverse.*",
-    "uk.gov.hmrc.BuildInfo",
-    "app.*",
-    "prod.*",
-    "v1.config.*",
-    "testOnly.*",
-    "testOnlyDoNotUseInAppConf.*"
-  )
+import scala.concurrent.Future
 
-  val settings: Seq[Setting[_]] = Seq(
-    ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
-    ScoverageKeys.coverageMinimum := 95,
-    ScoverageKeys.coverageFailOnMinimum := true,
-    ScoverageKeys.coverageHighlighting := true
-  )
+@Singleton
+class TaxCalcController @Inject()(val authService: EnrolmentsAuthService)
+  extends AuthorisedController {
+
+  //  Enrolment("HMRC-MTD-IT")
+  //    .withIdentifier("MTDITID", mtdId.mtdId)
+  //    .withDelegatedAuthRule("mtd-it-auth"))
+
+  def getTaxCalculation(nino: String, calcId: String): Action[AnyContent] = authorisedAction(nino).async{
+    implicit request =>
+      Future.successful(Ok(request.mtdId))
+  }
 }
