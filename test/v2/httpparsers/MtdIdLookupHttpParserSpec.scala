@@ -20,7 +20,7 @@ import v2.httpparsers.MtdIdLookupHttpParser.mtdIdLookupHttpReads
 import v2.outcomes.MtdIdLookupOutcome.{DownstreamError, InvalidNino, MtdIdLookupOutcome}
 import play.api.libs.json.{JsObject, Json}
 import play.api.libs.json.Writes.StringWrites
-import play.api.test.Helpers.{INTERNAL_SERVER_ERROR, NOT_FOUND, OK}
+import play.api.test.Helpers.{INTERNAL_SERVER_ERROR, FORBIDDEN, OK}
 import support.UnitSpec
 import uk.gov.hmrc.http.HttpResponse
 
@@ -43,8 +43,8 @@ class MtdIdLookupHttpParserSpec extends UnitSpec {
     }
 
     "return an InvalidNino error" when {
-      "the HttpResponse contains a 404 status" in {
-        val response = HttpResponse(NOT_FOUND)
+      "the HttpResponse contains a 403 status" in {
+        val response = HttpResponse(FORBIDDEN)
         val result: MtdIdLookupOutcome = mtdIdLookupHttpReads.read(method, url, response)
 
         result shouldBe Left(InvalidNino)

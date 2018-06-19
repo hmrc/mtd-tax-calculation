@@ -17,7 +17,7 @@
 package v2.httpparsers
 
 import v2.outcomes.MtdIdLookupOutcome.{DownstreamError, InvalidNino, MtdIdLookupOutcome}
-import play.api.http.Status.{NOT_FOUND, OK}
+import play.api.http.Status.{FORBIDDEN, OK}
 import play.api.libs.json._
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
@@ -32,7 +32,7 @@ object MtdIdLookupHttpParser extends HttpParser {
           case Some(mtdId) => Right(mtdId)
           case None => Left(DownstreamError)
         }
-        case NOT_FOUND => Left(InvalidNino)
+        case FORBIDDEN => Left(InvalidNino)
         case _ => Left(DownstreamError)
       }
     }
