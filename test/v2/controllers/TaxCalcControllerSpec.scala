@@ -16,7 +16,7 @@
 
 package controllers
 
-import mocks.services.MockEnrolmentsAuthService
+import mocks.services.{MockEnrolmentsAuthService, MockMtdIdLookupService}
 import play.api.mvc.Result
 import services.MtdIdLookupService
 import uk.gov.hmrc.auth.core.authorise.Predicate
@@ -26,7 +26,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class TaxCalcControllerSpec extends ControllerBaseSpec {
 
-  class Test extends MockEnrolmentsAuthService {
+  class Test extends MockEnrolmentsAuthService with MockMtdIdLookupService {
     val hc = HeaderCarrier()
     val mockLookupService = mock[MtdIdLookupService]
 

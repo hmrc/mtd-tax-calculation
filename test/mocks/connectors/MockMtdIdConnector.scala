@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-package v2.connectors
+package mocks.connectors
 
-import v2.config.AppConfig
-import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import v2.httpparsers.MtdIdLookupHttpParser.mtdIdLookupHttpReads
-import v2.outcomes.MtdIdLookupOutcome.MtdIdLookupOutcome
+import connectors.MtdIdLookupConnector
+import org.scalamock.handlers.CallHandler
+import org.scalamock.scalatest.MockFactory
+import outcomes.MtdIdLookupOutcome.MtdIdLookupOutcome
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton
-class MtdIdLookupConnector @Inject()(http: HttpClient,
-                                     appConfig: AppConfig){
+trait MockMtdIdLookupConnector extends MockFactory {
 
-  def getMtdId(nino: String)
-              (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[MtdIdLookupOutcome] = {
-    http.GET[MtdIdLookupOutcome](s"${appConfig.mtdIdBaseUrl}/mtd-identifier-lookup/nino/$nino")
+  val mockMtdIdLookupConnector: MtdIdLookupConnector = mock[MtdIdLookupConnector]
+
+  object MockedMtdIdLookupConnector {
+    def lookup(nino: String): CallHandler[Future[MtdIdLookupOutcome]] = {
+      (mockMtdIdLookupConnector.getMtdId(_: String)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(nino, *, *)
+    }
   }
+
 }
