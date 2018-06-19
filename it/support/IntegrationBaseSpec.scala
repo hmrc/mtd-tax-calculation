@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package helpers
+package support
 
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
@@ -33,6 +33,11 @@ trait IntegrationBaseSpec extends UnitSpec with WireMockHelper with GuiceOneServ
   lazy val client: WSClient = app.injector.instanceOf[WSClient]
 
   def servicesConfig: Map[String, String] = Map(
+    "microservice.services.des.host" -> mockHost,
+    "microservice.services.des.port" -> mockPort,
+    "microservice.services.des.env" -> "Prod",
+    "microservice.services.mtd-id-lookup.host" -> mockHost,
+    "microservice.services.mtd-id-lookup.port" -> mockPort,
     "microservice.services.auth.host" -> mockHost,
     "microservice.services.auth.port" -> mockPort
   )

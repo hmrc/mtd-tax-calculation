@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package services
+package v2.services
 
-import mocks.connectors.MockMtdIdLookupConnector
-import outcomes.MtdIdLookupOutcome._
+import v2.mocks.connectors.MockMtdIdLookupConnector
 import support.UnitSpec
 import uk.gov.hmrc.http.HeaderCarrier
+import v2.outcomes.MtdIdLookupOutcome._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

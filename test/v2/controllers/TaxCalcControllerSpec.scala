@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package controllers
+package v2.controllers
 
-import mocks.services.{MockEnrolmentsAuthService, MockMtdIdLookupService}
 import uk.gov.hmrc.http.HeaderCarrier
+import v2.mocks.services.{MockEnrolmentsAuthService, MockMtdIdLookupService}
 
 import scala.concurrent.Future
 
@@ -42,7 +42,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
 
       MockedEnrolmentsAuthService.authoriseUser()
 
-      private val result = target.getTaxCalculation(nino)(hc)(fakeGetRequest)
+      private val result = target.getTaxCalculation(nino, "calcId")(fakeGetRequest)
       status(result) shouldBe OK
       contentAsString(result) shouldBe "test-mtd-id"
     }
