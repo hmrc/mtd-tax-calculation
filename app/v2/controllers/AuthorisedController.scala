@@ -19,10 +19,12 @@ package v2.controllers
 import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.Enrolment
+import v2.models.errors.InvalidNino
+
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.controller.BaseController
-import v2.models.errors.{AuthError, InvalidNino}
+import v2.models.errors.AuthError
 import v2.outcomes.MtdIdLookupOutcome._
 import v2.services.{EnrolmentsAuthService, MtdIdLookupService}
 
