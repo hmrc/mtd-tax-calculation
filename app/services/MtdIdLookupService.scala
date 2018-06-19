@@ -18,7 +18,7 @@ package services
 
 import connectors.MtdIdLookupConnector
 import javax.inject.{Inject, Singleton}
-import outcomes.MtdIdLookupOutcome.{InvalidNino, MtdIdLookupOutcome}
+import outcomes.MtdIdLookupOutcome._
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
 
