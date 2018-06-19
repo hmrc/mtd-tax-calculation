@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package controllers
+package v2.controllers
 
-import models.errors.AuthError
-import outcomes.MtdIdLookupOutcome._
 import play.api.libs.json.Json
 import play.api.mvc._
-import services.{EnrolmentsAuthService, MtdIdLookupService}
 import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.auth.core.authorise.{EmptyPredicate, Predicate}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import v2.models.errors.AuthError
+import v2.outcomes.MtdIdLookupOutcome._
+import v2.services.{EnrolmentsAuthService, MtdIdLookupService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -36,7 +36,7 @@ abstract class AuthorisedController extends BaseController {
 
   case class UserRequest[A](mtdId: String, request: Request[A]) extends WrappedRequest[A](request)
 
-  def authorisedAction(nino: String)(implicit hc: HeaderCarrier): ActionBuilder[UserRequest] = new ActionBuilder[UserRequest] {
+  def authorisedAction(nino: String): ActionBuilder[UserRequest] = new ActionBuilder[UserRequest] {
 
     def predicate(mtdId: String): Predicate = Enrolment("HMRC-MTD-IT")
       .withIdentifier("MTDITID", mtdId)
@@ -44,8 +44,8 @@ abstract class AuthorisedController extends BaseController {
 
     def invokeBlockWithAuthCheck[A](mtdId: String,
                                     request: Request[A],
-                                    block: UserRequest[A] => Future[Result]): Future[Result] = {
-
+                                    block: UserRequest[A] => Future[Result])
+                                   (implicit headerCarrier: HeaderCarrier): Future[Result] = {
       authService.authorised(predicate(mtdId)).flatMap[Result] {
         case Right(_) => block(UserRequest(mtdId, request))
         case Left(AuthError(false, _)) => Future.successful(Unauthorized(Json.obj()))
@@ -54,6 +54,9 @@ abstract class AuthorisedController extends BaseController {
     }
 
     override def invokeBlock[A](request: Request[A], block: UserRequest[A] => Future[Result]): Future[Result] = {
+
+      implicit val headerCarrier: HeaderCarrier = hc(request)
+
       lookupService.lookup(nino).flatMap[Result] {
         case Right(mtdId) => invokeBlockWithAuthCheck(mtdId, request, block)
         case Left(InvalidNino) => Future.successful(BadRequest(""))
@@ -61,16 +64,5 @@ abstract class AuthorisedController extends BaseController {
         case Left(DownstreamError) => Future.successful(InternalServerError(""))
       }
     }
-  }
-
-  def authAction(predicate: Predicate = EmptyPredicate)
-                (block: Request[AnyContent] => Future[Result]): Action[AnyContent] = Action.async {
-    implicit request =>
-
-      authService.authorised(predicate) flatMap {
-        case Right(_) => block(request)
-        case Left(AuthError(false, _)) => Future.successful(Unauthorized(Json.obj()))
-        case Left(_) => Future.successful(Forbidden(Json.obj()))
-      }
   }
 }

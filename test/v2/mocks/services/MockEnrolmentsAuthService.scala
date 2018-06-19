@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package mocks.services
+package v2.mocks.services
 
 import org.scalamock.scalatest.MockFactory
-import services.EnrolmentsAuthService
+import v2.services.EnrolmentsAuthService
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.http.HeaderCarrier
 

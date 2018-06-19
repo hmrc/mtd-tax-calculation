@@ -17,7 +17,7 @@
 package v2.stubs
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import helpers.WireMockMethods
+import support.WireMockMethods
 import play.api.http.Status._
 import play.api.libs.json.{JsObject, Json}
 
