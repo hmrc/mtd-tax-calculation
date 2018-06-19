@@ -19,6 +19,8 @@ package v2.endpoints
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
+import v2.fixtures.TaxCalculationFixture
+import v2.stubs.{AuthStub, TaxCalcStub}
 import support.IntegrationBaseSpec
 import v2.stubs.{AuthStub, MtdIdLookupStub, TaxCalcStub}
 
@@ -26,7 +28,8 @@ class GetTaxCalcISpec extends IntegrationBaseSpec {
 
   private trait Test {
 
-    val calcId = "12345678"
+    val calcId: String = "12345678"
+    val mtdId: String  = "XA123456789"
     val nino: String
     def setupStubs(): StubMapping
 
@@ -45,12 +48,13 @@ class GetTaxCalcISpec extends IntegrationBaseSpec {
         override val nino: String = "AA123456A"
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
-          TaxCalcStub.successfulTaxCalc("any-mtdid", calcId)
-          MtdIdLookupStub.ninoFound(nino)
+          MtdIdLookupStub.ninoFound(nino, mtdId)
+          TaxCalcStub.successfulTaxCalc(mtdId, calcId)
         }
 
         val response: WSResponse = await(request().get())
         response.status shouldBe Status.OK
+        response.json shouldBe TaxCalculationFixture.taxCalcJson
       }
     }
   }

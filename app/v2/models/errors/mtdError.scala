@@ -16,6 +16,8 @@
 
 package v2.models.errors
 
+import play.api.libs.json.{Json, OFormat}
+
 trait MtdError
 
 case class Error(code: String, message: String) extends MtdError
@@ -24,3 +26,6 @@ object InvalidNino extends Error("NINO_INVALID", "The provided NINO is invalid")
 object InvalidCalcID extends Error("CALCID_INVALID", "The provided calculationId is invalid")
 
 
+object Error {
+  implicit val format: OFormat[Error] = Json.format[Error]
+}

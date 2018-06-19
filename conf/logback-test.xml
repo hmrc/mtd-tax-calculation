@@ -49,7 +49,6 @@
     <logger name="play.core.netty" level="OFF"/>
 
 
-    <logger name="application" level="DEBUG"/>
 
     <logger name="connector" level="ERROR">
         <appender-ref ref="STDOUT"/>
@@ -59,4 +58,8 @@
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
     </root>
+    <logger name="application" level="DEBUG"/>
+    <logger name="uk.gov.hmrc.audit" level="OFF"/>
+    <logger name="scala.Predef" thread = "akka" level="ERROR"/>
+
 </configuration>

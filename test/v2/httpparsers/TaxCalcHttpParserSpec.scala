@@ -31,10 +31,10 @@ class TaxCalcHttpParserSpec extends UnitSpec {
   "read" should {
     "return a TaxCalculation model" when {
       "the HttpResponse contains a 200 status and correct response body" in {
-        val response = HttpResponse(OK, Some(TaxCalculationFixture.testTaxCalcJson))
+        val response = HttpResponse(OK, Some(TaxCalculationFixture.desTaxCalcJson))
         val result: TaxCalcOutcome = taxCalcHttpReads.read(method, url, response)
 
-        result shouldBe Right(TaxCalculationFixture.testTaxCalc)
+        result shouldBe Right(TaxCalculationFixture.taxCalc)
       }
     }
   }

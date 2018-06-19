@@ -26,8 +26,8 @@ class TaxCalculationSpec extends UnitSpec {
     import v2.fixtures.{TaxCalculationFixture => TestData}
 
     "be parsed from correct JSON" in {
-      val result = TestData.testTaxCalcJson.as[TaxCalculation]
-      result shouldEqual TestData.testTaxCalc
+      val result = TestData.desTaxCalcJson.as[TaxCalculation]
+      result shouldEqual TestData.taxCalc
     }
   }
 

@@ -17,17 +17,22 @@
 package v2.controllers
 
 import javax.inject.{Inject, Singleton}
+import play.api.Logger
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
-import v2.services.{EnrolmentsAuthService, MtdIdLookupService}
-
-import scala.concurrent.Future
+import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
+import v2.services.{EnrolmentsAuthService, MtdIdLookupService, TaxCalcService}
 
 @Singleton
 class TaxCalcController @Inject()(val authService: EnrolmentsAuthService,
-                                  val lookupService: MtdIdLookupService) extends AuthorisedController {
+                                  val lookupService: MtdIdLookupService,
+                                  val service: TaxCalcService ) extends AuthorisedController {
 
-  def getTaxCalculation(nino: String,
-                        calcId: String): Action[AnyContent] = authorisedAction(nino).async { implicit request =>
-    Future.successful(Ok(request.mtdId))
+  def getTaxCalculation(nino: String, calcId: String): Action[AnyContent] = authorisedAction(nino).async { implicit request =>
+      service.getTaxCalculation(request.mtdId, calcId).map {
+        case Right(s) => Ok(Json.toJson(s))
+        case s => Logger.warn(s"BAD THINGS: $s");InternalServerError
+      }
+
   }
 }

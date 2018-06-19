@@ -16,38 +16,59 @@
 
 package v2.controllers
 
+import play.api.mvc.Result
 import uk.gov.hmrc.http.HeaderCarrier
-import v2.mocks.services.{MockEnrolmentsAuthService, MockMtdIdLookupService}
+import v2.fixtures.TaxCalculationFixture
+import v2.mocks.services.{MockEnrolmentsAuthService, MockMtdIdLookupService, MockTaxCalcService}
+import v2.models.errors.{Error, InvalidNino}
+import v2.outcomes.MtdIdLookupOutcome.NotAuthorised
 
 import scala.concurrent.Future
-import play.api.mvc.Results.BadRequest
-import v2.models.errors.InvalidNino
-import v2.outcomes.MtdIdLookupOutcome.NotAuthorised
 
 class TaxCalcControllerSpec extends ControllerBaseSpec {
 
-  trait Test extends MockEnrolmentsAuthService with MockMtdIdLookupService {
+  trait Test extends MockEnrolmentsAuthService with MockMtdIdLookupService with MockTaxCalcService{
     val hc = HeaderCarrier()
 
-    lazy val target = new TaxCalcController(
+    val mtdId = "test-mtd-id"
+    val calcId = "12345678"
+
+    lazy val controller = new TaxCalcController(
       authService = mockEnrolmentsAuthService,
-      lookupService = mockMtdIdLookupService
-    )
+      service = mockTaxCalcService,
+      lookupService = mockMtdIdLookupService)
   }
 
   val nino = "test-nino"
 
   "getTaxCalculation" should {
-    "return a 200" in new Test {
+    "return a 200 with the correct body" in new Test {
+      MockedEnrolmentsAuthService.authoriseUser()
 
       MockedMtdIdLookupService.lookup(nino)
-        .returns(Future.successful(Right("test-mtd-id")))
+        .returns(Future.successful(Right(mtdId)))
+
+      MockedTaxCalcService.getTaxCalculation(mtdId, calcId)
+        .returns(Future.successful(Right(TaxCalculationFixture.taxCalc)))
+
+      val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
+
+      status(result) shouldBe OK
+      contentAsJson(result) shouldBe TaxCalculationFixture.taxCalcJson
+    }
+
+    "return a 500" in new Test {
 
       MockedEnrolmentsAuthService.authoriseUser()
 
-      private val result = target.getTaxCalculation(nino, "calcId")(fakeGetRequest)
-      status(result) shouldBe OK
-      contentAsString(result) shouldBe "test-mtd-id"
+      MockedMtdIdLookupService.lookup(nino)
+        .returns(Future.successful(Right(mtdId)))
+
+      MockedTaxCalcService.getTaxCalculation(mtdId, calcId)
+        .returns(Future.successful(Left(Error("",""))))
+
+      val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
+      status(result) shouldBe INTERNAL_SERVER_ERROR
     }
 
     "return a 400" when {
@@ -56,7 +77,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Left(InvalidNino)))
 
-        private val result = target.getTaxCalculation(nino, "calcId")(fakeGetRequest)
+        private val result = controller.getTaxCalculation(nino, "calcId")(fakeGetRequest)
         status(result) shouldBe BAD_REQUEST
       }
     }
@@ -67,7 +88,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Left(NotAuthorised)))
 
-        private val result = target.getTaxCalculation(nino, "calcId")(fakeGetRequest)
+        private val result = controller.getTaxCalculation(nino, "calcId")(fakeGetRequest)
         status(result) shouldBe FORBIDDEN
       }
     }
