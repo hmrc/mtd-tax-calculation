@@ -17,28 +17,45 @@
 package v2.endpoints
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import helpers.IntegrationBaseSpec
 import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
-import v2.stubs.AuthStub
+import support.IntegrationBaseSpec
+import v2.stubs.{AuthStub, MtdIdLookupStub}
 
-class HelloWorldISpec extends IntegrationBaseSpec {
+class AuthISpec extends IntegrationBaseSpec {
 
   private trait Test {
+    val nino: String
     def setupStubs(): StubMapping
 
     def request(): WSRequest = {
       setupStubs()
-      buildRequest("/2.0/hello-world")
+      val x = buildRequest(s"/2.0/self-assessment/ni/$nino/calculations/12345678")
+      x
     }
   }
 
-  "Calling the hello-world endpoint" when {
+  "Calling the get calc endpoint" when {
 
-    "the user is authorised" should {
+    "the NINO cannot be converted to a MTD ID" should {
+
+      "return 500" in new Test {
+        override val nino: String = "AA123456A"
+        override def setupStubs(): StubMapping = {
+          MtdIdLookupStub.internalServerError(nino)
+        }
+
+        val response: WSResponse = await(request().get())
+        response.status shouldBe Status.INTERNAL_SERVER_ERROR
+      }
+    }
+
+    "an MTD ID is successfully retrieve from the NINO and the user is authorised" should {
 
       "return 200" in new Test {
+        override val nino: String = "AA123456A"
         override def setupStubs(): StubMapping = {
+          MtdIdLookupStub.ninoFound(nino)
           AuthStub.authorised()
         }
 
@@ -47,10 +64,12 @@ class HelloWorldISpec extends IntegrationBaseSpec {
       }
     }
 
-    "the user is NOT logged in" should {
+    "an MTD ID is successfully retrieve from the NINO and the user is NOT logged in" should {
 
       "return 401" in new Test {
+        override val nino: String = "AA123456A"
         override def setupStubs(): StubMapping = {
+          MtdIdLookupStub.ninoFound(nino)
           AuthStub.unauthorisedNotLoggedIn()
         }
 
@@ -59,11 +78,12 @@ class HelloWorldISpec extends IntegrationBaseSpec {
       }
     }
 
-
-    "the user is NOT authorised" should {
+    "an MTD ID is successfully retrieve from the NINO and the user is NOT authorised" should {
 
       "return 403" in new Test {
+        override val nino: String = "AA123456A"
         override def setupStubs(): StubMapping = {
+          MtdIdLookupStub.ninoFound(nino)
           AuthStub.unauthorisedOther()
         }
 
@@ -73,4 +93,5 @@ class HelloWorldISpec extends IntegrationBaseSpec {
     }
 
   }
+
 }

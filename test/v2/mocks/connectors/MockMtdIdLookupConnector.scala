@@ -14,24 +14,25 @@
  * limitations under the License.
  */
 
-package v2.mocks.services
+package v2.mocks.connectors
 
+import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-import v2.services.EnrolmentsAuthService
-import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.http.HeaderCarrier
+import v2.connectors.MtdIdLookupConnector
+import v2.outcomes.MtdIdLookupOutcome.MtdIdLookupOutcome
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockEnrolmentsAuthService extends MockFactory {
+trait MockMtdIdLookupConnector extends MockFactory {
 
-  val mockEnrolmentsAuthService: EnrolmentsAuthService = mock[EnrolmentsAuthService]
+  val mockMtdIdLookupConnector: MtdIdLookupConnector = mock[MtdIdLookupConnector]
 
-  object MockedEnrolmentsAuthService {
-    def authoriseUser(): Unit = {
-      (mockEnrolmentsAuthService.authorised(_: Predicate)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(*, *, *)
-        .returns(Future.successful(Right(true)))
+  object MockedMtdIdLookupConnector {
+    def lookup(nino: String): CallHandler[Future[MtdIdLookupOutcome]] = {
+      (mockMtdIdLookupConnector.getMtdId(_: String)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(nino, *, *)
     }
   }
+
 }

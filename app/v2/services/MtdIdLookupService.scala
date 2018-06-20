@@ -14,21 +14,26 @@
  * limitations under the License.
  */
 
-package v2.controllers
+package v2.services
 
 import javax.inject.{Inject, Singleton}
-import play.api.mvc._
-import v2.services.EnrolmentsAuthService
 
-import scala.concurrent.Future
+import v2.models.errors.InvalidNino
+import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.http.HeaderCarrier
+import v2.connectors.MtdIdLookupConnector
+import v2.outcomes.MtdIdLookupOutcome.MtdIdLookupOutcome
 
+import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton()
-class HelloWorldController @Inject()(val authService: EnrolmentsAuthService)
-  extends AuthorisedController {
+@Singleton
+class MtdIdLookupService @Inject()(val connector: MtdIdLookupConnector) {
 
-  def hello(): Action[AnyContent] = authorisedAction() { implicit request =>
-    Future.successful(Ok("Hello world"))
+  def lookup(nino: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[MtdIdLookupOutcome] = {
+    if (Nino.isValid(nino)) {
+      connector.getMtdId(nino)
+    } else {
+      Future.successful(Left(InvalidNino))
+    }
   }
-
 }

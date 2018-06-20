@@ -1,3 +1,1 @@
-GET  /self-assessment/ni/:nino/calculations/:calcId         controllers.TaxCalcController.getTaxCalculation(nino:String, calcId:String)
-
-GET  /hello-world                                           controllers.HelloWorldController.hello
+GET  /self-assessment/ni/:nino/calculations/:calcId         v2.controllers.TaxCalcController.getTaxCalculation(nino:String, calcId:String)

@@ -17,22 +17,22 @@
 package v2.endpoints
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import helpers.IntegrationBaseSpec
 import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
-import v2.stubs.{AuthStub, TaxCalcStub}
+import support.IntegrationBaseSpec
+import v2.stubs.{AuthStub, MtdIdLookupStub, TaxCalcStub}
 
 class GetTaxCalcISpec extends IntegrationBaseSpec {
 
   private trait Test {
 
     val calcId = "12345678"
-
+    val nino: String
     def setupStubs(): StubMapping
 
     def request(): WSRequest = {
       setupStubs()
-      buildRequest(s"/2.0/self-assessment/ni/AA111111A/calculations/$calcId")
+      buildRequest(s"/2.0/self-assessment/ni/$nino/calculations/$calcId")
     }
   }
 
@@ -42,9 +42,11 @@ class GetTaxCalcISpec extends IntegrationBaseSpec {
 
       //todo: change the description for this when the parser changes
       "any valid request is made" in new Test {
+        override val nino: String = "AA123456A"
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
           TaxCalcStub.successfulTaxCalc("any-mtdid", calcId)
+          MtdIdLookupStub.ninoFound(nino)
         }
 
         val response: WSResponse = await(request().get())

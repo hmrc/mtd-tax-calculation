@@ -43,6 +43,15 @@ class MtdIdLookupHttpParserSpec extends UnitSpec {
       }
     }
 
+    "returns a success response without MtdId" when {
+      "backend doesn't have a valid data" in {
+        val response = HttpResponse(OK, None)
+        val result: MtdIdLookupOutcome = mtdIdLookupHttpReads.read(method, url, response)
+
+        result shouldBe Left(DownstreamError)
+      }
+    }
+
     "return an InvalidNino error" when {
       "the HttpResponse contains a 403 status" in {
         val response = HttpResponse(FORBIDDEN)

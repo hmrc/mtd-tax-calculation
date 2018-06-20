@@ -16,22 +16,23 @@
 
 package v2.mocks.services
 
+import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-import v2.services.EnrolmentsAuthService
-import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.http.HeaderCarrier
+import v2.outcomes.MtdIdLookupOutcome.MtdIdLookupOutcome
+import v2.services.MtdIdLookupService
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockEnrolmentsAuthService extends MockFactory {
+trait MockMtdIdLookupService extends MockFactory {
 
-  val mockEnrolmentsAuthService: EnrolmentsAuthService = mock[EnrolmentsAuthService]
+  val mockMtdIdLookupService: MtdIdLookupService = mock[MtdIdLookupService]
 
-  object MockedEnrolmentsAuthService {
-    def authoriseUser(): Unit = {
-      (mockEnrolmentsAuthService.authorised(_: Predicate)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(*, *, *)
-        .returns(Future.successful(Right(true)))
+  object MockedMtdIdLookupService {
+    def lookup(nino: String): CallHandler[Future[MtdIdLookupOutcome]] = {
+      (mockMtdIdLookupService.lookup(_: String)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(nino, *, *)
     }
   }
+
 }

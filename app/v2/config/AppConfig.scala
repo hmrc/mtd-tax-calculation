@@ -21,15 +21,22 @@ import play.api.{Configuration, Environment}
 import play.api.Mode.Mode
 import uk.gov.hmrc.play.config.ServicesConfig
 
+trait AppConfig {
+  def desBaseUrl: String
+  def mtdIdBaseUrl: String
+  def desEnv: String
+  def desToken: String
+}
+
 @Singleton
-class AppConfig @Inject()(environment: Environment,
-                          config: Configuration) extends ServicesConfig {
+class AppConfigImpl @Inject()(environment: Environment,
+                          config: Configuration) extends AppConfig with ServicesConfig {
 
   override protected def mode: Mode = environment.mode
   override protected def runModeConfiguration: Configuration = config
 
-  def desBaseUrl: String = baseUrl("des")
-  def mtdIdBaseUrl: String = baseUrl("mtd-id-lookup")
-  def desEnv: String = getString("microservice.services.des.env")
-  def desToken: String = getString("microservice.services.des.token")
+  val desBaseUrl: String = baseUrl("des")
+  val mtdIdBaseUrl: String = baseUrl("mtd-id-lookup")
+  val desEnv: String = getString("microservice.services.des.env")
+  val desToken: String = getString("microservice.services.des.token")
 }

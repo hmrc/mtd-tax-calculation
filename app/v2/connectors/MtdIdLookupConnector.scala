@@ -30,6 +30,7 @@ class MtdIdLookupConnector @Inject()(http: HttpClient,
 
   def getMtdId(nino: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[MtdIdLookupOutcome] = {
     import v2.httpparsers.MtdIdLookupHttpParser.mtdIdLookupHttpReads
+
     http.GET[MtdIdLookupOutcome](s"${appConfig.mtdIdBaseUrl}/mtd-identifier-lookup/nino/$nino")
   }
 }
