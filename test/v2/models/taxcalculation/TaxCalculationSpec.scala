@@ -18,7 +18,7 @@ package v2.models.taxcalculation
 
 import play.api.libs.json.Json
 import uk.gov.hmrc.play.test.UnitSpec
-import v2.models.TaxCalculation
+import v2.models._
 
 class TaxCalculationSpec extends UnitSpec {
 
@@ -26,8 +26,80 @@ class TaxCalculationSpec extends UnitSpec {
     import v2.fixtures.{TaxCalculationFixture => TestData}
 
     "be parsed from correct JSON" in {
-      val result = Json.parse(TestData.testTaxCalcString).as[TaxCalculation]
+      val result = TestData.testTaxCalcJson.as[TaxCalculation]
       result shouldEqual TestData.testTaxCalc
+    }
+  }
+
+  "EoyEstimate" should {
+    "be parsed correctly from valid JSON" in {
+
+      val eoyEstimateJson = Json.parse(
+        """
+          |{
+          |  "totalTaxableIncome":1234.56,
+          |  "incomeTaxAmount":9938.22,
+          |  "nic2":7738.33,
+          |  "nic4":228.22,
+          |  "totalNicAmount":3321.11,
+          |  "incomeTaxNicAmount":99.22,
+          |  "incomeSource" : [
+          |    {
+          |      "id":"id1",
+          |      "type":"05",
+          |      "taxableIncome":62345.67,
+          |      "supplied":true,
+          |      "finalised":true
+          |    },
+          |    {
+          |      "id":"id2",
+          |      "type":"05",
+          |      "taxableIncome":423.22,
+          |      "supplied":false,
+          |      "finalised":true
+          |    },
+          |    {
+          |      "id":"id3",
+          |      "type":"01",
+          |      "taxableIncome":12443.22,
+          |      "supplied":false,
+          |      "finalised":false
+          |    },
+          |    {
+          |      "type":"02",
+          |      "taxableIncome":9982.03,
+          |      "supplied":true,
+          |      "finalised":true
+          |    },
+          |    {
+          |      "type":"10",
+          |      "taxableIncome":1123.2,
+          |      "supplied":true,
+          |      "finalised":false
+          |    }
+          |  ]
+          |}
+        """.stripMargin)
+
+      val expectedEoyEstimate = EoyEstimate(
+        employments = List(
+          EoyEmployment(Some("id1"), Some(62345.67), Some(true), Some(true)),
+          EoyEmployment(Some("id2"), Some(423.22), Some(false), Some(true))
+        ),
+        selfEmployments = List(
+          EoySelfEmployment("id3", Some(12443.22), Some(false), Some(false))
+        ),
+        ukProperty = EoyItem(Some(9982.03), Some(true), Some(true)),
+        ukDividends = EoyItem(Some(1123.2), Some(true), Some(false)),
+        totalTaxableIncome = Some(1234.56),
+        incomeTaxAmount = Some(9938.22),
+        nic2 = Some(7738.33),
+        nic4 = Some(228.22),
+        totalNicAmount = Some(3321.11),
+        incomeTaxAndNicAmount = Some(99.22)
+      )
+
+      eoyEstimateJson.as[EoyEstimate](EoyEstimate.reads) shouldBe expectedEoyEstimate
     }
   }
 }
