@@ -20,17 +20,19 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
 import support.IntegrationBaseSpec
-import v2.stubs.{AuthStub, MtdIdLookupStub}
+import v2.stubs.{AuthStub, MtdIdLookupStub, TaxCalcStub}
 
 class AuthISpec extends IntegrationBaseSpec {
 
   private trait Test {
     val nino: String
+    val mtdId: String = "XA123456789"
+    val calcId: String = "12345678"
     def setupStubs(): StubMapping
 
     def request(): WSRequest = {
       setupStubs()
-      val x = buildRequest(s"/2.0/self-assessment/ni/$nino/calculations/12345678")
+      val x = buildRequest(s"/2.0/self-assessment/ni/$nino/calculations/$calcId")
       x
     }
   }
@@ -42,6 +44,7 @@ class AuthISpec extends IntegrationBaseSpec {
       "return 500" in new Test {
         override val nino: String = "AA123456A"
         override def setupStubs(): StubMapping = {
+          MtdIdLookupStub.ninoFound(nino)
           MtdIdLookupStub.internalServerError(nino)
         }
 
@@ -55,8 +58,9 @@ class AuthISpec extends IntegrationBaseSpec {
       "return 200" in new Test {
         override val nino: String = "AA123456A"
         override def setupStubs(): StubMapping = {
-          MtdIdLookupStub.ninoFound(nino)
+          MtdIdLookupStub.ninoFound(nino, mtdId)
           AuthStub.authorised()
+          TaxCalcStub.successfulTaxCalc(mtdId, calcId)
         }
 
         val response: WSResponse = await(request().get())

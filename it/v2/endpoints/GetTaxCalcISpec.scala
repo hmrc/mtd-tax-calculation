@@ -18,15 +18,20 @@ package v2.endpoints
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
+import play.api.libs.json.Json
 import play.api.libs.ws.{WSRequest, WSResponse}
+import v2.fixtures.{DESErrorsFixture, TaxCalculationFixture}
+import v2.stubs.{AuthStub, TaxCalcStub}
 import support.IntegrationBaseSpec
+import v2.models.errors.InternalServerError
 import v2.stubs.{AuthStub, MtdIdLookupStub, TaxCalcStub}
 
 class GetTaxCalcISpec extends IntegrationBaseSpec {
 
   private trait Test {
 
-    val calcId = "12345678"
+    val calcId: String = "12345678"
+    val mtdId: String  = "XA123456789"
     val nino: String
     def setupStubs(): StubMapping
 
@@ -40,17 +45,32 @@ class GetTaxCalcISpec extends IntegrationBaseSpec {
 
     "return a 200 with a valid Tax Calculation response" when {
 
-      //todo: change the description for this when the parser changes
-      "any valid request is made" in new Test {
+      "DES returns a valid Tax Calculation" in new Test {
         override val nino: String = "AA123456A"
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
-          TaxCalcStub.successfulTaxCalc("any-mtdid", calcId)
-          MtdIdLookupStub.ninoFound(nino)
+          MtdIdLookupStub.ninoFound(nino, mtdId)
+          TaxCalcStub.successfulTaxCalc(mtdId, calcId)
         }
 
         val response: WSResponse = await(request().get())
         response.status shouldBe Status.OK
+        response.json shouldBe TaxCalculationFixture.taxCalcJson
+      }
+    }
+
+    "return a 500" when {
+      "DES returns a ServerError" in new Test {
+        override val nino: String = "AA123456A"
+        override def setupStubs(): StubMapping = {
+          AuthStub.authorised()
+          MtdIdLookupStub.ninoFound(nino, mtdId)
+          TaxCalcStub.unsuccessfulTaxCalc(mtdId, calcId)
+        }
+
+        val response: WSResponse = await(request().get())
+        response.status shouldBe Status.INTERNAL_SERVER_ERROR
+        response.json shouldBe Json.toJson(InternalServerError)
       }
     }
   }

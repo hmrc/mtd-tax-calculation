@@ -24,5 +24,4 @@ object TaxCalcOutcome {
   type TaxCalcOutcome = Either[MtdError, TaxCalculation]
 
   sealed trait TaxCalcError extends MtdError
-  object NotFound extends TaxCalcError
 }

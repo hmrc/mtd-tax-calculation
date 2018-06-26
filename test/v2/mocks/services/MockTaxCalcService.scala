@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package v2.mocks.connectors
+package v2.mocks.services
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
-import v2.connectors.TaxCalcConnector
 import v2.outcomes.TaxCalcOutcome.TaxCalcOutcome
+import v2.services.TaxCalcService
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockTaxCalcConnector extends MockFactory {
+trait MockTaxCalcService extends MockFactory {
 
-  val mockTaxCalcConnector: TaxCalcConnector = mock[TaxCalcConnector]
+  val mockTaxCalcService: TaxCalcService = mock[TaxCalcService]
 
-  object MockedTaxCalcConnector {
-    def getTaxCalculation(mtdid: String, calcId: String): CallHandler[Future[TaxCalcOutcome]] =
+  object MockedTaxCalcService {
+    def getTaxCalculation(nino: String, calcId: String): CallHandler[Future[TaxCalcOutcome]] =
     {
-      (mockTaxCalcConnector.getTaxCalculation(_:String, _:String)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(mtdid, calcId, *, *)
+      (mockTaxCalcService.getTaxCalculation(_:String, _: String)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(nino, calcId, *, *)
     }
   }
 }
