@@ -17,22 +17,26 @@
 package v2.controllers
 
 import javax.inject.{Inject, Singleton}
-import play.api.Logger
-import play.api.libs.json.Json
+import play.api.libs.json.Json.toJson
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
+import v2.models.errors.{InvalidCalcID, InvalidNino, InternalServerError => ISE, NotFound => Not_Found}
 import v2.services.{EnrolmentsAuthService, MtdIdLookupService, TaxCalcService}
 
 @Singleton
 class TaxCalcController @Inject()(val authService: EnrolmentsAuthService,
                                   val lookupService: MtdIdLookupService,
-                                  val service: TaxCalcService ) extends AuthorisedController {
+                                  val service: TaxCalcService) extends AuthorisedController {
 
   def getTaxCalculation(nino: String, calcId: String): Action[AnyContent] = authorisedAction(nino).async { implicit request =>
-      service.getTaxCalculation(request.mtdId, calcId).map {
-        case Right(s) => Ok(Json.toJson(s))
-        case s => Logger.warn(s"BAD THINGS: $s");InternalServerError
-      }
-
+    service.getTaxCalculation(request.mtdId, calcId).map {
+      case Right(taxCalculation) => Ok(toJson(taxCalculation))
+      case Left(mtdError) =>
+        mtdError match {
+          case InvalidCalcID | InvalidNino => BadRequest(toJson(mtdError))
+          case Not_Found => NotFound
+          case ISE => InternalServerError(toJson(mtdError))
+        }
+    }
   }
 }

@@ -18,10 +18,12 @@ package v2.endpoints
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
+import play.api.libs.json.Json
 import play.api.libs.ws.{WSRequest, WSResponse}
-import v2.fixtures.TaxCalculationFixture
+import v2.fixtures.{DESErrorsFixture, TaxCalculationFixture}
 import v2.stubs.{AuthStub, TaxCalcStub}
 import support.IntegrationBaseSpec
+import v2.models.errors.InternalServerError
 import v2.stubs.{AuthStub, MtdIdLookupStub, TaxCalcStub}
 
 class GetTaxCalcISpec extends IntegrationBaseSpec {
@@ -35,7 +37,7 @@ class GetTaxCalcISpec extends IntegrationBaseSpec {
 
     def request(): WSRequest = {
       setupStubs()
-      buildRequest(s"/2.0/self-assessment/ni/$nino/calculations/$calcId")
+      buildRequest(s"/2.0/ni/$nino/calculations/$calcId")
     }
   }
 
@@ -43,8 +45,7 @@ class GetTaxCalcISpec extends IntegrationBaseSpec {
 
     "return a 200 with a valid Tax Calculation response" when {
 
-      //todo: change the description for this when the parser changes
-      "any valid request is made" in new Test {
+      "DES returns a valid Tax Calculation" in new Test {
         override val nino: String = "AA123456A"
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
@@ -55,6 +56,21 @@ class GetTaxCalcISpec extends IntegrationBaseSpec {
         val response: WSResponse = await(request().get())
         response.status shouldBe Status.OK
         response.json shouldBe TaxCalculationFixture.taxCalcJson
+      }
+    }
+
+    "return a 500" when {
+      "DES returns a ServerError" in new Test {
+        override val nino: String = "AA123456A"
+        override def setupStubs(): StubMapping = {
+          AuthStub.authorised()
+          MtdIdLookupStub.ninoFound(nino, mtdId)
+          TaxCalcStub.unsuccessfulTaxCalc(mtdId, calcId)
+        }
+
+        val response: WSResponse = await(request().get())
+        response.status shouldBe Status.INTERNAL_SERVER_ERROR
+        response.json shouldBe Json.toJson(InternalServerError)
       }
     }
   }

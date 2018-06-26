@@ -20,7 +20,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status._
 import play.api.libs.json.JsValue
 import support.WireMockMethods
-import v2.fixtures.{TaxCalculationFixture => TestData}
+import v2.fixtures.{DESErrorsFixture, TaxCalculationFixture => TestData}
 
 object TaxCalcStub extends WireMockMethods {
 
@@ -30,8 +30,16 @@ object TaxCalcStub extends WireMockMethods {
     when(method = GET, uri = taxCalcUri(mtdId, calcId))
       .thenReturn(status = OK, body = successfulTaxCalcResponse)
   }
+
+  def unsuccessfulTaxCalc(mtdId: String, calcId: String): StubMapping = {
+    when(method = GET, uri = taxCalcUri(mtdId, calcId))
+      .thenReturn(status = INTERNAL_SERVER_ERROR, body = unsuccessfulTaxCalcResponse)
+  }
   
   lazy val successfulTaxCalcResponse: JsValue = {
     TestData.desTaxCalcJson
+  }
+  lazy val unsuccessfulTaxCalcResponse: JsValue = {
+    DESErrorsFixture.serverErrorJson
   }
 }

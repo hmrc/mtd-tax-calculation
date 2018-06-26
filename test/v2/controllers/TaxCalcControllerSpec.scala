@@ -16,11 +16,12 @@
 
 package v2.controllers
 
+import play.api.libs.json.Json
 import play.api.mvc.Result
 import uk.gov.hmrc.http.HeaderCarrier
 import v2.fixtures.TaxCalculationFixture
 import v2.mocks.services.{MockEnrolmentsAuthService, MockMtdIdLookupService, MockTaxCalcService}
-import v2.models.errors.{Error, InvalidNino}
+import v2.models.errors.{InternalServerError, InvalidCalcID, InvalidNino, NotFound}
 import v2.outcomes.MtdIdLookupOutcome.NotAuthorised
 
 import scala.concurrent.Future
@@ -57,20 +58,6 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
       contentAsJson(result) shouldBe TaxCalculationFixture.taxCalcJson
     }
 
-    "return a 500" in new Test {
-
-      MockedEnrolmentsAuthService.authoriseUser()
-
-      MockedMtdIdLookupService.lookup(nino)
-        .returns(Future.successful(Right(mtdId)))
-
-      MockedTaxCalcService.getTaxCalculation(mtdId, calcId)
-        .returns(Future.successful(Left(Error("",""))))
-
-      val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
-      status(result) shouldBe INTERNAL_SERVER_ERROR
-    }
-
     "return a 400" when {
       "a invalid NI number is passed" in new Test {
 
@@ -79,6 +66,51 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
 
         private val result = controller.getTaxCalculation(nino, "calcId")(fakeGetRequest)
         status(result) shouldBe BAD_REQUEST
+      }
+      "the service returns an Invalid Identifier error" in new Test {
+        MockedEnrolmentsAuthService.authoriseUser()
+
+        MockedMtdIdLookupService.lookup(nino)
+          .returns(Future.successful(Right(mtdId)))
+
+        MockedTaxCalcService.getTaxCalculation(mtdId, calcId)
+          .returns(Future.successful(Left(InvalidNino)))
+
+        val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
+
+        status(result) shouldBe BAD_REQUEST
+        contentAsJson(result) shouldBe Json.toJson(InvalidNino)
+      }
+      "the service returns an Invalid CalcID error" in new Test {
+        MockedEnrolmentsAuthService.authoriseUser()
+
+        MockedMtdIdLookupService.lookup(nino)
+          .returns(Future.successful(Right(mtdId)))
+
+        MockedTaxCalcService.getTaxCalculation(mtdId, calcId)
+          .returns(Future.successful(Left(InvalidCalcID)))
+
+        val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
+
+        status(result) shouldBe BAD_REQUEST
+        contentAsJson(result) shouldBe Json.toJson(InvalidCalcID)
+      }
+    }
+
+    "return a 404" when {
+      "the service returns a NotFound error" in new Test {
+        MockedEnrolmentsAuthService.authoriseUser()
+
+        MockedMtdIdLookupService.lookup(nino)
+          .returns(Future.successful(Right(mtdId)))
+
+        MockedTaxCalcService.getTaxCalculation(mtdId, calcId)
+          .returns(Future.successful(Left(NotFound)))
+
+        val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
+
+        status(result) shouldBe NOT_FOUND
+        await(result).body.isKnownEmpty shouldBe true
       }
     }
 
@@ -90,6 +122,20 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
 
         private val result = controller.getTaxCalculation(nino, "calcId")(fakeGetRequest)
         status(result) shouldBe FORBIDDEN
+      }
+      "the service returns an InternalServerError response" in new Test {
+        MockedEnrolmentsAuthService.authoriseUser()
+
+        MockedMtdIdLookupService.lookup(nino)
+          .returns(Future.successful(Right(mtdId)))
+
+        MockedTaxCalcService.getTaxCalculation(mtdId, calcId)
+          .returns(Future.successful(Left(InternalServerError)))
+
+        val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
+
+        status(result) shouldBe INTERNAL_SERVER_ERROR
+        contentAsJson(result) shouldBe Json.toJson(InternalServerError)
       }
     }
   }

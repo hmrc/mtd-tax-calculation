@@ -16,16 +16,29 @@
 
 package v2.models.errors
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json._
 
 trait MtdError
 
 case class Error(code: String, message: String) extends MtdError
 
+//4xx
+object NotFound extends MtdError
 object InvalidNino extends Error("NINO_INVALID", "The provided NINO is invalid")
 object InvalidCalcID extends Error("CALCID_INVALID", "The provided calculationId is invalid")
 
+//5xx
+object InternalServerError extends Error("INTERNAL_SERVER_ERROR", "An internal server error occurred")
 
 object Error {
   implicit val format: OFormat[Error] = Json.format[Error]
+}
+object MtdError {
+  implicit val mtdErrorWrites: Writes[MtdError] =
+    new Writes[MtdError]{
+      def writes(o: MtdError): JsValue = o match {
+        case error: Error => Error.format.writes(error)
+        case _: MtdError => JsNull
+      }
+    }
 }

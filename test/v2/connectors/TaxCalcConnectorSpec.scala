@@ -21,12 +21,14 @@ import v2.mocks.{MockAppConfig, MockHttpClient}
 import v2.outcomes.TaxCalcOutcome
 import v2.outcomes.TaxCalcOutcome.TaxCalcOutcome
 import uk.gov.hmrc.http.HttpResponse
+import v2.models.errors.NotFound
 
 import scala.concurrent.Future
 
 class TaxCalcConnectorSpec extends ConnectorSpec {
 
   val desBaseUrl = "test-base-url"
+  val desEnv = "TestEnv"
   val nino = "test-nino"
   val calculationId = "test-calc-id"
   val url = s"$desBaseUrl/income-tax/calculation-data/$nino/calcId/$calculationId"
@@ -42,6 +44,7 @@ class TaxCalcConnectorSpec extends ConnectorSpec {
     )
 
     MockedAppConfig.desBaseUrl returns desBaseUrl
+    MockedAppConfig.desEnv returns desEnv
   }
 
   "getTaxCalculation" should {
@@ -58,10 +61,10 @@ class TaxCalcConnectorSpec extends ConnectorSpec {
     "return an NotFound error" when {
       "the http parser returns a NotFound error" in new Test {
         MockedHttpClient.get[TaxCalcOutcome](url)
-          .returns(Future.successful(Left(TaxCalcOutcome.NotFound)))
+          .returns(Future.successful(Left(NotFound)))
 
         val result: TaxCalcOutcome = await(connector.getTaxCalculation(nino, calculationId))
-        result shouldBe Left(TaxCalcOutcome.NotFound)
+        result shouldBe Left(NotFound)
       }
     }
   }

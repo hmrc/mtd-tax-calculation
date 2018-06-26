@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package v2.outcomes
+package v2.connectors
 
-import v2.models.TaxCalculation
-import v2.models.errors.MtdError
+import uk.gov.hmrc.http.HeaderCarrier
+import v2.config.AppConfig
 
-object TaxCalcOutcome {
+trait DesConnector {
 
-  type TaxCalcOutcome = Either[MtdError, TaxCalculation]
-
-  sealed trait TaxCalcError extends MtdError
+  implicit class DesHeaders(hc: HeaderCarrier)(implicit appConfig: AppConfig) {
+    def withDesHeaders(): HeaderCarrier = {
+      hc.withExtraHeaders(
+        "Environment" -> appConfig.desEnv,
+        "Accept" -> "application/json",
+        "Originator-Id" -> "DA_SDI"
+      )
+    }
+  }
 }

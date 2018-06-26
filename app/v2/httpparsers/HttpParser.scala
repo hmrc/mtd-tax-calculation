@@ -19,11 +19,20 @@ package v2.httpparsers
 import play.api.libs.json.{JsValue, Reads}
 import uk.gov.hmrc.http.HttpResponse
 
-import scala.util.{Success, Try}
+import scala.util.{Failure, Success, Try}
 
 trait HttpParser {
 
-  implicit class HttpResponseOps(response: HttpResponse) {
+  implicit class HttpResponseOps(resp: HttpResponse){
+    def jsonOpt: Option[JsValue] = {
+      Try(resp.json) match {
+        case Success(json: JsValue) => Some(json)
+        case _ => None
+      }
+    }
+  }
+
+  implicit class JsonResponseOps(response: HttpResponse) {
     def validateJson[T](implicit reads: Reads[T]): Option[T] = {
       Try(response.json) match {
         case Success(js: JsValue) => js.asOpt

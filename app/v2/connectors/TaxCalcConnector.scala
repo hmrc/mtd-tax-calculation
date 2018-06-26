@@ -26,10 +26,10 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class TaxCalcConnector @Inject()(http: HttpClient,
-                                 appConfig: AppConfig){
+                                 implicit val appConfig: AppConfig) extends DesConnector {
 
   def getTaxCalculation(mtdid: String, calculationId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[TaxCalcOutcome] = {
     import v2.httpparsers.TaxCalcHttpParser.taxCalcHttpReads
-    http.GET[TaxCalcOutcome](s"${appConfig.desBaseUrl}/income-tax/calculation-data/$mtdid/calcId/$calculationId")
+    http.GET[TaxCalcOutcome](s"${appConfig.desBaseUrl}/income-tax/calculation-data/$mtdid/calcId/$calculationId")(implicitly, hc.withDesHeaders(), ec)
   }
 }
