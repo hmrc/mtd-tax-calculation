@@ -30,7 +30,7 @@ object TaxCalcHttpParser extends HttpParser {
         case (OK, _) =>
           response.validateJson[TaxCalculation] match {
             case Some(taxCalc) => Right(taxCalc)
-            case None => Left(NotFound)
+            case None => Left(InternalServerError)
         }
         case (BAD_REQUEST, ErrorCode(DesErrorCode.INVALID_IDENTIFIER)) => Left(InvalidNino)
         case (BAD_REQUEST, ErrorCode(DesErrorCode.INVALID_CALCID)) => Left(InvalidCalcID)

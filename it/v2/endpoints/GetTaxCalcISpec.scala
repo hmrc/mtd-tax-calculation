@@ -39,7 +39,7 @@ class GetTaxCalcISpec extends IntegrationBaseSpec {
 
     def request(): WSRequest = {
       setupStubs()
-      buildRequest(s"/2.0/self-assessment/ni/$nino/calculations/$calcId")
+      buildRequest(s"/2.0/ni/$nino/calculations/$calcId")
     }
   }
 

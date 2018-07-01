@@ -32,7 +32,7 @@ class AuthISpec extends IntegrationBaseSpec {
 
     def request(): WSRequest = {
       setupStubs()
-      val x = buildRequest(s"/2.0/self-assessment/ni/$nino/calculations/$calcId")
+      val x = buildRequest(s"/2.0/ni/$nino/calculations/$calcId")
       x
     }
   }

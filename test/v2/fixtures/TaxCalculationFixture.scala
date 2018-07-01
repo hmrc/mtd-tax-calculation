@@ -23,14 +23,14 @@ object TaxCalculationFixture {
 
   val taxCalc =
     TaxCalculation(
-      year = "2016-17",
+      year = Some(2016),
       intentToCrystallise = Some(false),
       crystallised = Some(false),
       validationMessageCount = Some(3),
       incomeTaxAndNicYTD = Some(1000.25),
       nationalRegime = Some("UK"),
       taxableIncome = TaxableIncome(
-        employments = Employments(
+        employments = Some(Employments(
           totalIncome = Some(1000.25),
           totalPay = Some(1000.25),
           totalBenefitsAndExpenses = Some(1000.25),
@@ -43,8 +43,8 @@ object TaxCalculationFixture {
               allowableExpenses = Some(1000.25)
             )
           )
-        ),
-        selfEmployments = SelfEmployments(
+        )),
+        selfEmployments = Some(SelfEmployments(
           totalIncome = Some(1000.25),
           selfEmployment = Seq(
             SelfEmployment(
@@ -54,18 +54,18 @@ object TaxCalculationFixture {
               losses = Some(1000.25)
             )
           )
-        ),
-        ukProperty = UKProperty(
+        )),
+        ukProperty = Some(UKProperty(
           totalIncome = Some(1000.25),
           nonFurnishedHolidayLettingsTaxableProfit = Some(1000.25),
           nonFurnishedHolidayLettingsLoss = Some(1000.25),
           furnishedHolidayLettingsTaxableProfit = Some(1000.25),
           furnishedHolidayLettingsLoss = Some(1000.25),
           finalised = Some(true)
-        ),
-        ukDividends = UKDividends(
+        )),
+        ukDividends = Some(UKDividends(
           totalIncome = Some(1000.25)
-        ),
+        )),
         totalIncomeReceived = Some(1000.25),
         allowancesAndDeductions = AllowancesAndDeductions(
           totalAllowancesAndDeductions = Some(1000.25),
@@ -75,57 +75,57 @@ object TaxCalculationFixture {
         totalTaxableIncome = Some(1000.25)
       ),
       incomeTax = IncomeTax(
-        payPensionsProfit = IncomeTaxItem(
+        payPensionsProfit = Some(IncomeTaxItem(
           totalAmount = Some(1000.25),
           band = Seq(
-            Band(
+            IncomeTaxBand(
               name = "ZRT",
               rate = 99.99,
               threshold = 99999999,
               apportionedThreshold = 99999999,
               income = 1000.25,
-              amount = 1000.25
+              taxAmount = 1000.25
             )
           ),
           personalAllowanceUsed = Some(1000.25),
           taxableIncome = Some(1000.25)
-        ),
-        savingsAndGains = IncomeTaxItem(
+        )),
+        savingsAndGains = Some(IncomeTaxItem(
           totalAmount = Some(1000.25),
           band = Seq(
-            Band(
+            IncomeTaxBand(
               name = "BRT",
               rate = 99.99,
               threshold = 99999999,
               apportionedThreshold = 99999999,
               income = 1000.25,
-              amount = 1000.25
+              taxAmount = 1000.25
             )
           ),
           personalAllowanceUsed = Some(1000.25),
           taxableIncome = Some(1000.25)
-        ),
-        dividends = IncomeTaxItem(
+        )),
+        dividends = Some(IncomeTaxItem(
           totalAmount = Some(1000.25),
           band = Seq(
-            Band(
+            IncomeTaxBand(
               name = "BRT",
               rate = 99.99,
               threshold = 99999999,
               apportionedThreshold = 99999999,
               income = 1000.25,
-              amount = 1000.25
+              taxAmount = 1000.25
             )
           ),
           personalAllowanceUsed = Some(1000.25),
           taxableIncome = Some(1000.25)
-        ),
-        totalBeforeReliefs = Some(1000.25),
-        allowancesAndReliefs = AllowancesAndReliefs(
+        )),
+        totalBeforeReliefs = 1000.25,
+        allowancesAndReliefs = Some(AllowancesAndReliefs(
           propertyFinanceRelief = Some(1000.25),
-          totalAllowancesAndReliefs = Some(1000.25)
-        ),
-        totalAfterReliefs = Some(1000.25),
+          totalAllowancesAndReliefs = 1000.25
+        )),
+        totalAfterReliefs = 1000.25,
         giftAid = GiftAid(
           paymentsMade = Some(1000.25),
           rate = 99.99,
@@ -146,7 +146,7 @@ object TaxCalculationFixture {
         class4 = Class4Nic(
           totalAmount = Some(1000.25),
           band = Seq(
-            Band(
+            NicBand(
               name = "BRT",
               rate = 99.99,
               threshold = 99999999,
@@ -197,12 +197,12 @@ object TaxCalculationFixture {
         incomeTaxAndNicAmount = Some(99999999.99)
       ),
       calculationMessageCount = Some(1),
-      calculationMessages = Seq(
+      calculationMessages = Some(Seq(
         CalculationMessage(
           `type`= "warning",
           text = Some("abcdefghijklm")
         )
-      ),
+      )),
       annualAllowances = AnnualAllowances(
         personalAllowance = Some(99999999),
         personalAllowanceThreshold = Some(99999999),
@@ -214,7 +214,7 @@ object TaxCalculationFixture {
   val taxCalcJson: JsValue =
     Json.parse("""
       |{
-      | "year": "2016-17",
+      | "year": 2016,
       |	"intentToCrystallise": false,
       |	"crystallised": false,
       | "validationMessageCount":3,
@@ -275,7 +275,7 @@ object TaxCalculationFixture {
       |					"threshold": 99999999,
       |					"apportionedThreshold": 99999999,
       |					"income": 1000.25,
-      |					"amount": 1000.25
+      |					"taxAmount": 1000.25
       |				}
       |			],
       |			"personalAllowanceUsed": 1000.25,
@@ -290,7 +290,7 @@ object TaxCalculationFixture {
       |					"threshold": 99999999,
       |					"apportionedThreshold": 99999999,
       |					"income": 1000.25,
-      |					"amount": 1000.25
+      |					"taxAmount": 1000.25
       |				}
       |			],
       |			"personalAllowanceUsed": 1000.25,
@@ -305,7 +305,7 @@ object TaxCalculationFixture {
       |					"threshold": 99999999,
       |					"apportionedThreshold": 99999999,
       |					"income": 1000.25,
-      |					"amount": 1000.25
+      |					"taxAmount": 1000.25
       |				}
       |			],
       |			"personalAllowanceUsed": 1000.25,
@@ -404,10 +404,10 @@ object TaxCalculationFixture {
     """.stripMargin)
 
   val desTaxCalcJson: JsValue = Json.parse(
-    """
+    s"""
       |{
       |  "calcOutput": {
-      |    "year": "2016-17",
+      |    "year": 2016,
       |	   "intentToCrystallise": false,
       |	   "crystallised": false,
       |    "bvrErrors": 1,
@@ -427,7 +427,7 @@ object TaxCalculationFixture {
       |      	  	"totalAllowableExpenses": 1000.25,
       |      	  	"employment": [
       |      	  		{
-      |      	  			"incomeSourceId": "ABIS10000000001",
+      |      	  			"incomeSourceID": "ABIS10000000001",
       |      	  			"netPay": 1000.25,
       |      	  			"benefitsAndExpenses": 1000.25,
       |      	  			"allowableExpenses": 1000.25
@@ -437,7 +437,7 @@ object TaxCalculationFixture {
       |      	  "selfEmploymentIncome": 1000.25,
       |      	  "selfEmployment": [
       |      	  	{
-      |      	  		"incomeSourceId": "XKIS00000000988",
+      |      	  		"incomeSourceID": "XKIS00000000988",
       |      	  		"taxableIncome": 1000.25,
       |      	  		"finalised": true,
       |      	  		"losses": 1000.25
@@ -462,7 +462,7 @@ object TaxCalculationFixture {
       |      },
       |      "totalTaxableIncome": 1000.25,
       |      "incomeTax": {
-      |      	"payAndPensionsProfit": {
+      |      	"payPensionsProfit": {
       |      		"totalAmount": 1000.25,
       |      		"band": [
       |      			{
@@ -471,7 +471,7 @@ object TaxCalculationFixture {
       |      				"threshold": 99999999,
       |      				"apportionedThreshold": 99999999,
       |      				"income": 1000.25,
-      |      				"amount": 1000.25
+      |      				"taxAmount": 1000.25
       |      			}
       |      		],
       |      		"personalAllowanceUsed": 1000.25,
@@ -486,7 +486,7 @@ object TaxCalculationFixture {
       |      				"threshold": 99999999,
       |      				"apportionedThreshold": 99999999,
       |      				"income": 1000.25,
-      |      				"amount": 1000.25
+      |      				"taxAmount": 1000.25
       |      			}
       |      		],
       |      		"personalAllowanceUsed": 1000.25,
@@ -501,7 +501,7 @@ object TaxCalculationFixture {
       |      				"threshold": 99999999,
       |      				"apportionedThreshold": 99999999,
       |      				"income": 1000.25,
-      |      				"amount": 1000.25
+      |      				"taxAmount": 1000.25
       |      			}
       |      		],
       |      		"personalAllowanceUsed": 1000.25,
