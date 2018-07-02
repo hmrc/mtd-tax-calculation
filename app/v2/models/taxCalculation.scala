@@ -16,14 +16,13 @@
 
 package v2.models
 
-import play.api.libs.json.{Json, OFormat}
-import play.api.libs.json._
-import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
+import play.api.libs.json.Reads._
+import play.api.libs.json.{Json, OFormat, _}
 
 //  #0
 case class TaxCalculation(
-                         year: String,
+                         year: Option[Int],
                          intentToCrystallise: Option[Boolean],
                          crystallised: Option[Boolean],
                          validationMessageCount: Option[Int],
@@ -36,15 +35,15 @@ case class TaxCalculation(
                          taxDeducted: TaxDeducted,
                          eoyEstimate: EoyEstimate,
                          calculationMessageCount: Option[Int],
-                         calculationMessages: Seq[CalculationMessage],
+                         calculationMessages: Option[Seq[CalculationMessage]],
                          annualAllowances: AnnualAllowances
                          )
 // #1
 case class TaxableIncome(
-                        employments: Employments,
-                        selfEmployments: SelfEmployments,
-                        ukProperty: UKProperty,
-                        ukDividends: UKDividends,
+                        employments: Option[Employments],
+                        selfEmployments: Option[SelfEmployments],
+                        ukProperty: Option[UKProperty],
+                        ukDividends: Option[UKDividends],
                         totalIncomeReceived: Option[BigDecimal],
                         allowancesAndDeductions: AllowancesAndDeductions,
                         totalTaxableIncome: Option[BigDecimal]
@@ -69,7 +68,7 @@ case class Employment(
 //#2
 case class SelfEmployments(
                           totalIncome: Option[BigDecimal],
-                          selfEmployment: Seq[SelfEmployment]
+                          selfEmployment: Seq[SelfEmployment]//todo: not required!
                           )
 //#3
 case class SelfEmployment(
@@ -102,12 +101,12 @@ case class AllowancesAndDeductions(
                                   )
 //#1
 case class IncomeTax(
-                    payPensionsProfit: IncomeTaxItem,
-                    savingsAndGains: IncomeTaxItem,
-                    dividends: IncomeTaxItem,
-                    totalBeforeReliefs: Option[BigDecimal],
-                    allowancesAndReliefs: AllowancesAndReliefs,
-                    totalAfterReliefs: Option[BigDecimal],
+                    payPensionsProfit: Option[IncomeTaxItem],//todo: not required!!
+                    savingsAndGains: Option[IncomeTaxItem],
+                    dividends: Option[IncomeTaxItem],
+                    totalBeforeReliefs: BigDecimal,
+                    allowancesAndReliefs: Option[AllowancesAndReliefs],//todo: required??
+                    totalAfterReliefs: BigDecimal,
                     giftAid: GiftAid,
                     totalAfterGiftAid: Option[BigDecimal],
                     totalIncomeTax: Option[BigDecimal]
@@ -115,24 +114,24 @@ case class IncomeTax(
 //#2
 case class IncomeTaxItem(
                         totalAmount: Option[BigDecimal],
-                        band: Seq[Band],
+                        band: Seq[IncomeTaxBand],
                         personalAllowanceUsed: Option[BigDecimal],
                         taxableIncome: Option[BigDecimal]
                         )
 //#3
-case class Band(
+case class IncomeTaxBand(
                  name: String,
                  rate: BigDecimal,
                  threshold: Int,
                  apportionedThreshold: Int,
                  income: BigDecimal,
-                 amount: BigDecimal
+                 taxAmount: BigDecimal
                  )
 
 //#2
 case class AllowancesAndReliefs(
                                propertyFinanceRelief: Option[BigDecimal],
-                               totalAllowancesAndReliefs: Option[BigDecimal]
+                               totalAllowancesAndReliefs: BigDecimal
                                )
 //#2
 case class GiftAid(
@@ -159,8 +158,18 @@ case class Class2Nic(
 //#2
 case class Class4Nic(
                     totalAmount: Option[BigDecimal],
-                    band: Seq[Band]
+                    band: Seq[NicBand]
                     )
+//#3
+case class NicBand(
+                    name: String,
+                    rate: BigDecimal,
+                    threshold: Int,
+                    apportionedThreshold: Int,
+                    income: BigDecimal,
+                    amount: BigDecimal
+                  )
+
 //#1
 case class TaxDeducted(
                       ukLandAndProperty: Option[BigDecimal],
@@ -215,7 +224,7 @@ object TaxCalculation {
 
   implicit val reads: Reads[TaxCalculation] = {
     (
-      (__ \ "calcOutput" \ "year").read[String] and
+      (__ \ "calcOutput" \ "year").readNullable[Int] and
         (__ \ "calcOutput" \ "intentToCrystallise").readNullable[Boolean] and
         (__ \ "calcOutput" \ "crystallised").readNullable[Boolean] and
         ((__ \ "calcOutput" \ "bvrErrors").readNullable[Int] and
@@ -224,28 +233,28 @@ object TaxCalculation {
         (__ \ "calcOutput" \ "calcResult" \ "incomeTaxNicYtd").readNullable[BigDecimal] and
         (__ \ "calcOutput" \ "calcResult" \ "nationalRegime").readNullable[String] and
         (__ \ "calcOutput" \ "calcResult").read[TaxableIncome]((
-          (__ \ "taxableIncome" \ "incomeReceived").read[Employments]((
+          (__ \ "taxableIncome" \ "incomeReceived").readNullable[Employments]((
             (__ \ "employmentIncome").readNullable[BigDecimal] and
             (__ \ "employments" \ "totalPay").readNullable[BigDecimal] and
             (__ \ "employments" \ "totalBenefitsAndExpenses").readNullable[BigDecimal] and
             (__ \ "employments" \ "totalAllowableExpenses").readNullable[BigDecimal] and
             (__ \ "employments" \ "employment").read[Seq[Employment]](traversableReads[Seq, Employment](implicitly, (
-              (__ \ "incomeSourceId").readNullable[String] and
+              (__ \ "incomeSourceID").readNullable[String] and
               (__ \ "netPay").readNullable[BigDecimal] and
               (__ \ "benefitsAndExpenses").readNullable[BigDecimal] and
               (__ \ "allowableExpenses").readNullable[BigDecimal]
             )(Employment.apply _)))
           )(Employments.apply _)) and
-          (__ \ "taxableIncome" \ "incomeReceived").read[SelfEmployments]((
+          (__ \ "taxableIncome" \ "incomeReceived").readNullable[SelfEmployments]((
             (__ \ "selfEmploymentIncome").readNullable[BigDecimal] and
             (__ \ "selfEmployment").read[Seq[SelfEmployment]](traversableReads[Seq, SelfEmployment](implicitly, (
-              (__ \ "incomeSourceId").read[String] and
+              (__ \ "incomeSourceID").read[String] and
               (__ \ "taxableIncome").readNullable[BigDecimal] and
               (__ \ "finalised").readNullable[Boolean] and
               (__ \ "losses").readNullable[BigDecimal]
             )(SelfEmployment.apply _)))
           )(SelfEmployments.apply _)) and
-          (__ \ "taxableIncome" \ "incomeReceived").read[UKProperty]((
+          (__ \ "taxableIncome" \ "incomeReceived").readNullable[UKProperty]((
             (__ \ "ukPropertyIncome").readNullable[BigDecimal] and
             (__ \ "ukProperty" \ "taxableProfit").readNullable[BigDecimal] and
             (__ \ "ukProperty" \ "losses").readNullable[BigDecimal] and
@@ -253,7 +262,7 @@ object TaxCalculation {
             (__ \ "ukProperty" \ "lossesFhlUk").readNullable[BigDecimal] and
             (__ \ "ukProperty" \ "finalised").readNullable[Boolean]
           )(UKProperty.apply _)) and
-          (__ \ "taxableIncome" \ "incomeReceived").read[UKDividends](
+          (__ \ "taxableIncome" \ "incomeReceived").readNullable[UKDividends](
             (__ \ "ukDividendsIncome").readNullable[BigDecimal].map(UKDividends.apply)
           ) and
           (__ \ "taxableIncome" \ "totalIncomeReceived").readNullable[BigDecimal] and
@@ -265,15 +274,15 @@ object TaxCalculation {
           (__ \ "totalTaxableIncome").readNullable[BigDecimal]
         )(TaxableIncome.apply _)) and
         (__ \ "calcOutput" \ "calcResult").read[IncomeTax]((
-          (__ \ "incomeTax" \ "payAndPensionsProfit").read[IncomeTaxItem] and
-          (__ \ "incomeTax" \ "savingsAndGains").read[IncomeTaxItem] and
-          (__ \ "incomeTax" \ "dividends").read[IncomeTaxItem] and
-          (__ \ "incomeTax" \ "totalBeforeReliefs").readNullable[BigDecimal] and
-          (__ \ "incomeTax").read[AllowancesAndReliefs]((
+          (__ \ "incomeTax" \ "payPensionsProfit").readNullable[IncomeTaxItem] and
+          (__ \ "incomeTax" \ "savingsAndGains").readNullable[IncomeTaxItem] and
+          (__ \ "incomeTax" \ "dividends").readNullable[IncomeTaxItem] and
+          (__ \ "incomeTax" \ "totalBeforeReliefs").read[BigDecimal] and
+          (__ \ "incomeTax").readNullable[AllowancesAndReliefs]((
             (__ \ "allowancesAndReliefs" \ "propertyFinanceRelief").readNullable[BigDecimal] and
-            (__ \ "totalAllowancesAndReliefs").readNullable[BigDecimal]
+            (__ \ "totalAllowancesAndReliefs").read[BigDecimal]
           )(AllowancesAndReliefs.apply _ )) and
-          (__ \ "incomeTax" \ "totalAfterReliefs").readNullable[BigDecimal] and
+          (__ \ "incomeTax" \ "totalAfterReliefs").read[BigDecimal] and
           (__ \ "incomeTax" \ "giftAid").read[GiftAid]((
             (__ \ "paymentsMade").readNullable[BigDecimal] and
             (__ \ "rate").read[BigDecimal] and
@@ -300,7 +309,7 @@ object TaxCalculation {
         )(TaxDeducted.apply _)) and
         (__ \ "calcOutput" \ "calcResult" \ "eoyEstimate").read[EoyEstimate] and
         (__ \ "calcOutput" \ "calcResult" \ "msgCount").readNullable[Int] and
-        (__ \ "calcOutput" \ "calcResult" \ "msg").read[Seq[CalculationMessage]] and
+        (__ \ "calcOutput" \ "calcResult" \ "msg").readNullable[Seq[CalculationMessage]] and
         (__ \ "calcOutput" \ "calcResult" \ "annualAllowances").read[AnnualAllowances]((
           (__ \ "personalAllowance").readNullable[Int] and
           (__ \ "reducedPersonalAllowanceThreshold").readNullable[Int] and
@@ -341,8 +350,11 @@ object IncomeTax {
 object IncomeTaxItem {
   implicit val format: OFormat[IncomeTaxItem] = Json.format[IncomeTaxItem]
 }
-object Band {
-  implicit val format: OFormat[Band] = Json.format[Band]
+object IncomeTaxBand {
+  implicit val format: OFormat[IncomeTaxBand] = Json.format[IncomeTaxBand]
+}
+object NicBand {
+  implicit val format: OFormat[NicBand] = Json.format[NicBand]
 }
 object AllowancesAndReliefs {
   implicit val writes: OWrites[AllowancesAndReliefs] = Json.writes[AllowancesAndReliefs]

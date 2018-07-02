@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package v2.mocks
+package v2.connectors
 
+import uk.gov.hmrc.http.HeaderCarrier
 import v2.config.AppConfig
-import org.scalamock.handlers.CallHandler
-import org.scalamock.scalatest.MockFactory
 
-trait MockAppConfig extends MockFactory {
+trait DesConnector {
 
-  val mockAppConfig: AppConfig = mock[AppConfig]
-
-  object MockedAppConfig {
-    def desEnv: CallHandler[String] = (mockAppConfig.desEnv _: () => String).expects()
-    def desBaseUrl: CallHandler[String] = (mockAppConfig.desBaseUrl _: () => String).expects()
-    def mtdIdBaseUrl: CallHandler[String] = (mockAppConfig.mtdIdBaseUrl _: () => String).expects()
+  implicit class DesHeaders(hc: HeaderCarrier)(implicit appConfig: AppConfig) {
+    def withDesHeaders(): HeaderCarrier = {
+      hc.withExtraHeaders(
+        "Environment" -> appConfig.desEnv,
+        "Accept" -> "application/json",
+        "Originator-Id" -> "DA_SDI"
+      )
+    }
   }
 }

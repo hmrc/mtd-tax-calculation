@@ -16,20 +16,20 @@
 
 package v2.connectors
 
-import v2.config.AppConfig
 import javax.inject.{Inject, Singleton}
-import v2.outcomes.TaxCalcOutcome.TaxCalcOutcome
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import v2.config.AppConfig
+import v2.outcomes.TaxCalcOutcome.TaxCalcOutcome
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class TaxCalcConnector @Inject()(http: HttpClient,
-                                 appConfig: AppConfig){
+                                 implicit val appConfig: AppConfig) extends DesConnector {
 
   def getTaxCalculation(mtdid: String, calculationId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[TaxCalcOutcome] = {
     import v2.httpparsers.TaxCalcHttpParser.taxCalcHttpReads
-    http.GET[TaxCalcOutcome](s"${appConfig.desBaseUrl}/income-tax/calculation-data/$mtdid/calcId/$calculationId")
+    http.GET[TaxCalcOutcome](s"${appConfig.desBaseUrl}/income-tax/calculation-data/$mtdid/calcId/$calculationId")(implicitly, hc.withDesHeaders(), ec)
   }
 }
