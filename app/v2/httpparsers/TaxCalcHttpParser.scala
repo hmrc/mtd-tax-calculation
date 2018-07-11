@@ -27,17 +27,20 @@ object TaxCalcHttpParser extends HttpParser {
   implicit val taxCalcHttpReads: HttpReads[TaxCalcOutcome] = new HttpReads[TaxCalcOutcome] {
     override def read(method: String, url: String, response: HttpResponse): TaxCalcOutcome = {
       (response.status, response.jsonOpt) match {
-        case (OK, _) =>
-          response.validateJson[TaxCalculation] match {
-            case Some(taxCalc) => Right(taxCalc)
-            case None => Left(InternalServerError)
-        }
+        case (OK, _) => parseResponse(response)
+        case (NO_CONTENT, _) => Left(CalculationNotReady)
         case (BAD_REQUEST, ErrorCode(DesErrorCode.INVALID_IDENTIFIER)) => Left(InvalidNino)
         case (BAD_REQUEST, ErrorCode(DesErrorCode.INVALID_CALCID)) => Left(InvalidCalcID)
+        case (FORBIDDEN, _) => Left(InternalServerError)
         case (NOT_FOUND, _) => Left(NotFound)
         case (INTERNAL_SERVER_ERROR, ErrorCode(DesErrorCode.SERVER_ERROR)) => Left(InternalServerError)
         case (INTERNAL_SERVER_ERROR, ErrorCode(DesErrorCode.SERVICE_UNAVAILABLE)) => Left(InternalServerError)
       }
+    }
+
+    private def parseResponse(response: HttpResponse): TaxCalcOutcome = response.validateJson[TaxCalculation] match {
+      case Some(taxCalc) => Right(taxCalc)
+      case None => Left(InternalServerError)
     }
   }
 }

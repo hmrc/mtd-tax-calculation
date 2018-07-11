@@ -16,6 +16,7 @@
 
 package v2.httpparsers
 
+import play.api.Logger
 import play.api.libs.json.{JsValue, Reads}
 import uk.gov.hmrc.http.HttpResponse
 
@@ -23,11 +24,16 @@ import scala.util.{Failure, Success, Try}
 
 trait HttpParser {
 
-  implicit class HttpResponseOps(resp: HttpResponse){
+  implicit class HttpResponseOps(resp: HttpResponse) {
     def jsonOpt: Option[JsValue] = {
       Try(resp.json) match {
         case Success(json: JsValue) => Some(json)
-        case _ => None
+        case Success(_) =>
+          Logger.warn("No JSON was returned")
+          None
+        case Failure(error) =>
+          Logger.warn(s"Unable to retrieve JSON: ${error.getMessage}")
+          None
       }
     }
   }
@@ -36,8 +42,14 @@ trait HttpParser {
     def validateJson[T](implicit reads: Reads[T]): Option[T] = {
       Try(response.json) match {
         case Success(js: JsValue) => js.asOpt
-        case _ => None
+        case Success(_) =>
+          Logger.warn("No JSON was returned")
+          None
+        case Failure(error) =>
+          Logger.warn(s"Unable to parse JSON: ${error.getMessage}")
+          None
       }
     }
   }
+
 }

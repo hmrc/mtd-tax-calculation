@@ -22,6 +22,9 @@ trait MtdError
 
 case class Error(code: String, message: String) extends MtdError
 
+//2xx
+object CalculationNotReady extends MtdError
+
 //4xx
 object NotFound extends MtdError
 object InvalidNino extends Error("NINO_INVALID", "The provided NINO is invalid")

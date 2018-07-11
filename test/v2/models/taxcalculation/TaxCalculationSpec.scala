@@ -26,8 +26,21 @@ class TaxCalculationSpec extends UnitSpec {
     import v2.fixtures.{TaxCalculationFixture => TestData}
 
     "be parsed from correct JSON" in {
-      val result = TestData.desTaxCalcJson.as[TaxCalculation]
-      result shouldEqual TestData.taxCalc
+      val result = TestData.v3_2DesTaxCalcJson.as[TaxCalculation]
+      result shouldEqual TestData.v3_2ClientTaxCalc
+    }
+
+    val validJsonPayloadsForVersion3_2 = Map(
+    "JSON representing self employment with UK property" -> TestData.selfEmploymentUkPropertyJson,
+    "JSON representing self employment with periodic updates" -> TestData.selfEmploymentPeriodicJson,
+    "JSON representing UK property with non-FHL with periodic and annual updates" -> TestData.ukPropertyOtherPeriodicAndAnnualJson,
+    "JSON representing self employment with periodic and annual updates" -> TestData.selfEmploymentPeriodicAndAnnualsJson,
+    "JSON representing UK property with FHL with periodic and annual updates" -> TestData.ukPropertyFhlPeriodicAndAnnualsJson,
+    "JSON representing Scottish self employment with multiple income sources" -> TestData.selfEmploymentScottishMultipleIncomeSourcesJson
+    )
+
+    validJsonPayloadsForVersion3_2.foreach{
+      case (description, payload) => s"be able to parse $description without falling over" in { payload.as[TaxCalculation] }
     }
   }
 

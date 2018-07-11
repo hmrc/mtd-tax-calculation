@@ -35,9 +35,9 @@ object TaxCalcStub extends WireMockMethods {
     when(method = GET, uri = taxCalcUri(mtdId, calcId))
       .thenReturn(status = INTERNAL_SERVER_ERROR, body = unsuccessfulTaxCalcResponse)
   }
-  
+
   lazy val successfulTaxCalcResponse: JsValue = {
-    TestData.desTaxCalcJson
+    TestData.v3_2DesTaxCalcJson
   }
   lazy val unsuccessfulTaxCalcResponse: JsValue = {
     DESErrorsFixture.serverErrorJson

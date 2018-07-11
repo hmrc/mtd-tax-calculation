@@ -32,9 +32,9 @@ case class TaxCalculation(
                          incomeTax: IncomeTax,
                          nic: Nic,
                          totalBeforeTaxDeducted: Option[BigDecimal],
-                         taxDeducted: TaxDeducted,
+                         taxDeducted: Option[TaxDeducted],
                          eoyEstimate: EoyEstimate,
-                         calculationMessageCount: Option[Int],
+                         calculationMessageCount: Option[Double],
                          calculationMessages: Option[Seq[CalculationMessage]],
                          annualAllowances: AnnualAllowances
                          )
@@ -101,13 +101,14 @@ case class AllowancesAndDeductions(
                                   )
 //#1
 case class IncomeTax(
+                    taxableIncome: Option[BigDecimal],
                     payPensionsProfit: Option[IncomeTaxItem],//todo: not required!!
                     savingsAndGains: Option[IncomeTaxItem],
                     dividends: Option[IncomeTaxItem],
                     totalBeforeReliefs: BigDecimal,
                     allowancesAndReliefs: Option[AllowancesAndReliefs],//todo: required??
-                    totalAfterReliefs: BigDecimal,
-                    giftAid: GiftAid,
+                    totalAfterReliefs: Option[BigDecimal],
+                    giftAid: Option[GiftAid],
                     totalAfterGiftAid: Option[BigDecimal],
                     totalIncomeTax: Option[BigDecimal]
                     )
@@ -143,8 +144,8 @@ case class GiftAid(
 //#1
 case class Nic(
               totalNic: Option[BigDecimal],
-              class2: Class2Nic,
-              class4: Class4Nic
+              class2: Option[Class2Nic],
+              class4: Option[Class4Nic]
               )
 
 //#2
@@ -226,41 +227,41 @@ object TaxCalculation {
     (
       (__ \ "calcOutput" \ "year").readNullable[Int] and
         (__ \ "calcOutput" \ "intentToCrystallise").readNullable[Boolean] and
-        (__ \ "calcOutput" \ "crystallised").readNullable[Boolean] and
+        (__ \ "calcOutput" \ "calcResult" \ "crystallised").readNullable[Boolean].orElse(Reads.pure(None)) and
         ((__ \ "calcOutput" \ "bvrErrors").readNullable[Int] and
          (__ \ "calcOutput" \ "bvrWarnings").readNullable[Int])
         ((errs, warns) => (errs ++ warns).reduceOption(_ + _)) and
-        (__ \ "calcOutput" \ "calcResult" \ "incomeTaxNicYtd").readNullable[BigDecimal] and
-        (__ \ "calcOutput" \ "calcResult" \ "nationalRegime").readNullable[String] and
+        (__ \ "calcOutput" \ "calcResult" \ "incomeTaxNicYtd").readNullable[BigDecimal].orElse(Reads.pure(None)) and
+        (__ \ "calcOutput" \ "calcResult" \ "nationalRegime").readNullable[String].orElse(Reads.pure(None)) and
         (__ \ "calcOutput" \ "calcResult").read[TaxableIncome]((
           (__ \ "taxableIncome" \ "incomeReceived").readNullable[Employments]((
             (__ \ "employmentIncome").readNullable[BigDecimal] and
-            (__ \ "employments" \ "totalPay").readNullable[BigDecimal] and
-            (__ \ "employments" \ "totalBenefitsAndExpenses").readNullable[BigDecimal] and
-            (__ \ "employments" \ "totalAllowableExpenses").readNullable[BigDecimal] and
+            (__ \ "employments" \ "totalPay").readNullable[BigDecimal].orElse(Reads.pure(None)) and
+            (__ \ "employments" \ "totalBenefitsAndExpenses").readNullable[BigDecimal].orElse(Reads.pure(None)) and
+            (__ \ "employments" \ "totalAllowableExpenses").readNullable[BigDecimal].orElse(Reads.pure(None)) and
             (__ \ "employments" \ "employment").read[Seq[Employment]](traversableReads[Seq, Employment](implicitly, (
               (__ \ "incomeSourceID").readNullable[String] and
               (__ \ "netPay").readNullable[BigDecimal] and
               (__ \ "benefitsAndExpenses").readNullable[BigDecimal] and
               (__ \ "allowableExpenses").readNullable[BigDecimal]
-            )(Employment.apply _)))
+            )(Employment.apply _))).orElse(Reads.pure(Seq.empty[Employment]))
           )(Employments.apply _)) and
           (__ \ "taxableIncome" \ "incomeReceived").readNullable[SelfEmployments]((
-            (__ \ "selfEmploymentIncome").readNullable[BigDecimal] and
+            (__ \ "selfEmploymentIncome").readNullable[BigDecimal].orElse(Reads.pure(None)) and
             (__ \ "selfEmployment").read[Seq[SelfEmployment]](traversableReads[Seq, SelfEmployment](implicitly, (
               (__ \ "incomeSourceID").read[String] and
-              (__ \ "taxableIncome").readNullable[BigDecimal] and
-              (__ \ "finalised").readNullable[Boolean] and
-              (__ \ "losses").readNullable[BigDecimal]
-            )(SelfEmployment.apply _)))
+              (__ \ "taxableIncome").readNullable[BigDecimal].orElse(Reads.pure(None)) and
+              (__ \ "finalised").readNullable[Boolean].orElse(Reads.pure(None)) and
+              (__ \ "losses").readNullable[BigDecimal].orElse(Reads.pure(None))
+            )(SelfEmployment.apply _))).orElse(Reads.pure(Seq.empty[SelfEmployment]))
           )(SelfEmployments.apply _)) and
           (__ \ "taxableIncome" \ "incomeReceived").readNullable[UKProperty]((
-            (__ \ "ukPropertyIncome").readNullable[BigDecimal] and
-            (__ \ "ukProperty" \ "taxableProfit").readNullable[BigDecimal] and
-            (__ \ "ukProperty" \ "losses").readNullable[BigDecimal] and
-            (__ \ "ukProperty" \ "taxableProfitFhlUk").readNullable[BigDecimal] and
-            (__ \ "ukProperty" \ "lossesFhlUk").readNullable[BigDecimal] and
-            (__ \ "ukProperty" \ "finalised").readNullable[Boolean]
+            (__ \ "ukPropertyIncome").readNullable[BigDecimal].orElse(Reads.pure(None)) and
+            (__ \ "ukProperty" \ "taxableProfit").readNullable[BigDecimal].orElse(Reads.pure(None)) and
+            (__ \ "ukProperty" \ "losses").readNullable[BigDecimal].orElse(Reads.pure(None)) and
+            (__ \ "ukProperty" \ "taxableProfitFhlUk").readNullable[BigDecimal].orElse(Reads.pure(None)) and
+            (__ \ "ukProperty" \ "lossesFhlUk").readNullable[BigDecimal].orElse(Reads.pure(None)) and
+            (__ \ "ukProperty" \ "finalised").readNullable[Boolean].orElse(Reads.pure(None))
           )(UKProperty.apply _)) and
           (__ \ "taxableIncome" \ "incomeReceived").readNullable[UKDividends](
             (__ \ "ukDividendsIncome").readNullable[BigDecimal].map(UKDividends.apply)
@@ -274,16 +275,17 @@ object TaxCalculation {
           (__ \ "totalTaxableIncome").readNullable[BigDecimal]
         )(TaxableIncome.apply _)) and
         (__ \ "calcOutput" \ "calcResult").read[IncomeTax]((
+          (__ \ "incomeTax" \ "taxableIncome").readNullable[BigDecimal] and
           (__ \ "incomeTax" \ "payPensionsProfit").readNullable[IncomeTaxItem] and
           (__ \ "incomeTax" \ "savingsAndGains").readNullable[IncomeTaxItem] and
           (__ \ "incomeTax" \ "dividends").readNullable[IncomeTaxItem] and
           (__ \ "incomeTax" \ "totalBeforeReliefs").read[BigDecimal] and
           (__ \ "incomeTax").readNullable[AllowancesAndReliefs]((
-            (__ \ "allowancesAndReliefs" \ "propertyFinanceRelief").readNullable[BigDecimal] and
+            (__ \ "allowancesAndReliefs" \ "propertyFinanceRelief").readNullable[BigDecimal].orElse(Reads.pure(None)) and
             (__ \ "totalAllowancesAndReliefs").read[BigDecimal]
           )(AllowancesAndReliefs.apply _ )) and
-          (__ \ "incomeTax" \ "totalAfterReliefs").read[BigDecimal] and
-          (__ \ "incomeTax" \ "giftAid").read[GiftAid]((
+          (__ \ "incomeTax" \ "totalAfterReliefs").readNullable[BigDecimal] and
+          (__ \ "incomeTax" \ "giftAid").readNullable[GiftAid]((
             (__ \ "paymentsMade").readNullable[BigDecimal] and
             (__ \ "rate").read[BigDecimal] and
             (__ \ "taxableAmount").readNullable[BigDecimal]
@@ -293,27 +295,30 @@ object TaxCalculation {
         )(IncomeTax.apply _)) and
         (__ \ "calcOutput" \ "calcResult").read[Nic]((
           (__ \ "totalNic").readNullable[BigDecimal] and
-          (__ \ "nic" \ "class2").read[Class2Nic]((
+          (__ \ "nic" \ "class2").readNullable[Class2Nic]((
             (__ \ "amount").readNullable[BigDecimal] and
             (__ \ "weekRate").readNullable[BigDecimal] and
             (__ \ "weeks").readNullable[BigDecimal] and
             (__ \ "limit").readNullable[Int] and
             (__ \ "apportionedLimit").readNullable[Int]
-          )(Class2Nic.apply _)) and
-          (__ \ "nic" \ "class4").read[Class4Nic]
+          )(Class2Nic.apply _)).orElse(Reads.pure(None)) and
+          (__ \ "nic" \ "class4").readNullable[Class4Nic].orElse(Reads.pure(None))
         )(Nic.apply _)) and
         (__ \ "calcOutput" \ "calcResult" \ "totalBeforeTaxDeducted").readNullable[BigDecimal] and
-        (__ \ "calcOutput" \ "calcResult").read[TaxDeducted]((
-          (__ \ "taxDeducted" \ "ukLandAndProperty").readNullable[BigDecimal] and
+        (__ \ "calcOutput" \ "calcResult").readNullable[TaxDeducted]((
+          (__ \ "taxDeducted" \ "ukLandAndProperty").readNullable[BigDecimal].orElse(Reads.pure(None)) and
           (__ \ "totalTaxDeducted").readNullable[BigDecimal]
-        )(TaxDeducted.apply _)) and
+        )(TaxDeducted.apply _)).map(_.flatMap{
+          case TaxDeducted(None, None) => None
+          case t => Some(t)
+        }) and
         (__ \ "calcOutput" \ "calcResult" \ "eoyEstimate").read[EoyEstimate] and
-        (__ \ "calcOutput" \ "calcResult" \ "msgCount").readNullable[Int] and
-        (__ \ "calcOutput" \ "calcResult" \ "msg").readNullable[Seq[CalculationMessage]] and
+        (__ \ "calcOutput" \ "calcResult" \ "msgCount").readNullable[Double].orElse(Reads.pure(None)) and
+        (__ \ "calcOutput" \ "calcResult" \ "msg").readNullable[Seq[CalculationMessage]].orElse(Reads.pure(None)) and
         (__ \ "calcOutput" \ "calcResult" \ "annualAllowances").read[AnnualAllowances]((
           (__ \ "personalAllowance").readNullable[Int] and
           (__ \ "reducedPersonalAllowanceThreshold").readNullable[Int] and
-          (__ \ "reducedPersonalAllowance").readNullable[Int] and
+          (__ \ "reducedPersonalisedAllowance").readNullable[Int] and
           (__ \ "giftAidExtender").readNullable[Int]
         )(AnnualAllowances.apply _))
     )(TaxCalculation.apply _)
