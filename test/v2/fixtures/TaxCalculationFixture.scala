@@ -956,7 +956,7 @@ object TaxCalculationFixture {
       |	"annualAllowances": {
       |		"personalAllowance": 99999999,
       |		"personalAllowanceThreshold": 99999999,
-      |		"reducedPersonalisedAllowance": 99999999
+      |		"reducedPersonalAllowance": 99999999
       |	}
       |}
 """.stripMargin)
