@@ -17,13 +17,16 @@
 package v2.connectors
 
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.logging.Authorization
 import v2.config.AppConfig
 
 trait DesConnector {
 
   implicit class DesHeaders(hc: HeaderCarrier)(implicit appConfig: AppConfig) {
     def withDesHeaders(): HeaderCarrier = {
-      hc.withExtraHeaders(
+      hc
+        .copy(authorization = Some(Authorization(s"Bearer ${appConfig.desToken}")))
+        .withExtraHeaders(
         "Environment" -> appConfig.desEnv,
         "Accept" -> "application/json",
         "Originator-Id" -> "DA_SDI"
