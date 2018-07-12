@@ -29,6 +29,7 @@ class TaxCalcConnectorSpec extends ConnectorSpec {
 
   val desBaseUrl = "test-base-url"
   val desEnv = "TestEnv"
+  val desToken = "token"
   val nino = "test-nino"
   val calculationId = "test-calc-id"
   val url = s"$desBaseUrl/income-tax/calculation-data/$nino/calcId/$calculationId"
@@ -45,6 +46,7 @@ class TaxCalcConnectorSpec extends ConnectorSpec {
 
     MockedAppConfig.desBaseUrl returns desBaseUrl
     MockedAppConfig.desEnv returns desEnv
+    MockedAppConfig.desToken returns desToken
   }
 
   "getTaxCalculation" should {
