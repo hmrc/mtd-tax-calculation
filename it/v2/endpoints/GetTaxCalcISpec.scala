@@ -49,7 +49,7 @@ class GetTaxCalcISpec extends IntegrationBaseSpec {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
           MtdIdLookupStub.ninoFound(nino, mtdId)
-          TaxCalcStub.successfulTaxCalc(mtdId, calcId)
+          TaxCalcStub.successfulTaxCalc(nino, calcId)
         }
 
         val response: WSResponse = await(request().get())
@@ -64,7 +64,7 @@ class GetTaxCalcISpec extends IntegrationBaseSpec {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
           MtdIdLookupStub.ninoFound(nino, mtdId)
-          TaxCalcStub.unsuccessfulTaxCalc(mtdId, calcId)
+          TaxCalcStub.unsuccessfulTaxCalc(nino, calcId)
         }
 
         val response: WSResponse = await(request().get())

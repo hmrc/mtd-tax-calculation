@@ -49,7 +49,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
       MockedMtdIdLookupService.lookup(nino)
         .returns(Future.successful(Right(mtdId)))
 
-      MockedTaxCalcService.getTaxCalculation(mtdId, calcId)
+      MockedTaxCalcService.getTaxCalculation(nino, calcId)
         .returns(Future.successful(Right(TaxCalculationFixture.taxCalc)))
 
       val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
@@ -66,7 +66,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
 
-        MockedTaxCalcService.getTaxCalculation(mtdId, calcId)
+        MockedTaxCalcService.getTaxCalculation(nino, calcId)
           .returns(Future.successful(Left(CalculationNotReady)))
 
         private val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
@@ -91,7 +91,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
 
-        MockedTaxCalcService.getTaxCalculation(mtdId, calcId)
+        MockedTaxCalcService.getTaxCalculation(nino, calcId)
           .returns(Future.successful(Left(InvalidNino)))
 
         val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
@@ -106,7 +106,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
 
-        MockedTaxCalcService.getTaxCalculation(mtdId, calcId)
+        MockedTaxCalcService.getTaxCalculation(nino, calcId)
           .returns(Future.successful(Left(InvalidCalcID)))
 
         val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
@@ -123,7 +123,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
 
-        MockedTaxCalcService.getTaxCalculation(mtdId, calcId)
+        MockedTaxCalcService.getTaxCalculation(nino, calcId)
           .returns(Future.successful(Left(NotFound)))
 
         val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
@@ -149,7 +149,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
 
-        MockedTaxCalcService.getTaxCalculation(mtdId, calcId)
+        MockedTaxCalcService.getTaxCalculation(nino, calcId)
           .returns(Future.successful(Left(InternalServerError)))
 
         val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
