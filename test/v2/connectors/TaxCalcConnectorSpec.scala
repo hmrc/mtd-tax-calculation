@@ -32,7 +32,7 @@ class TaxCalcConnectorSpec extends ConnectorSpec {
   val desToken = "token"
   val nino = "test-nino"
   val calculationId = "test-calc-id"
-  val url = s"$desBaseUrl/income-tax/calculation-data/$nino/calcId/$calculationId"
+  val url = s"$desBaseUrl/calculation-store/calculation-data/$nino/calcId/$calculationId"
 
   val httpResponseOk = HttpResponse(OK)
   val httpResponseNotFound = HttpResponse(NOT_FOUND)
