@@ -17,8 +17,8 @@
 package v2.services
 
 import javax.inject.{Inject, Singleton}
+import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisationException, AuthorisedFunctions, MissingBearerToken}
 import uk.gov.hmrc.http.HeaderCarrier
 import v2.models.ServiceResponse
 import v2.models.errors.AuthError
