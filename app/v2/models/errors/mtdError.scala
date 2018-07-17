@@ -29,6 +29,7 @@ object CalculationNotReady extends MtdError
 object NotFound extends MtdError
 object InvalidNino extends Error("NINO_INVALID", "The provided NINO is invalid")
 object InvalidCalcID extends Error("CALCID_INVALID", "The provided calculationId is invalid")
+object Unauthorised extends Error("UNAUTHORIZED", "Bearer token is missing or not authorized")
 
 //5xx
 object InternalServerError extends Error("INTERNAL_SERVER_ERROR", "An internal server error occurred")

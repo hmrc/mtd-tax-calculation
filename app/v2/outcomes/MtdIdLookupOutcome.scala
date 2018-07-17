@@ -16,13 +16,21 @@
 
 package v2.outcomes
 
-import v2.models.errors.MtdError
+import v2.models.errors.{Error, InternalServerError, MtdError}
 
 object MtdIdLookupOutcome {
 
   type MtdIdLookupOutcome = Either[MtdError, String]
 
-  sealed trait MtdIdLookupError extends MtdError
-  object NotAuthorised extends MtdIdLookupError
-  object DownstreamError extends MtdIdLookupError
+  sealed trait MtdIdLookupError extends MtdError {
+    val error: Error
+  }
+
+  object NotAuthorised extends MtdIdLookupError {
+    val error = Error("CLIENT_OR_AGENT_NOT_AUTHORISED", "The client and/or agent is not authorised.")
+  }
+
+  object DownstreamError extends MtdIdLookupError {
+    val error = InternalServerError
+  }
 }
