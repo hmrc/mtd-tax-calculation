@@ -38,10 +38,10 @@ object TaxCalculationFixture {
           totalAllowableExpenses = Some(1000.25),
           employment = Seq(
             Employment(
-              employmentId = Some("ABIS10000000001"),
-              netPay = Some(1000.25),
-              benefitsAndExpenses = Some(1000.25),
-              allowableExpenses = Some(1000.25)
+              employmentId = "ABIS10000000001",
+              netPay = 1000.25,
+              benefitsAndExpenses = 1000.25,
+              allowableExpenses = 1000.25
             )
           )
         )),
@@ -621,10 +621,10 @@ object TaxCalculationFixture {
         totalAllowableExpenses = Some(1000.25),
         employment = Seq(
           Employment(
-            employmentId = Some("ABIS10000000001"),
-            netPay = Some(1000.25),
-            benefitsAndExpenses = Some(1000.25),
-            allowableExpenses = Some(1000.25)
+            employmentId = "ABIS10000000001",
+            netPay = 1000.25,
+            benefitsAndExpenses = 1000.25,
+            allowableExpenses = 1000.25
           )
         )
       )),

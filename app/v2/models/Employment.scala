@@ -18,21 +18,20 @@ package v2.models
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
-import play.api.libs.json.{Json, _}
+import play.api.libs.json._
 
-case class Employment(employmentId: Option[String],
-                      netPay: Option[BigDecimal],
-                      benefitsAndExpenses: Option[BigDecimal],
-                      allowableExpenses: Option[BigDecimal])
+case class Employment(employmentId: String,
+                      netPay: BigDecimal,
+                      benefitsAndExpenses: BigDecimal,
+                      allowableExpenses: BigDecimal)
 
 object Employment {
   implicit val writes: Writes[Employment] = Json.writes[Employment]
 
   implicit val reads: Reads[Employment] = (
-    (__ \ "incomeSourceID").readNullable[String].orElse(Reads.pure(None)) and
-      (__ \ "netPay").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "benefitsAndExpenses").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "allowableExpenses").readNullable[BigDecimal].orElse(Reads.pure(None))
+    (__ \ "incomeSourceID").read[String] and
+      (__ \ "netPay").read[BigDecimal] and
+      (__ \ "benefitsAndExpenses").read[BigDecimal] and
+      (__ \ "allowableExpenses").read[BigDecimal]
     )(Employment.apply _)
-
 }
