@@ -31,12 +31,12 @@ object UKProperty {
   implicit val writes: Writes[UKProperty] = Json.writes[UKProperty]
 
   implicit val reads: Reads[UKProperty] = (
-    (__ \ "ukPropertyIncome").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "ukProperty" \ "taxableProfit").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "ukProperty" \ "losses").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "ukProperty" \ "taxableProfitFhlUk").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "ukProperty" \ "lossesFhlUk").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "ukProperty" \ "finalised").readNullable[Boolean].orElse(Reads.pure(None))
+    (__ \ "ukPropertyIncome").readNullable[BigDecimal] and
+      (__ \ "ukProperty" \ "taxableProfit").readNullable[BigDecimal] and
+      (__ \ "ukProperty" \ "losses").readNullable[BigDecimal] and
+      (__ \ "ukProperty" \ "taxableProfitFhlUk").readNullable[BigDecimal] and
+      (__ \ "ukProperty" \ "lossesFhlUk").readNullable[BigDecimal] and
+      (__ \ "ukProperty" \ "finalised").readNullable[Boolean]
     ) (UKProperty.apply _)
 
 }

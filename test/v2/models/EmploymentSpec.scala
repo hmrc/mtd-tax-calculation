@@ -22,6 +22,8 @@ import v2.models.utils.JsonErrorValidators
 
 class EmploymentSpec extends UnitSpec with JsonErrorValidators {
 
+  import JsonError._
+
   val employment = Employment(
     employmentId = "ABIS10000000001",
     netPay = 1000.25,
@@ -52,18 +54,22 @@ class EmploymentSpec extends UnitSpec with JsonErrorValidators {
     """.stripMargin)
 
   "reads" should {
-    "return a successfully read employment model" when {
-      "all fields exist" in {
-        Employment.reads.reads(employmentDesJson).get shouldBe employment
-      }
+
+    "return correct validation errors" when {
       "all fields are empty" in {
         val Left(errors) =  Employment.reads.reads(emptyEmploymentJson).asEither
 
         multipleJsonErrorValidator(errors)(
-          "/netPay" -> "error.path.missing",
-          "/benefitsAndExpenses" -> "error.path.missing",
-          "/incomeSourceID" -> "error.path.missing",
-          "/allowableExpenses" -> "error.path.missing"  )
+          "/netPay" -> PATH_MISSING_EXCEPTION,
+          "/benefitsAndExpenses" -> PATH_MISSING_EXCEPTION,
+          "/incomeSourceID" -> PATH_MISSING_EXCEPTION,
+          "/allowableExpenses" -> PATH_MISSING_EXCEPTION  )
+      }
+    }
+
+    "return a successfully read employment model" when {
+      "all fields exist" in {
+        Employment.reads.reads(employmentDesJson).get shouldBe employment
       }
     }
   }
