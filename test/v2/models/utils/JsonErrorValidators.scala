@@ -23,6 +23,12 @@ import play.api.libs.json.JsPath
 trait JsonErrorValidators {
   _: Matchers =>
 
+  object JsonError {
+    val NUMBER_FORMAT_EXCEPTION = "error.expected.numberformatexception"
+    val PATH_MISSING_EXCEPTION = "error.path.missing"
+    val BOOLEAN_FORMAT_EXCEPTION = "error.expected.jsboolean"
+  }
+
   def singleJsonErrorValidator(errorPath: String, errorMessage: String, error: (JsPath,Seq[ValidationError])): Unit = {
     val (path, validationError) = error
     path.path.head.toString shouldBe errorPath
@@ -31,7 +37,8 @@ trait JsonErrorValidators {
 
   def multipleJsonErrorValidator(error: Seq[(JsPath,Seq[ValidationError])])(errorPathAndMessage: (String, String)*): Unit = {
     val mappedErrors: Seq[(String, String)] = error.map{
-      case (path, validationError) => path.path.head.toString -> validationError.head.message
+      case (path, validationError) =>
+        path.toString -> validationError.head.message
     }
     mappedErrors should contain theSameElementsAs errorPathAndMessage
   }
