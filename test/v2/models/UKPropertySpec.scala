@@ -17,10 +17,10 @@
 package v2.models
 
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.play.test.UnitSpec
+import support.UnitSpec
 import v2.models.utils.JsonErrorValidators
 
-class UKPropertySpec extends UnitSpec with JsonErrorValidators {
+class UKPropertySpec extends JsonErrorValidators with UnitSpec {
 
   import JsonError._
 
@@ -33,38 +33,57 @@ class UKPropertySpec extends UnitSpec with JsonErrorValidators {
       furnishedHolidayLettingsLoss = Some(123.45),
       finalised = Some(true)
     )
+
+  val ukPropertyDesJson: String =
+    """
+      |{
+      | "ukPropertyIncome": 123.45,
+      | "ukProperty": {
+      |    "taxableProfit": 123.45,
+      |    "losses": 123.45,
+      |    "taxableProfitFhlUk": 123.45,
+      |    "lossesFhlUk": 123.45,
+      |    "finalised": true
+      | }
+      |}
+      |""".stripMargin
+
   val emptyUkProperty = UKProperty(None,None,None,None,None,None)
 
   val emptyJson: JsValue = Json.parse("{}")
 
   "reads" should {
     "return correct validation errors" when {
-      "the wrong formats are returned for all of the fields" in {
-        val json = Json.parse(
-          s"""
-             |{
-             | "ukPropertyIncome": "nan",
-             | "ukProperty": {
-             |    "taxableProfit": "nan",
-             |    "losses": "nan",
-             |    "taxableProfitFhlUk": "nan",
-             |    "lossesFhlUk": "nan",
-             |    "finalised": "not a boolean"
-             | }
-             |}
-           """.stripMargin)
 
-        val Left(errors) = UKProperty.reads.reads(json).asEither
+      testPropertyType[UKProperty](ukPropertyDesJson)(
+        property = "ukPropertyIncome",
+        invalidValue = "\"nan\"",
+        errorPathAndError = ".ukPropertyIncome" -> NUMBER_FORMAT_EXCEPTION
+      )
 
-        multipleJsonErrorValidator(errors)(
-          "/ukPropertyIncome" -> NUMBER_FORMAT_EXCEPTION,
-          "/ukProperty/taxableProfit" -> NUMBER_FORMAT_EXCEPTION,
-          "/ukProperty/losses" -> NUMBER_FORMAT_EXCEPTION,
-          "/ukProperty/taxableProfitFhlUk" -> NUMBER_FORMAT_EXCEPTION,
-          "/ukProperty/lossesFhlUk" -> NUMBER_FORMAT_EXCEPTION,
-          "/ukProperty/finalised" -> BOOLEAN_FORMAT_EXCEPTION
-        )
-      }
+      testPropertyType[UKProperty](ukPropertyDesJson)(
+        property = "taxableProfit",
+        invalidValue = "\"nan\"",
+        errorPathAndError = "/ukProperty/taxableProfit" -> NUMBER_FORMAT_EXCEPTION
+      )
+
+      testPropertyType[UKProperty](ukPropertyDesJson)(
+        property = "losses",
+        invalidValue = "\"nan\"",
+        errorPathAndError = "/ukProperty/losses" -> NUMBER_FORMAT_EXCEPTION
+      )
+
+      testPropertyType[UKProperty](ukPropertyDesJson)(
+        property = "taxableProfitFhlUk",
+        invalidValue = "\"nan\"",
+        errorPathAndError = "/ukProperty/taxableProfitFhlUk" -> NUMBER_FORMAT_EXCEPTION
+      )
+
+      testPropertyType[UKProperty](ukPropertyDesJson)(
+        property = "finalised",
+        invalidValue = "\"not a boolean\"",
+        errorPathAndError = "/ukProperty/finalised" -> BOOLEAN_FORMAT_EXCEPTION
+      )
     }
 
     "return a correctly read UKProperty model" when {

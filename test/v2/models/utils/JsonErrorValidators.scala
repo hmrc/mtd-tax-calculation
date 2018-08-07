@@ -16,12 +16,15 @@
 
 package v2.models.utils
 
-import org.scalatest.Matchers
+import org.scalatest.Assertion
 import play.api.data.validation.ValidationError
-import play.api.libs.json.JsPath
+import play.api.libs.json.{JsResultException, Json, Reads}
+import support.UnitSpec
+
+import scala.util.{Failure, Success, Try}
 
 trait JsonErrorValidators {
-  _: Matchers =>
+  _: UnitSpec =>
 
   object JsonError {
     val NUMBER_FORMAT_EXCEPTION = "error.expected.numberformatexception"
@@ -29,17 +32,69 @@ trait JsonErrorValidators {
     val BOOLEAN_FORMAT_EXCEPTION = "error.expected.jsboolean"
   }
 
-  def singleJsonErrorValidator(errorPath: String, errorMessage: String, error: (JsPath,Seq[ValidationError])): Unit = {
-    val (path, validationError) = error
-    path.path.head.toString shouldBe errorPath
-    validationError.head.message shouldBe errorMessage
+  def testPropertyType[A](jsonString: String)(property: String, invalidValue: String, errorPathAndError: (String, String))
+                         (implicit rd: Reads[A]): Unit = {
+
+    val invalidTypedJson: String = jsonString.split('\n').map { line =>
+      if (line.trim.startsWith(s""""$property""")) {
+        s""""$property":$invalidValue,"""
+      } else {
+        line
+      }
+    }.mkString(" ").replace(",  }", " }")
+
+    val errorPathJson = errorPathAndError._1.replace("/", ".")
+
+    s"the JSON has the wrong data type for property $property" should {
+
+      val json = Json.parse(invalidTypedJson)
+
+      val result = Try(json.as[A])
+
+      "only throw one error" in {
+        result match {
+          case Failure(e: JsResultException) => e.errors.size shouldBe 1
+          case Success(s) => fail("A JSON error was expected")
+        }
+      }
+
+      "throw the error against the correct property" in {
+        result match {
+          case Failure(e: JsResultException) =>
+            val propertyName = getOnlyJsonErrorPath(e)
+            if (propertyName.isRight) {
+              propertyName.right.get should endWith (errorPathJson)
+            }
+          case _ => fail("A JSON error was expected")
+        }
+      }
+
+      "throw an invalid type error" in {
+        result match {
+          case Failure(e: JsResultException) =>
+            val message = getOnlyJsonErrorMessage(e)
+            if (message.isRight) {
+              message.right.get shouldBe errorPathAndError._2
+            }
+          case _ => fail("A JSON error was expected")
+        }
+      }
+    }
   }
 
-  def multipleJsonErrorValidator(error: Seq[(JsPath,Seq[ValidationError])])(errorPathAndMessage: (String, String)*): Unit = {
-    val mappedErrors: Seq[(String, String)] = error.map{
-      case (path, validationError) =>
-        path.toString -> validationError.head.message
+  private def getOnlyJsonErrorPath(ex: JsResultException): Either[Assertion, String] = {
+    ex.errors match {
+      case (jsonPath, _) :: Nil =>
+        Right(jsonPath.toJsonString)
+      case _ :: _ => Left(cancel("Too many JSON errors only expected one."))
     }
-    mappedErrors should contain theSameElementsAs errorPathAndMessage
+  }
+
+  private def getOnlyJsonErrorMessage(ex: JsResultException): Either[Assertion, String] = {
+    ex.errors match {
+      case (_, ValidationError(onlyError :: Nil) :: Nil) :: Nil => Right(onlyError)
+      case (_, ValidationError(_ :: _) :: Nil) :: Nil => Left(cancel("Too many error messages for property"))
+      case _ :: _ => Left(cancel("Too many JSON errors only expected one."))
+    }
   }
 }
