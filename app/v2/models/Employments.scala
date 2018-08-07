@@ -21,20 +21,19 @@ import play.api.libs.json.Reads._
 import play.api.libs.json.{Json, _}
 
 case class Employments(totalIncome: Option[BigDecimal],
-                       totalPay: Option[BigDecimal],
-                       totalBenefitsAndExpenses: Option[BigDecimal],
-                       totalAllowableExpenses: Option[BigDecimal],
+                       totalPay: BigDecimal,
+                       totalBenefitsAndExpenses: BigDecimal,
+                       totalAllowableExpenses: BigDecimal,
                        employment: Seq[Employment])
 
 object Employments {
   implicit val writes: Writes[Employments] = Json.writes[Employments]
 
   implicit val reads: Reads[Employments] = (
-    (__ \ "employmentIncome").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "employments" \ "totalPay").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "employments" \ "totalBenefitsAndExpenses").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "employments" \ "totalAllowableExpenses").readNullable[BigDecimal].orElse(Reads.pure(None)) and
+    (__ \ "employmentIncome").readNullable[BigDecimal] and
+      (__ \ "employments" \ "totalPay").read[BigDecimal] and
+      (__ \ "employments" \ "totalBenefitsAndExpenses").read[BigDecimal] and
+      (__ \ "employments" \ "totalAllowableExpenses").read[BigDecimal] and
       (__ \ "employments" \ "employment").read[Seq[Employment]]
-    ) (Employments.apply _)
-
+    )(Employments.apply _)
 }

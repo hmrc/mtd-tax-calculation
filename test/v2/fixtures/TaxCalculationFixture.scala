@@ -33,9 +33,9 @@ object TaxCalculationFixture {
       taxableIncome = TaxableIncome(
         employments = Some(Employments(
           totalIncome = Some(1000.25),
-          totalPay = Some(1000.25),
-          totalBenefitsAndExpenses = Some(1000.25),
-          totalAllowableExpenses = Some(1000.25),
+          totalPay = 1000.25,
+          totalBenefitsAndExpenses = 1000.25,
+          totalAllowableExpenses = 1000.25,
           employment = Seq(
             Employment(
               employmentId = "ABIS10000000001",
@@ -616,9 +616,9 @@ object TaxCalculationFixture {
     taxableIncome = TaxableIncome(
       employments = Some(Employments(
         totalIncome = Some(1000.25),
-        totalPay = Some(1000.25),
-        totalBenefitsAndExpenses = Some(1000.25),
-        totalAllowableExpenses = Some(1000.25),
+        totalPay = 1000.25,
+        totalBenefitsAndExpenses = 1000.25,
+        totalAllowableExpenses = 1000.25,
         employment = Seq(
           Employment(
             employmentId = "ABIS10000000001",
