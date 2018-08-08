@@ -20,17 +20,17 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json.{Json, _}
 
-case class AllowancesAndDeductions(totalAllowancesAndDeductions: Option[BigDecimal],
+case class AllowancesAndDeductions(totalAllowancesAndDeductions: BigDecimal,
                                    giftOfInvestmentsAndPropertyToCharity: Option[BigDecimal],
-                                   apportionedPersonalAllowance: Option[BigDecimal])
+                                   apportionedPersonalAllowance: BigDecimal)
 
 object AllowancesAndDeductions {
   implicit val writes: Writes[AllowancesAndDeductions] = Json.writes[AllowancesAndDeductions]
 
   implicit val reads: Reads[AllowancesAndDeductions] = (
-    (__ \ "totalAllowancesAndDeductions").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "allowancesAndDeductions" \ "giftOfInvestmentsAndPropertyToCharity").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "allowancesAndDeductions" \ "apportionedPersonalAllowance").readNullable[BigDecimal].orElse(Reads.pure(None))
+    (__ \ "totalAllowancesAndDeductions").read[BigDecimal] and
+      (__ \ "allowancesAndDeductions" \ "giftOfInvestmentsAndPropertyToCharity").readNullable[BigDecimal] and
+      (__ \ "allowancesAndDeductions" \ "apportionedPersonalAllowance").read[BigDecimal]
     ) (AllowancesAndDeductions.apply _)
 
 }

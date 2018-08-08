@@ -69,9 +69,9 @@ object TaxCalculationFixture {
         )),
         totalIncomeReceived = Some(1000.25),
         allowancesAndDeductions = AllowancesAndDeductions(
-          totalAllowancesAndDeductions = Some(1000.25),
+          totalAllowancesAndDeductions = 1000.25,
           giftOfInvestmentsAndPropertyToCharity = Some(1000.25),
-          apportionedPersonalAllowance = Some(1000.25)
+          apportionedPersonalAllowance = 1000.25
         ),
         totalTaxableIncome = Some(1000.25)
       ),
@@ -652,9 +652,9 @@ object TaxCalculationFixture {
       )),
       totalIncomeReceived = Some(1000.25),
       allowancesAndDeductions = AllowancesAndDeductions(
-        totalAllowancesAndDeductions = Some(1000.25),
+        totalAllowancesAndDeductions = 1000.25,
         giftOfInvestmentsAndPropertyToCharity = Some(1000.25),
-        apportionedPersonalAllowance = Some(1000.25)
+        apportionedPersonalAllowance = 1000.25
       ),
       totalTaxableIncome = Some(1000.25)
     ),
