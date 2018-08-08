@@ -20,7 +20,7 @@ import play.api.libs.json.{JsValue, Json}
 import support.UnitSpec
 import v2.models.utils.JsonErrorValidators
 
-class EmploymentSpec extends UnitSpec with JsonErrorValidators {
+class EmploymentSpec extends JsonErrorValidators with UnitSpec {
 
   import JsonError._
 
@@ -31,7 +31,7 @@ class EmploymentSpec extends UnitSpec with JsonErrorValidators {
     allowableExpenses = 1000.25
   )
 
-  val employmentDesJson: JsValue = Json.parse(
+  val employmentDesJson: String =
     """
       |{
       |  "incomeSourceID": "ABIS10000000001",
@@ -39,7 +39,7 @@ class EmploymentSpec extends UnitSpec with JsonErrorValidators {
       |  "benefitsAndExpenses": 1000.25,
       |  "allowableExpenses": 1000.25
       |}
-    """.stripMargin)
+    """.stripMargin
 
   val emptyEmploymentJson: JsValue = Json.parse("{}")
 
@@ -56,22 +56,42 @@ class EmploymentSpec extends UnitSpec with JsonErrorValidators {
   "reads" should {
 
     "return correct validation errors" when {
-      "all fields are empty" in {
-        val Left(errors) =  Employment.reads.reads(emptyEmploymentJson).asEither
+      testMandatoryProperty[Employment](employmentDesJson)(property = "incomeSourceID")
+      testMandatoryProperty[Employment](employmentDesJson)(property = "netPay")
+      testMandatoryProperty[Employment](employmentDesJson)(property = "benefitsAndExpenses")
+      testMandatoryProperty[Employment](employmentDesJson)(property = "allowableExpenses")
 
-        multipleJsonErrorValidator(errors)(
-          "/netPay" -> PATH_MISSING_EXCEPTION,
-          "/benefitsAndExpenses" -> PATH_MISSING_EXCEPTION,
-          "/incomeSourceID" -> PATH_MISSING_EXCEPTION,
-          "/allowableExpenses" -> PATH_MISSING_EXCEPTION  )
-      }
+      testPropertyType[Employment](employmentDesJson)(
+        property = "incomeSourceID",
+        invalidValue = "6",
+        errorPathAndError = "/incomeSourceID" -> STRING_FORMAT_EXCEPTION
+      )
+
+      testPropertyType[Employment](employmentDesJson)(
+        property = "netPay",
+        invalidValue = "\"nan\"",
+        errorPathAndError = "/netPay" -> NUMBER_FORMAT_EXCEPTION
+      )
+
+      testPropertyType[Employment](employmentDesJson)(
+        property = "benefitsAndExpenses",
+        invalidValue = "\"nan\"",
+        errorPathAndError = "/benefitsAndExpenses" -> NUMBER_FORMAT_EXCEPTION
+      )
+
+      testPropertyType[Employment](employmentDesJson)(
+        property = "allowableExpenses",
+        invalidValue = "\"nan\"",
+        errorPathAndError = "/allowableExpenses" -> NUMBER_FORMAT_EXCEPTION
+      )
+    }
+  }
+
+  "return a successfully read employment model" when {
+    "all fields exist" in {
+      Employment.reads.reads(Json.parse(employmentDesJson)).get shouldBe employment
     }
 
-    "return a successfully read employment model" when {
-      "all fields exist" in {
-        Employment.reads.reads(employmentDesJson).get shouldBe employment
-      }
-    }
   }
 
   "writes" should {
