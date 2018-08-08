@@ -25,7 +25,7 @@ object UKDividends {
   implicit val writes: Writes[UKDividends] = Json.writes[UKDividends]
 
   implicit val reads: Reads[UKDividends] = {
-    (__ \ "ukDividendsIncome").readNullable[BigDecimal].orElse(Reads.pure(None)).map(UKDividends.apply)
+    (__ \ "ukDividendsIncome").readNullable[BigDecimal].map(UKDividends.apply)
   }
 
 }

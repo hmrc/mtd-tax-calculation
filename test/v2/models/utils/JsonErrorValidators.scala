@@ -84,7 +84,7 @@ trait JsonErrorValidators {
         line
       }
     }.mkString(" ").replaceAll(",\\s*}", " }")
-      
+
     val errorPathJson = errorPathAndError._1.replace("/", ".")
 
     s"the JSON has the wrong data type for property $property" should {
