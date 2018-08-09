@@ -123,7 +123,6 @@ trait JsonErrorValidators {
       }
     }
   }
-
   private def getOnlyJsonErrorPath(ex: JsResultException): Either[Assertion, String] = {
     ex.errors match {
       case (jsonPath, _) :: Nil =>

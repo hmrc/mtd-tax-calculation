@@ -58,7 +58,7 @@ class UKPropertySpec extends JsonErrorValidators with UnitSpec {
       testPropertyType[UKProperty](ukPropertyDesJson)(
         property = "ukPropertyIncome",
         invalidValue = "\"nan\"",
-        errorPathAndError = ".ukPropertyIncome" -> NUMBER_FORMAT_EXCEPTION
+        errorPathAndError = "/ukPropertyIncome" -> NUMBER_FORMAT_EXCEPTION
       )
 
       testPropertyType[UKProperty](ukPropertyDesJson)(
