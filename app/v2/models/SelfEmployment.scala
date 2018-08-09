@@ -18,10 +18,10 @@ package v2.models
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
-import play.api.libs.json.{Json, _}
+import play.api.libs.json._
 
 case class SelfEmployment(selfEmploymentId: String,
-                          taxableIncome: Option[BigDecimal],
+                          taxableIncome: BigDecimal,
                           finalised: Option[Boolean],
                           losses: Option[BigDecimal])
 
@@ -30,9 +30,9 @@ object SelfEmployment {
 
   implicit val reads: Reads[SelfEmployment] = (
     (__ \ "incomeSourceID").read[String] and
-      (__ \ "taxableIncome").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "finalised").readNullable[Boolean].orElse(Reads.pure(None)) and
-      (__ \ "losses").readNullable[BigDecimal].orElse(Reads.pure(None))
+      (__ \ "taxableIncome").read[BigDecimal] and
+      (__ \ "finalised").readNullable[Boolean] and
+      (__ \ "losses").readNullable[BigDecimal]
     ) (SelfEmployment.apply _)
 
 }

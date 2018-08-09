@@ -50,7 +50,7 @@ object TaxCalculationFixture {
           selfEmployment = Seq(
             SelfEmployment(
               selfEmploymentId = "XKIS00000000988",
-              taxableIncome = Some(1000.25),
+              taxableIncome = 1000.25,
               finalised = Some(true),
               losses = Some(1000.25)
             )
@@ -633,7 +633,7 @@ object TaxCalculationFixture {
         selfEmployment = Seq(
           SelfEmployment(
             selfEmploymentId = "XKIS00000000988",
-            taxableIncome = Some(1000.25),
+            taxableIncome = 1000.25,
             finalised = Some(true),
             losses = None
           )
