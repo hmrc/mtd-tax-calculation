@@ -106,7 +106,7 @@ trait JsonErrorValidators {
           case Failure(e: JsResultException) =>
             val propertyName = getOnlyJsonErrorPath(e)
             if (propertyName.isRight) {
-              propertyName.right.get should endWith (errorPathJson)
+              propertyName.right.get should endWith (errorPathJson.split("\\.").last)
             }
           case _ => fail("A JSON error was expected")
         }
@@ -127,7 +127,9 @@ trait JsonErrorValidators {
   private def getOnlyJsonErrorPath(ex: JsResultException): Either[Assertion, String] = {
     ex.errors match {
       case (jsonPath, _) :: Nil =>
-        Right(jsonPath.toJsonString)
+        //recursive paths using ( __ \\ "field") return `obj*`, while nested objects return `obj.`.
+        //Replace these to match the useful part of the path
+        Right(jsonPath.toJsonString.replaceAll("obj(\\.|\\*)", "."))
       case _ :: _ => Left(cancel("Too many JSON errors only expected one."))
     }
   }

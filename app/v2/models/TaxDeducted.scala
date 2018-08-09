@@ -27,8 +27,15 @@ object TaxDeducted {
   implicit val writes: Writes[TaxDeducted] = Json.writes[TaxDeducted]
 
   implicit val reads: Reads[TaxDeducted] = (
-    (__ \ "taxDeducted" \ "ukLandAndProperty").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "totalTaxDeducted").readNullable[BigDecimal].orElse(Reads.pure(None))
-    ) (TaxDeducted.apply _)
+    (__ \\ "ukLandAndProperty").readNullable[BigDecimal] and
+      (__ \ "totalTaxDeducted").readNullable[BigDecimal]
+    )(TaxDeducted.apply _)
+
+  case class TaxDeducted_(ukLandAndProperty: Option[BigDecimal])
+
+  object TaxDeducted_ {
+    implicit val writes: OWrites[TaxDeducted_] = Json.writes[TaxDeducted_]
+    implicit val reads: Reads[TaxDeducted_] = (__ \ "ukLandAndProperty").readNullable[BigDecimal].map(TaxDeducted_.apply)
+  }
 
 }
