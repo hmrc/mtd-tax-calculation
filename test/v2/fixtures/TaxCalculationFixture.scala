@@ -129,9 +129,9 @@ object TaxCalculationFixture {
         )),
         totalAfterReliefs = Some(1000.25),
         giftAid = Some(GiftAid(
-          paymentsMade = Some(1000.25),
+          paymentsMade = 1000.25,
           rate = 99.99,
-          taxableAmount = Some(1000.25)
+          taxableAmount = 1000.25
         )),
         totalAfterGiftAid = Some(1000.25),
         totalIncomeTax = Some(1000.25)

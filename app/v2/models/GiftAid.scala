@@ -20,16 +20,16 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json.{Json, _}
 
-case class GiftAid(paymentsMade: Option[BigDecimal],
+case class GiftAid(paymentsMade: BigDecimal,
                    rate: BigDecimal,
-                   taxableAmount: Option[BigDecimal])
+                   taxableAmount: BigDecimal)
 
 object GiftAid {
   implicit val writes: Writes[GiftAid] = Json.writes[GiftAid]
 
   implicit val reads: Reads[GiftAid] = (
-    (__ \ "paymentsMade").readNullable[BigDecimal].orElse(Reads.pure(None)) and
+    (__ \ "paymentsMade").read[BigDecimal] and
       (__ \ "rate").read[BigDecimal] and
-      (__ \ "taxableAmount").readNullable[BigDecimal].orElse(Reads.pure(None))
+      (__ \ "taxableAmount").read[BigDecimal]
     ) (GiftAid.apply _)
 }
