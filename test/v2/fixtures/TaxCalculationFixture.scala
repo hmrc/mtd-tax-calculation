@@ -83,10 +83,10 @@ object TaxCalculationFixture {
             IncomeTaxBand(
               name = "ZRT",
               rate = 99.99,
-              threshold = 99999999,
-              apportionedThreshold = 99999999,
+              threshold = Some(99999999),
+              apportionedThreshold = Some(99999999),
               income = 1000.25,
-              taxAmount = 1000.25
+              amount = 1000.25
             )
           ),
           personalAllowanceUsed = Some(1000.25),
@@ -98,10 +98,10 @@ object TaxCalculationFixture {
             IncomeTaxBand(
               name = "BRT",
               rate = 99.99,
-              threshold = 99999999,
-              apportionedThreshold = 99999999,
+              threshold = Some(99999999),
+              apportionedThreshold = Some(99999999),
               income = 1000.25,
-              taxAmount = 1000.25
+              amount = 1000.25
             )
           ),
           personalAllowanceUsed = Some(1000.25),
@@ -113,10 +113,10 @@ object TaxCalculationFixture {
             IncomeTaxBand(
               name = "BRT",
               rate = 99.99,
-              threshold = 99999999,
-              apportionedThreshold = 99999999,
+              threshold = Some(99999999),
+              apportionedThreshold = Some(99999999),
               income = 1000.25,
-              taxAmount = 1000.25
+              amount = 1000.25
             )
           ),
           personalAllowanceUsed = Some(1000.25),
@@ -278,7 +278,7 @@ object TaxCalculationFixture {
       |					"threshold": 99999999,
       |					"apportionedThreshold": 99999999,
       |					"income": 1000.25,
-      |					"taxAmount": 1000.25
+      |					"amount": 1000.25
       |				}
       |			],
       |			"personalAllowanceUsed": 1000.25,
@@ -293,7 +293,7 @@ object TaxCalculationFixture {
       |					"threshold": 99999999,
       |					"apportionedThreshold": 99999999,
       |					"income": 1000.25,
-      |					"taxAmount": 1000.25
+      |					"amount": 1000.25
       |				}
       |			],
       |			"personalAllowanceUsed": 1000.25,
@@ -308,7 +308,7 @@ object TaxCalculationFixture {
       |					"threshold": 99999999,
       |					"apportionedThreshold": 99999999,
       |					"income": 1000.25,
-      |					"taxAmount": 1000.25
+      |					"amount": 1000.25
       |				}
       |			],
       |			"personalAllowanceUsed": 1000.25,
@@ -666,10 +666,10 @@ object TaxCalculationFixture {
           IncomeTaxBand(
             name = "ZRT",
             rate = 99.99,
-            threshold = 99999999,
-            apportionedThreshold = 99999999,
+            threshold = Some(99999999),
+            apportionedThreshold = Some(99999999),
             income = 1000.25,
-            taxAmount = 1000.25
+            amount = 1000.25
           )
         ),
         personalAllowanceUsed = None,
@@ -681,10 +681,10 @@ object TaxCalculationFixture {
           IncomeTaxBand(
             name = "BRT",
             rate = 99.99,
-            threshold = 99999999,
-            apportionedThreshold = 99999999,
+            threshold = Some(99999999),
+            apportionedThreshold = Some(99999999),
             income = 1000.25,
-            taxAmount = 1000.25
+            amount = 1000.25
           )
         ),
         personalAllowanceUsed = None,
@@ -696,10 +696,10 @@ object TaxCalculationFixture {
           IncomeTaxBand(
             name = "HRT",
             rate = 99.99,
-            threshold = 99999999,
-            apportionedThreshold = 99999999,
+            threshold = Some(99999999),
+            apportionedThreshold = Some(99999999),
             income = 1000.25,
-            taxAmount = 1000.25
+            amount = 1000.25
           )
         ),
         personalAllowanceUsed = None,
@@ -849,7 +849,7 @@ object TaxCalculationFixture {
       |					"threshold": 99999999,
       |					"apportionedThreshold": 99999999,
       |					"income": 1000.25,
-      |					"taxAmount": 1000.25
+      |					"amount": 1000.25
       |				}
       |			],
       |			"taxableIncome": 1000.25
@@ -863,7 +863,7 @@ object TaxCalculationFixture {
       |					"threshold": 99999999,
       |					"apportionedThreshold": 99999999,
       |					"income": 1000.25,
-      |					"taxAmount": 1000.25
+      |					"amount": 1000.25
       |				}
       |			],
       |			"taxableIncome": 1000.25
@@ -877,7 +877,7 @@ object TaxCalculationFixture {
       |					"threshold": 99999999,
       |					"apportionedThreshold": 99999999,
       |					"income": 1000.25,
-      |					"taxAmount": 1000.25
+      |					"amount": 1000.25
       |				}
       |			],
       |			"taxableIncome": 1000.25

@@ -22,10 +22,10 @@ import play.api.libs.json.{Json, _}
 
 case class IncomeTaxBand(name: String,
                          rate: BigDecimal,
-                         threshold: Int,
-                         apportionedThreshold: Int,
+                         threshold: Option[Int],
+                         apportionedThreshold: Option[Int],
                          income: BigDecimal,
-                         taxAmount: BigDecimal)
+                         amount: BigDecimal)
 
 object IncomeTaxBand {
   implicit val writes: Writes[IncomeTaxBand] = Json.writes[IncomeTaxBand]
@@ -33,8 +33,8 @@ object IncomeTaxBand {
   implicit val reads: Reads[IncomeTaxBand] = (
     (__ \ "name").read[String] and
       (__ \ "rate").read[BigDecimal] and
-      (__ \ "threshold").read[Int] and
-      (__ \ "apportionedThreshold").read[Int] and
+      (__ \ "threshold").readNullable[Int] and
+      (__ \ "apportionedThreshold").readNullable[Int] and
       (__ \ "income").read[BigDecimal] and
       (__ \ "taxAmount").read[BigDecimal]
     ) (IncomeTaxBand.apply _)

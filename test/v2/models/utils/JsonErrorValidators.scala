@@ -18,7 +18,7 @@ package v2.models.utils
 
 import org.scalatest.Assertion
 import play.api.data.validation.ValidationError
-import play.api.libs.json.{JsResultException, Json, Reads}
+import play.api.libs.json._
 import support.UnitSpec
 
 import scala.util.{Failure, Success, Try}
@@ -30,6 +30,7 @@ trait JsonErrorValidators {
     val NUMBER_FORMAT_EXCEPTION = "error.expected.numberformatexception"
     val BOOLEAN_FORMAT_EXCEPTION = "error.expected.jsboolean"
     val STRING_FORMAT_EXCEPTION = "error.expected.jsstring"
+    val JSNUMBER_FORMAT_EXCEPTION = "error.expected.jsnumber"
     val PATH_MISSING_EXCEPTION = "error.path.missing"
   }
 
