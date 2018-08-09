@@ -151,8 +151,8 @@ object TaxCalculationFixture {
             NicBand(
               name = "BRT",
               rate = 99.99,
-              threshold = 99999999,
-              apportionedThreshold = 99999999,
+              threshold = Some(99999999),
+              apportionedThreshold = Some(99999999),
               income = 1000.25,
               amount = 1000.25
             )
@@ -730,8 +730,8 @@ object TaxCalculationFixture {
           NicBand(
             name = "HRT",
             rate = 99.99,
-            threshold = 99999999,
-            apportionedThreshold = 99999999,
+            threshold = Some(99999999),
+            apportionedThreshold = Some(99999999),
             income = 1000.25,
             amount = 1000.25
           )

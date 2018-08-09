@@ -31,7 +31,7 @@ class AllowancesAndDeductionsSpec extends JsonErrorValidators with UnitSpec {
       apportionedPersonalAllowance = 123.45
     )
 
-  val mandatoryFieldsallowancesAndDeductions =
+  val mandatoryFieldsAllowancesAndDeductions =
     AllowancesAndDeductions(
       totalAllowancesAndDeductions = 123.45,
       giftOfInvestmentsAndPropertyToCharity = None,
@@ -134,7 +134,7 @@ class AllowancesAndDeductionsSpec extends JsonErrorValidators with UnitSpec {
              |}
            """.stripMargin)
 
-        AllowancesAndDeductions.writes.writes(mandatoryFieldsallowancesAndDeductions) shouldBe optionalFieldJson
+        AllowancesAndDeductions.writes.writes(mandatoryFieldsAllowancesAndDeductions) shouldBe optionalFieldJson
       }
     }
   }
