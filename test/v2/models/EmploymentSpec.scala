@@ -56,6 +56,7 @@ class EmploymentSpec extends JsonErrorValidators with UnitSpec {
   "reads" should {
 
     "return correct validation errors" when {
+
       testMandatoryProperty[Employment](employmentDesJson)(property = "incomeSourceID")
       testMandatoryProperty[Employment](employmentDesJson)(property = "netPay")
       testMandatoryProperty[Employment](employmentDesJson)(property = "benefitsAndExpenses")

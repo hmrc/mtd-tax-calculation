@@ -20,7 +20,7 @@ import play.api.libs.json.{JsValue, Json}
 import support.UnitSpec
 import v2.models.utils.JsonErrorValidators
 
-class AllowancesAndDeductionsSpec extends UnitSpec with JsonErrorValidators {
+class AllowancesAndDeductionsSpec extends JsonErrorValidators with UnitSpec {
 
   import JsonError._
 

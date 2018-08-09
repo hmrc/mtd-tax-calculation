@@ -27,7 +27,7 @@ object AllowancesAndReliefs {
   implicit val writes: Writes[AllowancesAndReliefs] = Json.writes[AllowancesAndReliefs]
 
   implicit val reads: Reads[AllowancesAndReliefs] = (
-    (__ \ "allowancesAndReliefs" \ "propertyFinanceRelief").readNullable[BigDecimal].orElse(Reads.pure(None)) and
+    (__ \ "allowancesAndReliefs" \ "propertyFinanceRelief").readNullable[BigDecimal] and
       (__ \ "totalAllowancesAndReliefs").read[BigDecimal]
     ) (AllowancesAndReliefs.apply _)
 
