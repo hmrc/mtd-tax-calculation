@@ -20,21 +20,21 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json.{Json, _}
 
-case class Class2Nic(amount: Option[BigDecimal],
-                     weekRate: Option[BigDecimal],
-                     weeks: Option[BigDecimal],
-                     limit: Option[Int],
-                     apportionedLimit: Option[Int])
+case class Class2Nic(amount: BigDecimal,
+                     weekRate: BigDecimal,
+                     weeks: Int,
+                     limit: Int,
+                     apportionedLimit: Int)
 
 object Class2Nic {
   implicit val writes: Writes[Class2Nic] = Json.writes[Class2Nic]
 
   implicit val reads: Reads[Class2Nic] = (
-    (__ \ "amount").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "weekRate").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "weeks").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "limit").readNullable[Int].orElse(Reads.pure(None)) and
-      (__ \ "apportionedLimit").readNullable[Int].orElse(Reads.pure(None))
+    (__ \ "amount").read[BigDecimal] and
+      (__ \ "weekRate").read[BigDecimal] and
+      (__ \ "weeks").read[Int] and
+      (__ \ "limit").read[Int] and
+      (__ \ "apportionedLimit").read[Int]
     ) (Class2Nic.apply _)
 
 }

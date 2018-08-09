@@ -139,11 +139,11 @@ object TaxCalculationFixture {
       nic = Nic(
         totalNic = Some(1000.25),
         class2 = Some(Class2Nic(
-          amount = Some(1000.25),
-          weekRate = Some(1000.25),
-          weeks = Some(1.1),
-          limit = Some(99999999),
-          apportionedLimit = Some(2)
+          amount = 1000.25,
+          weekRate = 1000.25,
+          weeks = 1,
+          limit = 99999999,
+          apportionedLimit = 2
         )),
         class4 = Some(Class4Nic(
           totalAmount = Some(1000.25),
@@ -333,7 +333,7 @@ object TaxCalculationFixture {
       |		"class2": {
       |			"amount": 1000.25,
       |			"weekRate": 1000.25,
-      |			"weeks": 1.1,
+      |			"weeks": 1,
       |			"limit": 99999999,
       |			"apportionedLimit": 2
       |		},
@@ -529,7 +529,7 @@ object TaxCalculationFixture {
       |      	"class2": {
       |      		"amount": 1000.25,
       |      		"weekRate": 1000.25,
-      |      		"weeks": 1.1,
+      |      		"weeks": 1,
       |      		"limit": 99999999,
       |      		"apportionedLimit": 2
       |      	},
@@ -718,11 +718,11 @@ object TaxCalculationFixture {
     nic = Nic(
       totalNic = Some(1000.25),
       class2 = Some(Class2Nic(
-        amount = Some(1000.25),
-        weekRate = Some(1000.25),
-        weeks = Some(1.1),
-        limit = Some(99999999),
-        apportionedLimit = Some(2)
+        amount = 1000.25,
+        weekRate = 1000.25,
+        weeks = 1,
+        limit = 99999999,
+        apportionedLimit = 2
       )),
       class4 = Some(Class4Nic(
         totalAmount = Some(1000.25),
@@ -894,7 +894,7 @@ object TaxCalculationFixture {
       |		"class2": {
       |			"amount": 1000.25,
       |			"weekRate": 1000.25,
-      |			"weeks": 1.1,
+      |			"weeks": 1,
       |			"limit": 99999999,
       |			"apportionedLimit": 2
       |		},
@@ -1159,7 +1159,7 @@ object TaxCalculationFixture {
       |				"class2": {
       |					"amount": 1000.25,
       |					"weekRate": 1000.25,
-      |					"weeks": 1.1,
+      |					"weeks": 1,
       |					"limit": 99999999,
       |					"apportionedLimit": 2
       |				},
