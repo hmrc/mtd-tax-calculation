@@ -78,7 +78,7 @@ object TaxCalculationFixture {
       incomeTax = IncomeTax(
         taxableIncome = Some(1000.25),
         payPensionsProfit = Some(IncomeTaxItem(
-          totalAmount = Some(1000.25),
+          totalAmount = 1000.25,
           band = Seq(
             IncomeTaxBand(
               name = "ZRT",
@@ -90,10 +90,10 @@ object TaxCalculationFixture {
             )
           ),
           personalAllowanceUsed = Some(1000.25),
-          taxableIncome = Some(1000.25)
+          taxableIncome = 1000.25
         )),
         savingsAndGains = Some(IncomeTaxItem(
-          totalAmount = Some(1000.25),
+          totalAmount = 1000.25,
           band = Seq(
             IncomeTaxBand(
               name = "BRT",
@@ -105,10 +105,10 @@ object TaxCalculationFixture {
             )
           ),
           personalAllowanceUsed = Some(1000.25),
-          taxableIncome = Some(1000.25)
+          taxableIncome = 1000.25
         )),
         dividends = Some(IncomeTaxItem(
-          totalAmount = Some(1000.25),
+          totalAmount = 1000.25,
           band = Seq(
             IncomeTaxBand(
               name = "BRT",
@@ -120,7 +120,7 @@ object TaxCalculationFixture {
             )
           ),
           personalAllowanceUsed = Some(1000.25),
-          taxableIncome = Some(1000.25)
+          taxableIncome = 1000.25
         )),
         totalBeforeReliefs = 1000.25,
         allowancesAndReliefs = Some(AllowancesAndReliefs(
@@ -661,7 +661,7 @@ object TaxCalculationFixture {
     incomeTax = IncomeTax(
       taxableIncome = Some(1000.25),
       payPensionsProfit = Some(IncomeTaxItem(
-        totalAmount = Some(1000.25),
+        totalAmount = 1000.25,
         band = Seq(
           IncomeTaxBand(
             name = "ZRT",
@@ -672,11 +672,11 @@ object TaxCalculationFixture {
             amount = 1000.25
           )
         ),
-        personalAllowanceUsed = None,
-        taxableIncome = Some(1000.25)
+        personalAllowanceUsed = Some(1000.25),
+        taxableIncome = 1000.25
       )),
       savingsAndGains = Some(IncomeTaxItem(
-        totalAmount = Some(1000.25),
+        totalAmount = 1000.25,
         band = Seq(
           IncomeTaxBand(
             name = "BRT",
@@ -687,11 +687,11 @@ object TaxCalculationFixture {
             amount = 1000.25
           )
         ),
-        personalAllowanceUsed = None,
-        taxableIncome = Some(1000.25)
+        personalAllowanceUsed = Some(1000.25),
+        taxableIncome = 1000.25
       )),
       dividends = Some(IncomeTaxItem(
-        totalAmount = Some(1000.25),
+        totalAmount = 1000.25,
         band = Seq(
           IncomeTaxBand(
             name = "HRT",
@@ -702,8 +702,8 @@ object TaxCalculationFixture {
             amount = 1000.25
           )
         ),
-        personalAllowanceUsed = None,
-        taxableIncome = Some(1000.25)
+        personalAllowanceUsed = Some(1000.25),
+        taxableIncome = 1000.25
       )),
       totalBeforeReliefs = 1000.25,
       allowancesAndReliefs = Some(AllowancesAndReliefs(
@@ -852,6 +852,7 @@ object TaxCalculationFixture {
       |					"amount": 1000.25
       |				}
       |			],
+      |     "personalAllowanceUsed":1000.25,
       |			"taxableIncome": 1000.25
       |		},
       |		"savingsAndGains": {
@@ -866,6 +867,7 @@ object TaxCalculationFixture {
       |					"amount": 1000.25
       |				}
       |			],
+      |     "personalAllowanceUsed":1000.25,
       |			"taxableIncome": 1000.25
       |		},
       |		"dividends": {
@@ -880,6 +882,7 @@ object TaxCalculationFixture {
       |					"amount": 1000.25
       |				}
       |			],
+      |     "personalAllowanceUsed":1000.25,
       |			"taxableIncome": 1000.25
       |		},
       |		"totalBeforeReliefs": 1000.25,
@@ -1102,7 +1105,8 @@ object TaxCalculationFixture {
       |							"income": 1000.25,
       |							"taxAmount": 1000.25
       |						}
-      |					]
+      |					],
+      |         "personalAllowanceUsed":1000.25
       |				},
       |				"savingsAndGains": {
       |					"totalAmount": 1000.25,
@@ -1116,7 +1120,8 @@ object TaxCalculationFixture {
       |							"income": 1000.25,
       |							"taxAmount": 1000.25
       |						}
-      |					]
+      |					],
+      |         "personalAllowanceUsed":1000.25
       |				},
       |				"dividends": {
       |					"totalAmount": 1000.25,
@@ -1130,7 +1135,8 @@ object TaxCalculationFixture {
       |							"income": 1000.25,
       |							"taxAmount": 1000.25
       |						}
-      |					]
+      |					],
+      |         "personalAllowanceUsed":1000.25
       |				},
       |				"excludedIncome": 1000.25,
       |				"totalAllowancesAndReliefs": 1000.25,
