@@ -20,19 +20,20 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json.{Json, _}
 
-case class IncomeTaxItem(totalAmount: Option[BigDecimal],
+case class IncomeTaxItem(totalAmount: BigDecimal,
                          band: Seq[IncomeTaxBand],
                          personalAllowanceUsed: Option[BigDecimal],
-                         taxableIncome: Option[BigDecimal])
+                         taxableIncome: BigDecimal
+                        )
 
 object IncomeTaxItem {
   implicit val writes: Writes[IncomeTaxItem] = Json.writes[IncomeTaxItem]
 
   implicit val reads: Reads[IncomeTaxItem] = (
-    (__ \ "totalAmount").readNullable[BigDecimal].orElse(Reads.pure(None)) and
+    (__ \ "totalAmount").read[BigDecimal] and
       (__ \ "band").read[Seq[IncomeTaxBand]] and
-      (__ \ "personalAllowanceUsed").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "taxableIncome").readNullable[BigDecimal].orElse(Reads.pure(None))
+      (__ \ "personalAllowanceUsed").readNullable[BigDecimal] and
+      (__ \ "taxableIncome").read[BigDecimal]
     )(IncomeTaxItem.apply _)
 
 }
