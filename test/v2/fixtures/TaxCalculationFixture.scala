@@ -146,7 +146,7 @@ object TaxCalculationFixture {
           apportionedLimit = 2
         )),
         class4 = Some(Class4Nic(
-          totalAmount = Some(1000.25),
+          totalAmount = 1000.25,
           band = Seq(
             NicBand(
               name = "BRT",
@@ -725,7 +725,7 @@ object TaxCalculationFixture {
         apportionedLimit = 2
       )),
       class4 = Some(Class4Nic(
-        totalAmount = Some(1000.25),
+        totalAmount = 1000.25,
         band = Seq(
           NicBand(
             name = "HRT",

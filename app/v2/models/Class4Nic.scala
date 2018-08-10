@@ -20,14 +20,14 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json.{Json, _}
 
-case class Class4Nic(totalAmount: Option[BigDecimal],
+case class Class4Nic(totalAmount: BigDecimal,
                      band: Seq[NicBand])
 
 object Class4Nic {
   implicit val writes: Writes[Class4Nic] = Json.writes[Class4Nic]
 
   implicit val reads: Reads[Class4Nic] = (
-    (__ \ "totalAmount").readNullable[BigDecimal].orElse(Reads.pure(None)) and
+    (__ \ "totalAmount").read[BigDecimal] and
       (__ \ "band").read[Seq[NicBand]]
     ) (Class4Nic.apply _)
 
