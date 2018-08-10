@@ -20,7 +20,7 @@ import play.api.libs.json.{JsObject, JsValue, Json}
 import support.UnitSpec
 import v2.models.utils.JsonErrorValidators
 
-class eoySelfEmploymentSpec extends UnitSpec with JsonErrorValidators {
+class EoySelfEmploymentSpec extends UnitSpec with JsonErrorValidators {
 
   val validEoySelfEmploymentInputJson: String =
     """
