@@ -24,12 +24,6 @@ class TaxDeductedSpec extends UnitSpec with JsonErrorValidators {
 
   import JsonError._
 
-  val taxDeducted =
-    TaxDeducted(
-      ukLandAndProperty = Some(123.45),
-      totalTaxDeducted = Some(123.45)
-    )
-
   val taxDeductedDesJson: String =
     """
       |{
@@ -40,7 +34,22 @@ class TaxDeductedSpec extends UnitSpec with JsonErrorValidators {
       |}
     """.stripMargin
 
-  val emptyTaxDeducted = TaxDeducted(None,None)
+  val taxDeducted =
+    TaxDeducted(
+      ukLandAndProperty = Some(123.45),
+      totalTaxDeducted = Some(123.45)
+    )
+
+  val clientJson: JsValue = Json.parse(
+    s"""
+       |{
+       |  "ukLandAndProperty": 123.45,
+       |  "totalTaxDeducted": 123.45
+       |}
+     """.stripMargin
+  )
+
+  val emptyTaxDeducted = TaxDeducted(None, None)
 
   "reads" should {
     "return correct validation errors" when {
@@ -50,6 +59,7 @@ class TaxDeductedSpec extends UnitSpec with JsonErrorValidators {
         invalidValue = "\"nan\"",
         errorPathAndError = "taxDeducted/ukLandAndProperty" -> NUMBER_FORMAT_EXCEPTION
       )
+
       testPropertyType[TaxDeducted](taxDeductedDesJson)(
         property = "totalTaxDeducted",
         invalidValue = "\"nan\"",
@@ -95,14 +105,6 @@ class TaxDeductedSpec extends UnitSpec with JsonErrorValidators {
 
   "write" should {
     "return client json" when {
-
-      val clientJson = Json.parse(
-        s"""
-           |{
-           |  "ukLandAndProperty": 123.45,
-           |  "totalTaxDeducted": 123.45
-           |}
-           """.stripMargin)
 
       val emptyClientJson = Json.parse("{}")
 
