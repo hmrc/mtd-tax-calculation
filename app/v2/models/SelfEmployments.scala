@@ -21,14 +21,14 @@ import play.api.libs.json.Reads._
 import play.api.libs.json.{Json, _}
 
 case class SelfEmployments(totalIncome: Option[BigDecimal],
-                           selfEmployment: Seq[SelfEmployment])
+                           selfEmployment: Option[Seq[SelfEmployment]])
 
 object SelfEmployments {
   implicit val writes: Writes[SelfEmployments] = Json.writes[SelfEmployments]
 
   implicit val reads: Reads[SelfEmployments] = (
-    (__ \ "selfEmploymentIncome").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "selfEmployment").read[Seq[SelfEmployment]]
+    (__ \ "selfEmploymentIncome").readNullable[BigDecimal] and
+      (__ \ "selfEmployment").readNullable[Seq[SelfEmployment]]
     ) (SelfEmployments.apply _)
 
 }

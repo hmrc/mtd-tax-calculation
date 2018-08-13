@@ -31,6 +31,7 @@ trait JsonErrorValidators {
     val BOOLEAN_FORMAT_EXCEPTION = "error.expected.jsboolean"
     val STRING_FORMAT_EXCEPTION = "error.expected.jsstring"
     val JSNUMBER_FORMAT_EXCEPTION = "error.expected.jsnumber"
+    val JSARRAY_FORMAT_EXCEPTION = "error.expected.jsarray"
     val PATH_MISSING_EXCEPTION = "error.path.missing"
   }
 
