@@ -35,6 +35,10 @@ trait JsonErrorValidators {
     val PATH_MISSING_EXCEPTION = "error.path.missing"
   }
 
+  implicit class toJsonImp[T : Writes](a: T){
+    def toJson: JsValue = Json.toJson(a)
+  }
+
   def testMandatoryProperty[A](jsonString: String)(property: String)(implicit rd: Reads[A]): Unit = {
     s"the JSON is missing the required property $property" should {
 
@@ -75,6 +79,54 @@ trait JsonErrorValidators {
     }
   }
 
+  def testPropertyType[T](json: JsValue)(path: String, replacement: JsValue, expectedError: String)
+                         (implicit rds: Reads[T]): Unit = {
+
+    val jsPath = path.split("/").filterNot(_ == "").foldLeft(JsPath())(_ \ _)
+
+    lazy val readResult = {
+
+      val overwriteJsonValue: JsValue = {
+        val updateReads: Reads[JsObject] = __.json.update(jsPath.json.put(replacement))
+        json.as[JsObject](updateReads)
+      }
+
+      val amendedJson: JsValue = jsPath.json.pickBranch.reads(json).fold(
+        invalid = errs => fail(s"an error occurred when reading $path : $errs"),
+        valid = _ => overwriteJsonValue
+      )
+
+      rds.reads(amendedJson)
+    }
+
+    s"the JSON has the wrong data type for path $path" should {
+
+      "only throw one error" in {
+        readResult match {
+          case JsError(errs) => withClue(s"${errs.size} errors found, 1 expected : $errs")(errs.size shouldBe 1)
+          case _ => fail(s"expected to fail but didn't")
+        }
+      }
+
+      lazy val pathFilteredErrors: Seq[ValidationError] = readResult.fold(
+        invalid = _.filter { case (_path, _) => _path == jsPath }.flatMap(_._2),
+        valid = _ => fail(s"expected to fail but didn't")
+      )
+
+      "throw the error against the correct property" in {
+        pathFilteredErrors.size shouldBe 1
+      }
+
+      "throw an invalid type error" in {
+        pathFilteredErrors match {
+          case err :: Nil => err.message shouldBe expectedError
+          case errs @ _ :: _ => fail(s"multiple errors returned for $path but only 1 required : $errs")
+          case Nil => fail(s"no property type error found for $path")
+        }
+      }
+    }
+  }
+
 
   def testPropertyType[A](jsonString: String)(property: String, invalidValue: String, errorPathAndError: (String, String))
                          (implicit rd: Reads[A]): Unit = {
@@ -97,7 +149,7 @@ trait JsonErrorValidators {
 
       "only throw one error" in {
         result match {
-          case Failure(e: JsResultException) => e.errors.size shouldBe 1
+          case Failure(e: JsResultException) => withClue(s"${e.errors.size} errors found, 1 expected : ${e.errors}")(e.errors.size shouldBe 1)
           case Success(s) => fail("A JSON error was expected")
         }
       }
