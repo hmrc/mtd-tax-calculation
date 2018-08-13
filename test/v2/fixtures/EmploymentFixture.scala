@@ -38,7 +38,7 @@ trait EmploymentFixture {
       |}
     """.stripMargin)
 
-  val employmentDesJson: JsValue = Json.parse(
+  val employmentDesJson: String =
     """
       |{
       |  "incomeSourceID": "ABIS10000000001",
@@ -46,5 +46,5 @@ trait EmploymentFixture {
       |  "benefitsAndExpenses": 1000.25,
       |  "allowableExpenses": 1000.25
       |}
-    """.stripMargin)
+    """.stripMargin
 }
