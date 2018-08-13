@@ -76,8 +76,8 @@ object TaxCalculationFixture {
         totalTaxableIncome = Some(1000.25)
       ),
       incomeTax = IncomeTax(
-        taxableIncome = Some(1000.25),
-        payPensionsProfit = Some(IncomeTaxItem(
+        taxableIncome = 1000.25,
+        payAndPensionsProfit = Some(IncomeTaxItem(
           totalAmount = 1000.25,
           band = Seq(
             IncomeTaxBand(
@@ -127,14 +127,14 @@ object TaxCalculationFixture {
           propertyFinanceRelief = Some(1000.25),
           totalAllowancesAndReliefs = 1000.25
         )),
-        totalAfterReliefs = Some(1000.25),
+        totalAfterReliefs = 1000.25,
         giftAid = Some(GiftAid(
           paymentsMade = 1000.25,
           rate = 99.99,
           taxableAmount = 1000.25
         )),
         totalAfterGiftAid = Some(1000.25),
-        totalIncomeTax = Some(1000.25)
+        totalIncomeTax = 1000.25
       ),
       nic = Nic(
         totalNic = Some(1000.25),
@@ -269,7 +269,7 @@ object TaxCalculationFixture {
       |	},
       |	"incomeTax": {
       |   "taxableIncome": 1000.25,
-      |		"payPensionsProfit": {
+      |		"payAndPensionsProfit": {
       |			"totalAmount": 1000.25,
       |			"band": [
       |				{
@@ -659,8 +659,8 @@ object TaxCalculationFixture {
       totalTaxableIncome = Some(1000.25)
     ),
     incomeTax = IncomeTax(
-      taxableIncome = Some(1000.25),
-      payPensionsProfit = Some(IncomeTaxItem(
+      taxableIncome = 1000.25,
+      payAndPensionsProfit = Some(IncomeTaxItem(
         totalAmount = 1000.25,
         band = Seq(
           IncomeTaxBand(
@@ -710,10 +710,10 @@ object TaxCalculationFixture {
         propertyFinanceRelief = Some(1000.25),
         totalAllowancesAndReliefs = 1000.25
       )),
-      totalAfterReliefs = None,
+      totalAfterReliefs = 1000.25,
       giftAid = None,
       totalAfterGiftAid = None,
-      totalIncomeTax = Some(1000.25)
+      totalIncomeTax = 1000.25
     ),
     nic = Nic(
       totalNic = Some(1000.25),
@@ -840,7 +840,7 @@ object TaxCalculationFixture {
       |	},
       |	"incomeTax": {
       |		"taxableIncome": 1000.25,
-      |		"payPensionsProfit": {
+      |		"payAndPensionsProfit": {
       |			"totalAmount": 1000.25,
       |			"band": [
       |				{
@@ -890,6 +890,7 @@ object TaxCalculationFixture {
       |			"propertyFinanceRelief": 1000.25,
       |			"totalAllowancesAndReliefs": 1000.25
       |		},
+      |  "totalAfterReliefs":1000.25,
       |		"totalIncomeTax": 1000.25
       |	},
       |	"nic": {
@@ -1092,6 +1093,7 @@ object TaxCalculationFixture {
       |			"totalIncomeTax": 1000.25,
       |			"incomeTax": {
       |				"totalBeforeReliefs": 1000.25,
+      |       "totalAfterReliefs": 1000.25,
       |				"taxableIncome": 1000.25,
       |				"payPensionsProfit": {
       |					"totalAmount": 1000.25,
@@ -1300,6 +1302,7 @@ object TaxCalculationFixture {
       |      "totalIncomeTax": 21754.4,
       |      "incomeTax": {
       |        "totalBeforeReliefs": 21754.4,
+      |        "totalAfterReliefs": 1000.25,
       |        "taxableIncome": 71136,
       |        "payPensionsProfit": {
       |          "totalAmount": 21754.4,
@@ -1444,6 +1447,7 @@ object TaxCalculationFixture {
       |            "totalIncomeTax": 0,
       |            "incomeTax": {
       |                "totalBeforeReliefs": 0,
+      |                "totalAfterReliefs": 0,
       |                "taxableIncome": 0,
       |                "totalAllowancesAndReliefs": 0
       |            },
@@ -1544,6 +1548,7 @@ object TaxCalculationFixture {
       |            "totalIncomeTax": 1561.8,
       |            "incomeTax": {
       |                "totalBeforeReliefs": 1561.8,
+      |                "totalAfterReliefs": 1000.25,
       |                "taxableIncome": 7809,
       |                "payPensionsProfit": {
       |                    "totalAmount": 1561.8,
@@ -1632,6 +1637,7 @@ object TaxCalculationFixture {
       |            "totalIncomeTax": 9985801.25,
       |            "incomeTax": {
       |                "totalBeforeReliefs": 9985801.25,
+      |                "totalAfterReliefs": 1000.25,
       |                "taxableIncome": 22222225,
       |                "payPensionsProfit": {
       |                    "totalAmount": 9985801.25,
@@ -1772,6 +1778,7 @@ object TaxCalculationFixture {
       |            "totalIncomeTax": 3809.6,
       |            "incomeTax": {
       |                "totalBeforeReliefs": 3809.6,
+      |                "totalAfterReliefs": 1000.25,
       |                "taxableIncome": 19048,
       |                "payPensionsProfit": {
       |                    "totalAmount": 3809.6,
@@ -1866,6 +1873,7 @@ object TaxCalculationFixture {
       |            "totalIncomeTax": 26713.6,
       |            "incomeTax": {
       |                "totalBeforeReliefs": 26713.6,
+      |                "totalAfterReliefs": 1000.25,
       |                "taxableIncome": 82749,
       |                "payPensionsProfit": {
       |                    "totalAmount": 26713.6,

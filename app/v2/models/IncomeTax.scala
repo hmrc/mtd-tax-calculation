@@ -20,31 +20,31 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json.{Json, _}
 
-case class IncomeTax(taxableIncome: Option[BigDecimal],
-                     payPensionsProfit: Option[IncomeTaxItem],
+case class IncomeTax(taxableIncome: BigDecimal,
+                     payAndPensionsProfit: Option[IncomeTaxItem],
                      savingsAndGains: Option[IncomeTaxItem],
                      dividends: Option[IncomeTaxItem],
                      totalBeforeReliefs: BigDecimal,
                      allowancesAndReliefs: Option[AllowancesAndReliefs],
-                     totalAfterReliefs: Option[BigDecimal],
+                     totalAfterReliefs: BigDecimal,
                      giftAid: Option[GiftAid],
                      totalAfterGiftAid: Option[BigDecimal],
-                     totalIncomeTax: Option[BigDecimal])
+                     totalIncomeTax: BigDecimal)
 
 object IncomeTax {
   implicit val writes: Writes[IncomeTax] = Json.writes[IncomeTax]
 
   implicit val reads: Reads[IncomeTax] = (
-    (__ \ "incomeTax" \ "taxableIncome").readNullable[BigDecimal].orElse(Reads.pure(None)) and
+    (__ \ "incomeTax" \ "taxableIncome").read[BigDecimal] and
       (__ \ "incomeTax" \ "payPensionsProfit").readNullable[IncomeTaxItem].orElse(Reads.pure(None)) and
       (__ \ "incomeTax" \ "savingsAndGains").readNullable[IncomeTaxItem].orElse(Reads.pure(None)) and
       (__ \ "incomeTax" \ "dividends").readNullable[IncomeTaxItem].orElse(Reads.pure(None)) and
       (__ \ "incomeTax" \ "totalBeforeReliefs").read[BigDecimal] and
       (__ \ "incomeTax").readNullable[AllowancesAndReliefs].orElse(Reads.pure(None)) and
-      (__ \ "incomeTax" \ "totalAfterReliefs").readNullable[BigDecimal].orElse(Reads.pure(None)) and
+      (__ \ "incomeTax" \ "totalAfterReliefs").read[BigDecimal] and
       (__ \ "incomeTax" \ "giftAid").readNullable[GiftAid].orElse(Reads.pure(None)) and
-      (__ \ "incomeTax" \ "totalAfterGiftAid").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "totalIncomeTax").readNullable[BigDecimal].orElse(Reads.pure(None))
+      (__ \ "incomeTax" \ "totalAfterGiftAid").readNullable[BigDecimal] and
+      (__ \ "totalIncomeTax").read[BigDecimal]
     ) (IncomeTax.apply _)
 
 }
