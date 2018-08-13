@@ -201,8 +201,8 @@ object TaxCalculationFixture {
       calculationMessageCount = Some(1),
       calculationMessages = Some(Seq(
         CalculationMessage(
-          `type`= "warning",
-          text = Some("abcdefghijklm")
+          `type`= "WARN",
+          text = "You have entered a large amount in total Gift Aid payments. Please check."
         )
       )),
       annualAllowances = AnnualAllowances(
@@ -393,8 +393,8 @@ object TaxCalculationFixture {
       |	"calculationMessageCount": 1,
       |	"calculationMessages": [
       |		{
-      |			"type": "warning",
-      |			"text": "abcdefghijklm"
+      |			"type": "WARN",
+      |			"text": "You have entered a large amount in total Gift Aid payments. Please check."
       |		}
       |	],
       |	"annualAllowances": {
@@ -777,8 +777,8 @@ object TaxCalculationFixture {
     calculationMessageCount = Some(1),
     calculationMessages = Some(Seq(
       CalculationMessage(
-        `type`= "abcdefghijklm",
-        text = Some("abcdefghijklm")
+        `type`= "WARN",
+        text = "You have entered a large amount in total Gift Aid payments. Please check."
       )
     )),
     annualAllowances = AnnualAllowances(
@@ -953,8 +953,8 @@ object TaxCalculationFixture {
       |	"calculationMessageCount": 1,
       |	"calculationMessages": [
       |		{
-      |			"type": "abcdefghijklm",
-      |			"text": "abcdefghijklm"
+      |			"type": "WARN",
+      |			"text": "You have entered a large amount in total Gift Aid payments. Please check."
       |		}
       |	],
       |	"annualAllowances": {
@@ -1223,8 +1223,8 @@ object TaxCalculationFixture {
       |			"msgCount": 1,
       |			"msg": [
       |				{
-      |					"type": "abcdefghijklm",
-      |					"text": "abcdefghijklm"
+      |					"type": "WARN",
+      |					"text": "You have entered a large amount in total Gift Aid payments. Please check."
       |				}
       |			],
       |			"previousCalc": {

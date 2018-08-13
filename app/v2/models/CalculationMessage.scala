@@ -21,14 +21,14 @@ import play.api.libs.json.Reads._
 import play.api.libs.json.{Json, _}
 
 case class CalculationMessage(`type`: String,
-                              text: Option[String])
+                              text: String)
 
 object CalculationMessage {
   implicit val writes: Writes[CalculationMessage] = Json.writes[CalculationMessage]
 
   implicit val reads: Reads[CalculationMessage] = (
     (__ \ "type").read[String] and
-      (__ \ "text").readNullable[String].orElse(Reads.pure(None))
+      (__ \ "text").read[String]
     ) (CalculationMessage.apply _)
 
 }
