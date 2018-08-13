@@ -27,8 +27,8 @@ object TaxDeducted {
   implicit val writes: Writes[TaxDeducted] = Json.writes[TaxDeducted]
 
   implicit val reads: Reads[TaxDeducted] = (
-    (__ \ "taxDeducted" \ "ukLandAndProperty").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "totalTaxDeducted").readNullable[BigDecimal].orElse(Reads.pure(None))
+    (__ \\ "ukLandAndProperty").readNullable[BigDecimal] and
+      (__ \ "totalTaxDeducted").readNullable[BigDecimal]
     ) (TaxDeducted.apply _)
 
 }
