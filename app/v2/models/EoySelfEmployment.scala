@@ -21,8 +21,8 @@ import play.api.libs.json.Reads._
 import play.api.libs.json.{Json, _}
 
 case class EoySelfEmployment(selfEmploymentId: String,
-                             taxableIncome: Option[BigDecimal],
-                             supplied: Option[Boolean],
+                             taxableIncome: BigDecimal,
+                             supplied: Boolean,
                              finalised: Option[Boolean])
 
 object EoySelfEmployment {
@@ -30,9 +30,9 @@ object EoySelfEmployment {
 
   implicit val reads: Reads[EoySelfEmployment] = (
     (__ \ "id").read[String] and
-      (__ \ "taxableIncome").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "supplied").readNullable[Boolean].orElse(Reads.pure(None)) and
-      (__ \ "finalised").readNullable[Boolean].orElse(Reads.pure(None))
+      (__ \ "taxableIncome").read[BigDecimal] and
+      (__ \ "supplied").read[Boolean] and
+      (__ \ "finalised").readNullable[Boolean]
     )(EoySelfEmployment.apply _)
 
 }

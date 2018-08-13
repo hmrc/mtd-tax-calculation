@@ -176,8 +176,8 @@ object TaxCalculationFixture {
         selfEmployments = Seq(
           EoySelfEmployment(
             selfEmploymentId = "XKIS00000000988",
-            taxableIncome = Some(99999999.99),
-            supplied = Some(false),
+            taxableIncome = 99999999.99,
+            supplied = false,
             finalised = Some(false)
           )
         ),
@@ -752,8 +752,8 @@ object TaxCalculationFixture {
       selfEmployments = Seq(
         EoySelfEmployment(
           selfEmploymentId = "abcdefghijklm",
-          taxableIncome = Some(99999999.99),
-          supplied = Some(true),
+          taxableIncome = 99999999.99,
+          supplied = true,
           finalised = Some(true)
         )
       ),
