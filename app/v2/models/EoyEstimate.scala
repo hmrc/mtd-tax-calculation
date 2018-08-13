@@ -44,13 +44,13 @@ object EoyEstimate {
       (__ \ "incomeTaxNicAmount").readNullable[BigDecimal].orElse(Reads.pure(None))
       ){ (incomeSource, totalTaxableIncome, incomeTaxAmount, nic2, nic4, totalNicAmount, incomeTaxNicAmount) =>
 
-      val emptyEoyItem = EoyItem(None, None, None)
+      val mandatoryOnlyEoyItem = EoyItem(123.45, supplied = true, None)
 
       val estimate = EoyEstimate(
         employments = Seq(),
         selfEmployments = Seq(),
-        ukProperty = emptyEoyItem,
-        ukDividends = emptyEoyItem,
+        ukProperty = mandatoryOnlyEoyItem,
+        ukDividends = mandatoryOnlyEoyItem,
         totalTaxableIncome, incomeTaxAmount, nic2, nic4, totalNicAmount, incomeTaxNicAmount
       )
 

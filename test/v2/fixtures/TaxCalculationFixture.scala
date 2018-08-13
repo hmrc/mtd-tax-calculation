@@ -182,13 +182,13 @@ object TaxCalculationFixture {
           )
         ),
         ukProperty = EoyItem(
-          taxableIncome = Some(99999999.99),
-          supplied = Some(false),
+          taxableIncome = 99999999.99,
+          supplied = false,
           finalised = Some(false)
         ),
         ukDividends = EoyItem(
-          taxableIncome = Some(99999999.99),
-          supplied = Some(false),
+          taxableIncome = 99999999.99,
+          supplied = false,
           finalised = Some(false)
         ),
         totalTaxableIncome = Some(99999999.99),
@@ -758,13 +758,13 @@ object TaxCalculationFixture {
         )
       ),
       ukProperty = EoyItem(
-        taxableIncome = Some(99999999.99),
-        supplied = Some(true),
+        taxableIncome = 99999999.99,
+        supplied = true,
         finalised = Some(true)
       ),
       ukDividends = EoyItem(
-        taxableIncome = Some(99999999.99),
-        supplied = Some(true),
+        taxableIncome = 99999999.99,
+        supplied = true,
         finalised = Some(true)
       ),
       totalTaxableIncome = Some(99999999.99),

@@ -102,8 +102,8 @@ class TaxCalculationSpec extends UnitSpec {
         selfEmployments = List(
           EoySelfEmployment("id3", 12443.22, false, Some(false))
         ),
-        ukProperty = EoyItem(Some(9982.03), Some(true), Some(true)),
-        ukDividends = EoyItem(Some(1123.2), Some(true), Some(false)),
+        ukProperty = EoyItem(9982.03, supplied = true, Some(true)),
+        ukDividends = EoyItem(1123.2, supplied = true, Some(false)),
         totalTaxableIncome = Some(1234.56),
         incomeTaxAmount = Some(9938.22),
         nic2 = Some(7738.33),

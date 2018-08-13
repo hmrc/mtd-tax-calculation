@@ -20,17 +20,17 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json.{Json, _}
 
-case class EoyItem(taxableIncome: Option[BigDecimal],
-                   supplied: Option[Boolean],
+case class EoyItem(taxableIncome: BigDecimal,
+                   supplied: Boolean,
                    finalised: Option[Boolean])
 
 object EoyItem {
   implicit val writes: Writes[EoyItem] = Json.writes[EoyItem]
 
   implicit val reads: Reads[EoyItem] = (
-    (__ \ "taxableIncome").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "supplied").readNullable[Boolean].orElse(Reads.pure(None)) and
-      (__ \ "finalised").readNullable[Boolean].orElse(Reads.pure(None))
+    (__ \ "taxableIncome").read[BigDecimal] and
+      (__ \ "supplied").read[Boolean] and
+      (__ \ "finalised").readNullable[Boolean]
     ) (EoyItem.apply _)
 
 }
