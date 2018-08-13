@@ -20,19 +20,19 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json.{Json, _}
 
-case class EoyEmployment(employmentId: Option[String],
-                         taxableIncome: Option[BigDecimal],
-                         supplied: Option[Boolean],
+case class EoyEmployment(employmentId: String,
+                         taxableIncome: BigDecimal,
+                         supplied: Boolean,
                          finalised: Option[Boolean])
 
 object EoyEmployment {
   implicit val writes: OWrites[EoyEmployment] = Json.writes[EoyEmployment]
 
   implicit val reads: Reads[EoyEmployment] = (
-    (__ \ "id").readNullable[String].orElse(Reads.pure(None)) and
-      (__ \ "taxableIncome").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "supplied").readNullable[Boolean].orElse(Reads.pure(None)) and
-      (__ \ "finalised").readNullable[Boolean].orElse(Reads.pure(None))
+    (__ \ "id").read[String] and
+      (__ \ "taxableIncome").read[BigDecimal] and
+      (__ \ "supplied").read[Boolean] and
+      (__ \ "finalised").readNullable[Boolean]
     )(EoyEmployment.apply _)
 
 }

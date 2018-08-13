@@ -96,8 +96,8 @@ class TaxCalculationSpec extends UnitSpec {
 
       val expectedEoyEstimate = EoyEstimate(
         employments = List(
-          EoyEmployment(Some("id1"), Some(62345.67), Some(true), Some(true)),
-          EoyEmployment(Some("id2"), Some(423.22), Some(false), Some(true))
+          EoyEmployment("id1", 62345.67, true, Some(true)),
+          EoyEmployment("id2", 423.22, false, Some(true))
         ),
         selfEmployments = List(
           EoySelfEmployment("id3", 12443.22, false, Some(false))

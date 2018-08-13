@@ -167,9 +167,9 @@ object TaxCalculationFixture {
       eoyEstimate = EoyEstimate(
         employments = Seq(
           EoyEmployment(
-            employmentId = Some("ABIS10000000001"),
-            taxableIncome = Some(99999999.99),
-            supplied = Some(false),
+            employmentId = "ABIS10000000001",
+            taxableIncome = 99999999.99,
+            supplied = false,
             finalised = Some(false)
           )
         ),
@@ -743,9 +743,9 @@ object TaxCalculationFixture {
     eoyEstimate = EoyEstimate(
       employments = Seq(
         EoyEmployment(
-          employmentId = Some("abcdefghijklm"),
-          taxableIncome = Some(99999999.99),
-          supplied = Some(true),
+          employmentId = "abcdefghijklm",
+          taxableIncome = 99999999.99,
+          supplied = true,
           finalised = Some(true)
         )
       ),
