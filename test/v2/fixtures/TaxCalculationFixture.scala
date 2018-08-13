@@ -47,14 +47,14 @@ object TaxCalculationFixture {
         )),
         selfEmployments = Some(SelfEmployments(
           totalIncome = Some(1000.25),
-          selfEmployment = Seq(
+          selfEmployment = Some(Seq(
             SelfEmployment(
               selfEmploymentId = "XKIS00000000988",
               taxableIncome = 1000.25,
               finalised = Some(true),
               losses = Some(1000.25)
             )
-          )
+          ))
         )),
         ukProperty = Some(UKProperty(
           totalIncome = Some(1000.25),
@@ -630,14 +630,14 @@ object TaxCalculationFixture {
       )),
       selfEmployments = Some(SelfEmployments(
         totalIncome = Some(1000.25),
-        selfEmployment = Seq(
+        selfEmployment = Some(Seq(
           SelfEmployment(
             selfEmploymentId = "XKIS00000000988",
             taxableIncome = 1000.25,
             finalised = Some(true),
             losses = None
           )
-        )
+        ))
       )),
       ukProperty = Some(UKProperty(
         totalIncome = Some(1000.25),
