@@ -20,7 +20,7 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json.{Json, _}
 
-case class AnnualAllowances(personalAllowance: Option[Int],
+case class AnnualAllowances(personalAllowance: Int,
                             personalAllowanceThreshold: Option[Int],
                             reducedPersonalAllowance: Option[Int],
                             giftAidExtender: Option[Int])
@@ -29,10 +29,10 @@ object AnnualAllowances {
   implicit val writes: Writes[AnnualAllowances] = Json.writes[AnnualAllowances]
 
   implicit val reads: Reads[AnnualAllowances] = (
-    (__ \ "personalAllowance").readNullable[Int].orElse(Reads.pure(None)) and
-      (__ \ "reducedPersonalAllowanceThreshold").readNullable[Int].orElse(Reads.pure(None)) and
-      (__ \ "reducedPersonalisedAllowance").readNullable[Int].orElse(Reads.pure(None)) and
-      (__ \ "giftAidExtender").readNullable[Int].orElse(Reads.pure(None))
+    (__ \ "personalAllowance").read[Int] and
+      (__ \ "reducedPersonalAllowanceThreshold").readNullable[Int] and
+      (__ \ "reducedPersonalisedAllowance").readNullable[Int] and
+      (__ \ "giftAidExtender").readNullable[Int]
     ) (AnnualAllowances.apply _)
 
 }

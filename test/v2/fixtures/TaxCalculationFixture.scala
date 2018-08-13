@@ -206,7 +206,7 @@ object TaxCalculationFixture {
         )
       )),
       annualAllowances = AnnualAllowances(
-        personalAllowance = Some(99999999),
+        personalAllowance = 99999999,
         personalAllowanceThreshold = Some(99999999),
         reducedPersonalAllowance = Some(99999999),
         giftAidExtender = Some(99999999)
@@ -782,7 +782,7 @@ object TaxCalculationFixture {
       )
     )),
     annualAllowances = AnnualAllowances(
-      personalAllowance = Some(99999999),
+      personalAllowance = 99999999,
       personalAllowanceThreshold = Some(99999999),
       reducedPersonalAllowance = Some(99999999),
       giftAidExtender = None
