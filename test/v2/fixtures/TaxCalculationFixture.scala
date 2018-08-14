@@ -454,7 +454,7 @@ object TaxCalculationFixture {
       |      	  	"lossesFhlUk": 1000.25,
       |      	  	"finalised": true
       |      	  },
-      |      	  "ukDividendsIncome": 1000.25
+      |      	  "ukDividendIncome": 1000.25
       |        },
       |      	"totalIncomeReceived": 1000.25,
       |       "totalAllowancesAndDeductions": 1000.25,
@@ -1059,7 +1059,7 @@ object TaxCalculationFixture {
       |						"latestDate": "2016-01-01",
       |						"interestReceived": 1000.25
       |					},
-      |					"ukDividendsIncome": 1000.25,
+      |					"ukDividendIncome": 1000.25,
       |					"ukDividends": {
       |						"incomeSourceID": "ABIS10000000001",
       |						"latestDate": "2016-01-01"

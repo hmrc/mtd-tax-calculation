@@ -32,7 +32,7 @@ class UKDividendsSpec extends UnitSpec with JsonErrorValidators {
   val ukDividendsDesJson: String =
     """
       |{
-      |"ukDividendsIncome": 123.45
+      |"ukDividendIncome": 123.45
       |}
     """.stripMargin
 
@@ -44,9 +44,9 @@ class UKDividendsSpec extends UnitSpec with JsonErrorValidators {
     "return correct validation errors" when {
 
       testPropertyType[UKDividends](ukDividendsDesJson)(
-        property = "ukDividendsIncome",
+        property = "ukDividendIncome",
         invalidValue = "\"nan\"",
-        errorPathAndError = ".ukDividendsIncome" -> NUMBER_FORMAT_EXCEPTION
+        errorPathAndError = ".ukDividendIncome" -> NUMBER_FORMAT_EXCEPTION
       )
     }
 
