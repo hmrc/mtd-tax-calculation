@@ -21,7 +21,7 @@ import play.api.libs.json.Reads._
 import play.api.libs.json.{Json, _}
 
 
-case class Nic(totalNic: Option[BigDecimal],
+case class Nic(totalNic: BigDecimal,
                class2: Option[Class2Nic],
                class4: Option[Class4Nic])
 
@@ -29,9 +29,9 @@ object Nic {
   implicit val writes: Writes[Nic] = Json.writes[Nic]
 
   implicit val reads: Reads[Nic] = (
-    (__ \ "totalNic").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "nic" \ "class2").readNullable[Class2Nic].orElse(Reads.pure(None)) and
-      (__ \ "nic" \ "class4").readNullable[Class4Nic].orElse(Reads.pure(None))
+    (__ \ "totalNic").read[BigDecimal] and
+      (__ \\ "class2").readNullable[Class2Nic] and
+      (__ \\ "class4").readNullable[Class4Nic]
     ) (Nic.apply _)
 
 }

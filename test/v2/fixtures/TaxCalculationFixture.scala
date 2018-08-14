@@ -137,7 +137,7 @@ object TaxCalculationFixture {
         totalIncomeTax = 1000.25
       ),
       nic = Nic(
-        totalNic = Some(1000.25),
+        totalNic = 1000.25,
         class2 = Some(Class2Nic(
           amount = 1000.25,
           weekRate = 1000.25,
@@ -716,7 +716,7 @@ object TaxCalculationFixture {
       totalIncomeTax = 1000.25
     ),
     nic = Nic(
-      totalNic = Some(1000.25),
+      totalNic = 1000.25,
       class2 = Some(Class2Nic(
         amount = 1000.25,
         weekRate = 1000.25,

@@ -27,6 +27,7 @@ trait JsonErrorValidators {
   _: UnitSpec =>
 
   object JsonError {
+    val NUMBER_OR_STRING_FORMAT_EXCEPTION = "error.expected.jsnumberorjsstring"
     val NUMBER_FORMAT_EXCEPTION = "error.expected.numberformatexception"
     val BOOLEAN_FORMAT_EXCEPTION = "error.expected.jsboolean"
     val STRING_FORMAT_EXCEPTION = "error.expected.jsstring"
@@ -141,9 +142,14 @@ trait JsonErrorValidators {
 
     val errorPathJson = errorPathAndError._1.replace("/", ".")
 
+    executeJsonPropertyTests(invalidTypedJson, property, errorPathAndError._2)
+  }
+
+  def executeJsonPropertyTests[A](invalidJson: String, property: String, errorMessage: String)
+                              (implicit rd: Reads[A]): Unit = {
     s"the JSON has the wrong data type for property $property" should {
 
-      val json = Json.parse(invalidTypedJson)
+      val json = Json.parse(invalidJson)
 
       val result = Try(json.as[A])
 
@@ -159,7 +165,7 @@ trait JsonErrorValidators {
           case Failure(e: JsResultException) =>
             val propertyName = getOnlyJsonErrorPath(e)
             if (propertyName.isRight) {
-              propertyName.right.get should endWith (errorPathJson.split("\\.").last)
+              propertyName.right.get should endWith (property)
             }
           case _ => fail("A JSON error was expected")
         }
@@ -170,13 +176,15 @@ trait JsonErrorValidators {
           case Failure(e: JsResultException) =>
             val message = getOnlyJsonErrorMessage(e)
             if (message.isRight) {
-              message.right.get shouldBe errorPathAndError._2
+              message.right.get shouldBe errorMessage
             }
           case _ => fail("A JSON error was expected")
         }
       }
     }
+
   }
+
   private def getOnlyJsonErrorPath(ex: JsResultException): Either[Assertion, String] = {
     ex.errors match {
       case (jsonPath, _) :: Nil =>
