@@ -29,8 +29,8 @@ object TaxCalcHttpParser extends HttpParser {
       (response.status, response.jsonOpt) match {
         case (OK, _) => parseResponse(response)
         case (NO_CONTENT, _) => Left(CalculationNotReady)
-        case (BAD_REQUEST, ErrorCode(DesErrorCode.INVALID_IDENTIFIER)) => Left(InvalidNino)
-        case (BAD_REQUEST, ErrorCode(DesErrorCode.INVALID_CALCID)) => Left(InvalidCalcID)
+        case (BAD_REQUEST, ErrorCode(DesErrorCode.INVALID_IDENTIFIER)) => Left(InvalidNinoError)
+        case (BAD_REQUEST, ErrorCode(DesErrorCode.INVALID_CALCID)) => Left(InvalidCalcIDError)
         case (FORBIDDEN, _) => Left(InternalServerError)
         case (NOT_FOUND, _) => Left(NotFound)
         case (INTERNAL_SERVER_ERROR, ErrorCode(DesErrorCode.SERVER_ERROR)) => Left(InternalServerError)

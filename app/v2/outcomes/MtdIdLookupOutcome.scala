@@ -16,7 +16,7 @@
 
 package v2.outcomes
 
-import v2.models.errors.{Error, InternalServerError, MtdError}
+import v2.models.errors.{Error, InternalServerError, MtdError, UnauthorisedError}
 
 object MtdIdLookupOutcome {
 
@@ -26,8 +26,8 @@ object MtdIdLookupOutcome {
     val error: Error
   }
 
-  object NotAuthorised extends MtdIdLookupError {
-    val error = Error("CLIENT_OR_AGENT_NOT_AUTHORISED", "The client and/or agent is not authorised.")
+  object Unauthorised extends MtdIdLookupError {
+    val error = UnauthorisedError
   }
 
   object DownstreamError extends MtdIdLookupError {

@@ -16,10 +16,10 @@
 
 package v2.services
 
-import v2.mocks.connectors.MockMtdIdLookupConnector
 import support.UnitSpec
 import uk.gov.hmrc.http.HeaderCarrier
-import v2.models.errors.InvalidNino
+import v2.mocks.connectors.MockMtdIdLookupConnector
+import v2.models.errors.{InvalidNinoError, UnauthorisedError}
 import v2.outcomes.MtdIdLookupOutcome._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -40,7 +40,7 @@ class MtdIdLookupServiceSpec extends UnitSpec {
     "an invalid NINO is passed in" should {
       "return a valid mtdId" in new Test {
 
-        val expected = Left(InvalidNino)
+        val expected = Left(InvalidNinoError)
 
         // should not call the connector
         MockedMtdIdLookupConnector.lookup(invalidNino)
@@ -54,7 +54,7 @@ class MtdIdLookupServiceSpec extends UnitSpec {
 
     "a not authorised error occurs the service" should {
       "proxy the error to the caller" in new Test {
-        val connectorResponse = Left(NotAuthorised)
+        val connectorResponse = Left(UnauthorisedError)
 
         MockedMtdIdLookupConnector.lookup(nino)
           .returns(Future.successful(connectorResponse))

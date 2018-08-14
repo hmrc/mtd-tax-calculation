@@ -27,10 +27,9 @@ object CalculationNotReady extends MtdError
 
 //4xx
 object NotFound extends MtdError
-object InvalidNino extends Error("NINO_INVALID", "The provided NINO is invalid")
-object InvalidCalcID extends Error("CALCID_INVALID", "The provided calculationId is invalid")
-object Unauthorised extends Error("UNAUTHORIZED", "Bearer token is missing or not authorized")
-
+object InvalidNinoError extends Error("FORMAT_NINO", "The format of the National Insurance number is invalid")
+object InvalidCalcIDError extends Error("FORMAT_CALC_ID", "The format of the tax calculation ID is invalid")
+object UnauthorisedError extends Error("CLIENT_OR_AGENT_NOT_AUTHORISED", "The client and/or agent is not authorised")
 //5xx
 object InternalServerError extends Error("INTERNAL_SERVER_ERROR", "An internal server error occurred")
 
