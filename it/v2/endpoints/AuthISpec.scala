@@ -60,7 +60,7 @@ class AuthISpec extends IntegrationBaseSpec {
         override def setupStubs(): StubMapping = {
           MtdIdLookupStub.ninoFound(nino, mtdId)
           AuthStub.authorised()
-          TaxCalcStub.successfulTaxCalc(mtdId, calcId)
+          TaxCalcStub.successfulTaxCalc(nino, calcId)
         }
 
         val response: WSResponse = await(request().get())

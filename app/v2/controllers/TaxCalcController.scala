@@ -29,7 +29,7 @@ class TaxCalcController @Inject()(val authService: EnrolmentsAuthService,
                                   val service: TaxCalcService) extends AuthorisedController {
 
   def getTaxCalculation(nino: String, calcId: String): Action[AnyContent] = authorisedAction(nino).async { implicit request =>
-    service.getTaxCalculation(request.mtdId, calcId).map {
+    service.getTaxCalculation(nino, calcId).map {
       case Right(taxCalculation) => Ok(toJson(taxCalculation))
       case Left(mtdError) =>
         mtdError match {
