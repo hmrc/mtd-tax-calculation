@@ -30,9 +30,9 @@ class TaxCalcConnectorSpec extends ConnectorSpec {
   val desBaseUrl = "test-base-url"
   val desEnv = "TestEnv"
   val desToken = "token"
-  val nino = "test-nino"
+  val mtdId = "123456789012345"
   val calculationId = "test-calc-id"
-  val url = s"$desBaseUrl/calculation-store/calculation-data/$nino/calcId/$calculationId"
+  val url = s"$desBaseUrl/income-tax/calculation-data/$mtdId/calcId/$calculationId"
 
   val httpResponseOk = HttpResponse(OK)
   val httpResponseNotFound = HttpResponse(NOT_FOUND)
@@ -55,7 +55,7 @@ class TaxCalcConnectorSpec extends ConnectorSpec {
         MockedHttpClient.get[TaxCalcOutcome](url)
           .returns(Future.successful(Right(TaxCalculationFixture.taxCalc)))
 
-        val result: TaxCalcOutcome = await(connector.getTaxCalculation(nino, calculationId))
+        val result: TaxCalcOutcome = await(connector.getTaxCalculation(mtdId, calculationId))
         result shouldBe Right(TaxCalculationFixture.taxCalc)
       }
     }
@@ -65,7 +65,7 @@ class TaxCalcConnectorSpec extends ConnectorSpec {
         MockedHttpClient.get[TaxCalcOutcome](url)
           .returns(Future.successful(Left(NotFound)))
 
-        val result: TaxCalcOutcome = await(connector.getTaxCalculation(nino, calculationId))
+        val result: TaxCalcOutcome = await(connector.getTaxCalculation(mtdId, calculationId))
         result shouldBe Left(NotFound)
       }
     }

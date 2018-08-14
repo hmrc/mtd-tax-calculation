@@ -24,15 +24,15 @@ import v2.fixtures.{DESErrorsFixture, TaxCalculationFixture => TestData}
 
 object TaxCalcStub extends WireMockMethods {
 
-  private val taxCalcUri: (String, String) => String = (nino, calcId) => s"/calculation-store/calculation-data/$nino/calcId/$calcId"
+  private val taxCalcUri: (String, String) => String = (mtdId, calcId) => s"/income-tax/calculation-data/$mtdId/calcId/$calcId"
 
-  def successfulTaxCalc(nino: String, calcId: String): StubMapping = {
-    when(method = GET, uri = taxCalcUri(nino, calcId))
+  def successfulTaxCalc(mtdId: String, calcId: String): StubMapping = {
+    when(method = GET, uri = taxCalcUri(mtdId, calcId))
       .thenReturn(status = OK, body = successfulTaxCalcResponse)
   }
 
-  def unsuccessfulTaxCalc(nino: String, calcId: String): StubMapping = {
-    when(method = GET, uri = taxCalcUri(nino, calcId))
+  def unsuccessfulTaxCalc(mtdId: String, calcId: String): StubMapping = {
+    when(method = GET, uri = taxCalcUri(mtdId, calcId))
       .thenReturn(status = INTERNAL_SERVER_ERROR, body = unsuccessfulTaxCalcResponse)
   }
 

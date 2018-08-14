@@ -28,8 +28,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class TaxCalcConnector @Inject()(http: HttpClient,
                                  implicit val appConfig: AppConfig) extends DesConnector {
 
-  def getTaxCalculation(nino: String, calculationId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[TaxCalcOutcome] = {
+  def getTaxCalculation(mtdId: String, calculationId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[TaxCalcOutcome] = {
     import v2.httpparsers.TaxCalcHttpParser.taxCalcHttpReads
-    http.GET[TaxCalcOutcome](s"${appConfig.desBaseUrl}/calculation-store/calculation-data/$nino/calcId/$calculationId")(implicitly, hc.withDesHeaders(), ec)
+    http.GET[TaxCalcOutcome](s"${appConfig.desBaseUrl}/income-tax/calculation-data/$mtdId/calcId/$calculationId")(implicitly, hc.withDesHeaders(), ec)
   }
 }
