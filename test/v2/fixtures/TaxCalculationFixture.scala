@@ -165,38 +165,38 @@ object TaxCalculationFixture {
         totalTaxDeducted = Some(1000.25)
       )),
       eoyEstimate = EoyEstimate(
-        employments = Seq(
+        employments = Some(Seq(
           EoyEmployment(
             employmentId = "ABIS10000000001",
             taxableIncome = 99999999.99,
             supplied = false,
             finalised = Some(false)
           )
-        ),
-        selfEmployments = Seq(
+        )),
+        selfEmployments = Some(Seq(
           EoySelfEmployment(
             selfEmploymentId = "XKIS00000000988",
             taxableIncome = 99999999.99,
             supplied = false,
             finalised = Some(false)
           )
-        ),
-        ukProperty = EoyItem(
+        )),
+        ukProperty = Some(EoyItem(
           taxableIncome = 99999999.99,
           supplied = false,
           finalised = Some(false)
-        ),
-        ukDividends = EoyItem(
+        )),
+        ukDividends = Some(EoyItem(
           taxableIncome = 99999999.99,
           supplied = false,
           finalised = Some(false)
-        ),
-        totalTaxableIncome = Some(99999999.99),
-        incomeTaxAmount = Some(99999999.99),
-        nic2 = Some(99999999),
-        nic4 = Some(99999999),
-        totalNicAmount = Some(99999999.99),
-        incomeTaxAndNicAmount = Some(99999999.99)
+        )),
+        totalTaxableIncome = 99999999.99,
+        incomeTaxAmount = 99999999.99,
+        nic2 = 99999999,
+        nic4 = 99999999,
+        totalNicAmount = 99999999.99,
+        incomeTaxNicAmount = 99999999.99
       ),
       calculationMessageCount = Some(1),
       calculationMessages = Some(Seq(
@@ -388,7 +388,7 @@ object TaxCalculationFixture {
       |		"nic2": 99999999,
       |		"nic4": 99999999,
       |		"totalNicAmount": 99999999.99,
-      |		"incomeTaxAndNicAmount": 99999999.99
+      |		"incomeTaxNicAmount": 99999999.99
       |	},
       |	"calculationMessageCount": 1,
       |	"calculationMessages": [
@@ -741,38 +741,38 @@ object TaxCalculationFixture {
     totalBeforeTaxDeducted = None,
     taxDeducted = None,
     eoyEstimate = EoyEstimate(
-      employments = Seq(
+      employments = Some(Seq(
         EoyEmployment(
           employmentId = "abcdefghijklm",
           taxableIncome = 99999999.99,
           supplied = true,
           finalised = Some(true)
         )
-      ),
-      selfEmployments = Seq(
+      )),
+      selfEmployments = Some(Seq(
         EoySelfEmployment(
           selfEmploymentId = "abcdefghijklm",
           taxableIncome = 99999999.99,
           supplied = true,
           finalised = Some(true)
         )
-      ),
-      ukProperty = EoyItem(
+      )),
+      ukProperty = Some(EoyItem(
         taxableIncome = 99999999.99,
         supplied = true,
         finalised = Some(true)
-      ),
-      ukDividends = EoyItem(
+      )),
+      ukDividends = Some(EoyItem(
         taxableIncome = 99999999.99,
         supplied = true,
         finalised = Some(true)
-      ),
-      totalTaxableIncome = Some(99999999.99),
-      incomeTaxAmount = Some(99999999.99),
-      nic2 = Some(99999999),
-      nic4 = Some(99999999),
-      totalNicAmount = Some(99999999.99),
-      incomeTaxAndNicAmount = Some(99999999.99)
+      )),
+      totalTaxableIncome = 99999999.99,
+      incomeTaxAmount = 99999999.99,
+      nic2 = 99999999,
+      nic4 = 99999999,
+      totalNicAmount = 99999999.99,
+      incomeTaxNicAmount = 99999999.99
     ),
     calculationMessageCount = Some(1),
     calculationMessages = Some(Seq(
@@ -948,7 +948,7 @@ object TaxCalculationFixture {
       |		"nic2": 99999999,
       |		"nic4": 99999999,
       |		"totalNicAmount": 99999999.99,
-      |		"incomeTaxAndNicAmount": 99999999.99
+      |		"incomeTaxNicAmount": 99999999.99
       |	},
       |	"calculationMessageCount": 1,
       |	"calculationMessages": [

@@ -19,16 +19,16 @@ package v2.models
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
-case class EoyEstimate(employments: Seq[EoyEmployment],
-                       selfEmployments: Seq[EoySelfEmployment],
-                       ukProperty: EoyItem,
-                       ukDividends: EoyItem,
-                       totalTaxableIncome: Option[BigDecimal],
-                       incomeTaxAmount: Option[BigDecimal],
-                       nic2: Option[BigDecimal],
-                       nic4: Option[BigDecimal],
-                       totalNicAmount: Option[BigDecimal],
-                       incomeTaxAndNicAmount: Option[BigDecimal])
+case class EoyEstimate(employments: Option[Seq[EoyEmployment]],
+                       selfEmployments: Option[Seq[EoySelfEmployment]],
+                       ukProperty: Option[EoyItem],
+                       ukDividends: Option[EoyItem],
+                       totalTaxableIncome: BigDecimal,
+                       incomeTaxAmount: BigDecimal,
+                       nic2: BigDecimal,
+                       nic4: BigDecimal,
+                       totalNicAmount: BigDecimal,
+                       incomeTaxNicAmount: BigDecimal)
 
 object EoyEstimate {
   implicit val writes: OWrites[EoyEstimate] = Json.writes[EoyEstimate]
@@ -36,32 +36,31 @@ object EoyEstimate {
   implicit val reads: Reads[EoyEstimate] = {
 
     ((__ \ "incomeSource").read[Seq[JsValue]] and
-      (__ \ "totalTaxableIncome").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "incomeTaxAmount").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "nic2").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "nic4").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "totalNicAmount").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "incomeTaxNicAmount").readNullable[BigDecimal].orElse(Reads.pure(None))
+      (__ \ "totalTaxableIncome").read[BigDecimal] and
+      (__ \ "incomeTaxAmount").read[BigDecimal] and
+      (__ \ "nic2").read[BigDecimal] and
+      (__ \ "nic4").read[BigDecimal] and
+      (__ \ "totalNicAmount").read[BigDecimal] and
+      (__ \ "incomeTaxNicAmount").read[BigDecimal]
       ){ (incomeSource, totalTaxableIncome, incomeTaxAmount, nic2, nic4, totalNicAmount, incomeTaxNicAmount) =>
 
-      val mandatoryOnlyEoyItem = EoyItem(123.45, supplied = true, None)
-
       val estimate = EoyEstimate(
-        employments = Seq(),
-        selfEmployments = Seq(),
-        ukProperty = mandatoryOnlyEoyItem,
-        ukDividends = mandatoryOnlyEoyItem,
+        employments = None,
+        selfEmployments = None,
+        ukProperty = None,
+        ukDividends = None,
         totalTaxableIncome, incomeTaxAmount, nic2, nic4, totalNicAmount, incomeTaxNicAmount
       )
 
       incomeSource.foldLeft(estimate){ (old, json) =>
         (json \ "type").as[String] match {
-          case "05" => old.copy(employments = old.employments ++ Seq(json.as[EoyEmployment]))
-          case "01" => old.copy(selfEmployments = old.selfEmployments ++ Seq(json.as[EoySelfEmployment]))
-          case "02" => old.copy(ukProperty = json.as[EoyItem])
-          case "10" => old.copy(ukDividends = json.as[EoyItem])
+          case "05" => old.copy(employments = Some(old.employments.getOrElse(Seq()) ++  Seq(json.as[EoyEmployment])))
+          case "01" => old.copy(selfEmployments = Some(old.selfEmployments.getOrElse(Seq()) ++ Seq(json.as[EoySelfEmployment])))
+          case "02" => old.copy(ukProperty = Some(json.as[EoyItem]))
+          case "10" => old.copy(ukDividends = Some(json.as[EoyItem]))
         }
       }
+
     }
   }
 }

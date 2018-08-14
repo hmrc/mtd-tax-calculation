@@ -95,21 +95,21 @@ class TaxCalculationSpec extends UnitSpec {
         """.stripMargin)
 
       val expectedEoyEstimate = EoyEstimate(
-        employments = List(
+        employments = Some(List(
           EoyEmployment("id1", 62345.67, true, Some(true)),
           EoyEmployment("id2", 423.22, false, Some(true))
-        ),
-        selfEmployments = List(
+        )),
+        selfEmployments = Some(List(
           EoySelfEmployment("id3", 12443.22, false, Some(false))
-        ),
-        ukProperty = EoyItem(9982.03, supplied = true, Some(true)),
-        ukDividends = EoyItem(1123.2, supplied = true, Some(false)),
-        totalTaxableIncome = Some(1234.56),
-        incomeTaxAmount = Some(9938.22),
-        nic2 = Some(7738.33),
-        nic4 = Some(228.22),
-        totalNicAmount = Some(3321.11),
-        incomeTaxAndNicAmount = Some(99.22)
+        )),
+        ukProperty = Some(EoyItem(9982.03, supplied = true, Some(true))),
+        ukDividends = Some(EoyItem(1123.2, supplied = true, Some(false))),
+        totalTaxableIncome = 1234.56,
+        incomeTaxAmount = 9938.22,
+        nic2 = 7738.33,
+        nic4 = 228.22,
+        totalNicAmount = 3321.11,
+        incomeTaxNicAmount = 99.22
       )
 
       eoyEstimateJson.as[EoyEstimate](EoyEstimate.reads) shouldBe expectedEoyEstimate
