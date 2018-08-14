@@ -22,7 +22,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import v2.fixtures.TaxCalculationFixture
 import v2.mocks.services.{MockEnrolmentsAuthService, MockMtdIdLookupService, MockTaxCalcService}
 import v2.models.errors._
-import v2.outcomes.MtdIdLookupOutcome.NotAuthorised
 
 import scala.concurrent.Future
 
@@ -79,7 +78,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
       "a invalid NI number is passed" in new Test {
 
         MockedMtdIdLookupService.lookup(nino)
-          .returns(Future.successful(Left(InvalidNino)))
+          .returns(Future.successful(Left(InvalidNinoError)))
 
         private val result = controller.getTaxCalculation(nino, "calcId")(fakeGetRequest)
         status(result) shouldBe BAD_REQUEST
@@ -92,12 +91,12 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
           .returns(Future.successful(Right(mtdId)))
 
         MockedTaxCalcService.getTaxCalculation(mtdId, calcId)
-          .returns(Future.successful(Left(InvalidNino)))
+          .returns(Future.successful(Left(InvalidNinoError)))
 
         val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
 
         status(result) shouldBe BAD_REQUEST
-        contentAsJson(result) shouldBe Json.toJson(InvalidNino)
+        contentAsJson(result) shouldBe Json.toJson(InvalidNinoError)
       }
 
       "the service returns an Invalid CalcID error" in new Test {
@@ -107,12 +106,12 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
           .returns(Future.successful(Right(mtdId)))
 
         MockedTaxCalcService.getTaxCalculation(mtdId, calcId)
-          .returns(Future.successful(Left(InvalidCalcID)))
+          .returns(Future.successful(Left(InvalidCalcIDError)))
 
         val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
 
         status(result) shouldBe BAD_REQUEST
-        contentAsJson(result) shouldBe Json.toJson(InvalidCalcID)
+        contentAsJson(result) shouldBe Json.toJson(InvalidCalcIDError)
       }
     }
 
@@ -134,10 +133,10 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
     }
 
     "return a 500" when {
-      "the details passed or not authorised" in new Test {
+      "the details passed are not authorised" in new Test {
 
         MockedMtdIdLookupService.lookup(nino)
-          .returns(Future.successful(Left(NotAuthorised)))
+          .returns(Future.successful(Left(UnauthorisedError)))
 
         private val result = controller.getTaxCalculation(nino, "calcId")(fakeGetRequest)
         status(result) shouldBe FORBIDDEN

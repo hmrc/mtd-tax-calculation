@@ -54,7 +54,7 @@ class TaxCalcHttpParserSpec extends UnitSpec {
         val response = HttpResponse(BAD_REQUEST, Some(DESErrorsFixture.invalidIdentifierJson))
         val result: TaxCalcOutcome = taxCalcHttpReads.read(method, url, response)
 
-        result shouldBe Left(InvalidNino)
+        result shouldBe Left(InvalidNinoError)
       }
     }
 
@@ -63,7 +63,7 @@ class TaxCalcHttpParserSpec extends UnitSpec {
         val response = HttpResponse(BAD_REQUEST, Some(DESErrorsFixture.invalidCalcIDJson))
         val result: TaxCalcOutcome = taxCalcHttpReads.read(method, url, response)
 
-        result shouldBe Left(InvalidCalcID)
+        result shouldBe Left(InvalidCalcIDError)
       }
 
     }

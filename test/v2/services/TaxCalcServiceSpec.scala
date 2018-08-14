@@ -17,7 +17,7 @@
 package v2.services
 
 import v2.mocks.connectors.MockTaxCalcConnector
-import v2.models.errors.InvalidCalcID
+import v2.models.errors.InvalidCalcIDError
 import v2.outcomes.TaxCalcOutcome.TaxCalcOutcome
 
 import scala.concurrent.Future
@@ -38,7 +38,7 @@ class TaxCalcServiceSpec extends ServiceSpec {
         val invalidCalcId = "invalid-calc-id"
 
         val result: TaxCalcOutcome = await(service.getTaxCalculation(mtdId, invalidCalcId))
-        result shouldBe Left(InvalidCalcID)
+        result shouldBe Left(InvalidCalcIDError)
       }
     }
 
