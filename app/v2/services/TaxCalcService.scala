@@ -30,13 +30,13 @@ class TaxCalcService @Inject()(connector: TaxCalcConnector) {
 
   private val calcIdRegex = "^[0-9]{8}$|^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
 
-  def getTaxCalculation(mtdid: String, calcId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[TaxCalcOutcome] = {
+  def getTaxCalculation(nino: String, calcId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[TaxCalcOutcome] = {
     if (!calcId.matches(calcIdRegex)) {
       Logger.warn(s"[TaxCalcService] [getTaxCalculation] Invalid CalculationID supplied.")
       Future.successful(Left(InvalidCalcIDError))
     }
     else {
-      connector.getTaxCalculation(mtdid, calcId)
+      connector.getTaxCalculation(nino, calcId)
     }
   }
 }
