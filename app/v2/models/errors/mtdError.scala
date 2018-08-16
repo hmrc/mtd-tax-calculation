@@ -29,7 +29,7 @@ object CalculationNotReady extends MtdError
 object NotFound extends MtdError
 object InvalidNinoError extends Error("FORMAT_NINO", "The format of the National Insurance number is invalid")
 object InvalidCalcIDError extends Error("FORMAT_CALC_ID", "The format of the tax calculation ID is invalid")
-object UnauthorisedError extends Error("CLIENT_OR_AGENT_NOT_AUTHORISED", "The client and/or agent is not authorised")
+object UnauthorisedError extends Error("CLIENT_OR_AGENT_NOT_AUTHORISED", "The client and/or agent is not authorised.")
 //5xx
 object InternalServerError extends Error("INTERNAL_SERVER_ERROR", "An internal server error occurred")
 
