@@ -73,7 +73,7 @@ class TaxCalcHttpParserSpec extends UnitSpec {
         val response = HttpResponse(NOT_FOUND, Some(DESErrorsFixture.notFoundJson))
         val result: TaxCalcOutcome = taxCalcHttpReads.read(method, url, response)
 
-        result shouldBe Left(NotFound)
+        result shouldBe Left(MatchingResourceNotFound)
       }
 
       "the HttpResponse contains a 404 status and a list of errors" in {
@@ -84,7 +84,7 @@ class TaxCalcHttpParserSpec extends UnitSpec {
         val response = HttpResponse(NOT_FOUND, Some(errorListJson))
         val result: TaxCalcOutcome = taxCalcHttpReads.read(method, url, response)
 
-        result shouldBe Left(NotFound)
+        result shouldBe Left(MatchingResourceNotFound)
       }
     }
 

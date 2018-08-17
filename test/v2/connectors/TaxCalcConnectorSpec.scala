@@ -16,12 +16,11 @@
 
 package v2.connectors
 
+import uk.gov.hmrc.http.HttpResponse
 import v2.fixtures.TaxCalculationFixture
 import v2.mocks.{MockAppConfig, MockHttpClient}
-import v2.outcomes.TaxCalcOutcome
+import v2.models.errors.MatchingResourceNotFound
 import v2.outcomes.TaxCalcOutcome.TaxCalcOutcome
-import uk.gov.hmrc.http.HttpResponse
-import v2.models.errors.NotFound
 
 import scala.concurrent.Future
 
@@ -63,10 +62,10 @@ class TaxCalcConnectorSpec extends ConnectorSpec {
     "return an NotFound error" when {
       "the http parser returns a NotFound error" in new Test {
         MockedHttpClient.get[TaxCalcOutcome](url)
-          .returns(Future.successful(Left(NotFound)))
+          .returns(Future.successful(Left(MatchingResourceNotFound)))
 
         val result: TaxCalcOutcome = await(connector.getTaxCalculation(mtdId, calculationId))
-        result shouldBe Left(NotFound)
+        result shouldBe Left(MatchingResourceNotFound)
       }
     }
   }

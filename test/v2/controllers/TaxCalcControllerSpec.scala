@@ -123,12 +123,12 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
           .returns(Future.successful(Right(mtdId)))
 
         MockedTaxCalcService.getTaxCalculation(nino, calcId)
-          .returns(Future.successful(Left(NotFound)))
+          .returns(Future.successful(Left(MatchingResourceNotFound)))
 
         val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
 
         status(result) shouldBe NOT_FOUND
-        await(result).body.isKnownEmpty shouldBe true
+        contentAsJson(result) shouldBe Json.toJson(MatchingResourceNotFound)
       }
     }
 

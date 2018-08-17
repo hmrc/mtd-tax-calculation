@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json.toJson
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
-import v2.models.errors.{CalculationNotReady, InvalidCalcIDError, InvalidNinoError, MatchingResourceNotFound, InternalServerError => ISE, NotFound => Not_Found}
+import v2.models.errors.{CalculationNotReady, InvalidCalcIDError, InvalidNinoError, MatchingResourceNotFound, InternalServerError => ISE}
 import v2.services.{EnrolmentsAuthService, MtdIdLookupService, TaxCalcService}
 
 @Singleton
@@ -35,7 +35,7 @@ class TaxCalcController @Inject()(val authService: EnrolmentsAuthService,
         mtdError match {
           case CalculationNotReady => NoContent
           case InvalidCalcIDError | InvalidNinoError => BadRequest(toJson(mtdError))
-          case Not_Found => NotFound(toJson(MatchingResourceNotFound))
+          case MatchingResourceNotFound => NotFound(toJson(mtdError))
           case ISE => InternalServerError(toJson(mtdError))
         }
     }

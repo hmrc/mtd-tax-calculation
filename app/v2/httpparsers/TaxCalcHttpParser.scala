@@ -32,7 +32,7 @@ object TaxCalcHttpParser extends HttpParser {
         case (BAD_REQUEST, ErrorCode(DesErrorCode.INVALID_IDENTIFIER)) => Left(InvalidNinoError)
         case (BAD_REQUEST, ErrorCode(DesErrorCode.INVALID_CALCID)) => Left(InvalidCalcIDError)
         case (FORBIDDEN, _) => Left(InternalServerError)
-        case (NOT_FOUND, _) => Left(NotFound)
+        case (NOT_FOUND, _) => Left(MatchingResourceNotFound)
         case (INTERNAL_SERVER_ERROR, ErrorCode(DesErrorCode.SERVER_ERROR)) => Left(InternalServerError)
         case (INTERNAL_SERVER_ERROR, ErrorCode(DesErrorCode.SERVICE_UNAVAILABLE)) => Left(InternalServerError)
       }
