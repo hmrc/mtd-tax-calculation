@@ -67,7 +67,7 @@ object TaxCalculationFixture {
         ukDividends = Some(UKDividends(
           totalIncome = Some(1000.25)
         )),
-        totalIncomeReceived = Some(1000.25),
+        totalIncomeReceived = 1000.25,
         allowancesAndDeductions = AllowancesAndDeductions(
           totalAllowancesAndDeductions = 1000.25,
           giftOfInvestmentsAndPropertyToCharity = Some(1000.25),
@@ -650,7 +650,7 @@ object TaxCalculationFixture {
       ukDividends = Some(UKDividends(
         totalIncome = Some(1000.25)
       )),
-      totalIncomeReceived = Some(1000.25),
+      totalIncomeReceived = 1000.25,
       allowancesAndDeductions = AllowancesAndDeductions(
         totalAllowancesAndDeductions = 1000.25,
         giftOfInvestmentsAndPropertyToCharity = Some(1000.25),

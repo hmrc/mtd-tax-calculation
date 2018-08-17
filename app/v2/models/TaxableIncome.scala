@@ -17,13 +17,13 @@
 package v2.models
 
 import play.api.libs.functional.syntax._
-import play.api.libs.json._
+import play.api.libs.json.{Reads, _}
 
 case class TaxableIncome(employments: Option[Employments],
                          selfEmployments: Option[SelfEmployments],
                          ukProperty: Option[UKProperty],
                          ukDividends: Option[UKDividends],
-                         totalIncomeReceived: Option[BigDecimal],
+                         totalIncomeReceived: BigDecimal,
                          allowancesAndDeductions: AllowancesAndDeductions,
                          totalTaxableIncome: Option[BigDecimal])
 
@@ -31,17 +31,16 @@ object TaxableIncome {
   implicit val writes: Writes[TaxableIncome] = Json.writes[TaxableIncome]
 
   implicit val reads: Reads[TaxableIncome] = (
-    (__ \ "taxableIncome" \ "incomeReceived").readNullable[Employments].orElse(Reads.pure(None)) and
-      (__ \ "taxableIncome" \ "incomeReceived").readNullable[SelfEmployments].orElse(Reads.pure(None)) and
-      (__ \ "taxableIncome" \ "incomeReceived").readNullable[UKProperty].orElse(Reads.pure(None)) and
-      (__ \ "taxableIncome" \ "incomeReceived").readNullable[UKDividends].orElse(Reads.pure(None))
-        .map(_.flatMap {
-          case UKDividends(None) => None
-          case x => Some(x)
-        }) and
-      (__ \ "taxableIncome" \ "totalIncomeReceived").readNullable[BigDecimal].orElse(Reads.pure(None)) and
+    (__ \ "taxableIncome" \ "incomeReceived" \ "employments").readNestedNullable[JsObject].flatMap{
+      case Some(_) => (__ \ "taxableIncome" \ "incomeReceived").readNullable[Employments]
+      case None => Reads.pure[Option[Employments]](None)
+    } and
+       (__ \ "taxableIncome" \ "incomeReceived").readNullable[SelfEmployments] and
+      (__ \ "taxableIncome" \ "incomeReceived").readNullable[UKProperty] and
+      (__ \ "taxableIncome" \ "incomeReceived").readNullable[UKDividends] and
+      (__ \ "taxableIncome" \ "totalIncomeReceived").read[BigDecimal] and
       (__ \ "taxableIncome").read[AllowancesAndDeductions] and
-      (__ \ "totalTaxableIncome").readNullable[BigDecimal].orElse(Reads.pure(None))
+      (__ \ "totalTaxableIncome").readNullable[BigDecimal]
     )(TaxableIncome.apply _)
 
 }

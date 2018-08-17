@@ -32,11 +32,11 @@ object UKProperty {
 
   implicit val reads: Reads[UKProperty] = (
     (__ \ "ukPropertyIncome").readNullable[BigDecimal] and
-      (__ \ "ukProperty" \ "taxableProfit").readNullable[BigDecimal] and
-      (__ \ "ukProperty" \ "losses").readNullable[BigDecimal] and
-      (__ \ "ukProperty" \ "taxableProfitFhlUk").readNullable[BigDecimal] and
-      (__ \ "ukProperty" \ "lossesFhlUk").readNullable[BigDecimal] and
-      (__ \ "ukProperty" \ "finalised").readNullable[Boolean]
+      (__ \ "ukProperty" \ "taxableProfit").readNestedNullable[BigDecimal] and
+      (__ \ "ukProperty" \ "losses").readNestedNullable[BigDecimal] and
+      (__ \ "ukProperty" \ "taxableProfitFhlUk").readNestedNullable[BigDecimal] and
+      (__ \ "ukProperty" \ "lossesFhlUk").readNestedNullable[BigDecimal] and
+      (__ \ "ukProperty" \ "finalised").readNestedNullable[Boolean]
     ) (UKProperty.apply _)
 
 }
