@@ -185,6 +185,14 @@ trait JsonErrorValidators {
 
   }
 
+  def removeJsonProperty[T](json: JsValue)(pathToProperty: String): JsValue = {
+    val jsPath = pathToProperty.split("/").filterNot(_ == "").foldLeft(JsPath())(_ \ _)
+    jsPath.prune(json).fold(
+      invalid = errs => fail(s"an error occurred when reading $pathToProperty: $errs"),
+      valid = x => x
+    )
+  }
+
   private def getOnlyJsonErrorPath(ex: JsResultException): Either[Assertion, String] = {
     ex.errors match {
       case (jsonPath, _) :: Nil =>

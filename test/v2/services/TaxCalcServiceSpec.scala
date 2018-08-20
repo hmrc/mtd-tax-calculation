@@ -48,10 +48,10 @@ class TaxCalcServiceSpec extends ServiceSpec {
       "a valid calcId is passed and the connector returns a tax calculation" in new Test {
         val calcId = "67918878"
         MockedTaxCalcConnector.getTaxCalculation(mtdId, calcId)
-          .returns(Future.successful(Right(TestData.taxCalc)))
+          .returns(Future.successful(Right(TestData.v3_2ClientTaxCalc)))
 
         val result: TaxCalcOutcome = await(service.getTaxCalculation(mtdId, calcId))
-        result shouldBe Right(TestData.taxCalc)
+        result shouldBe Right(TestData.v3_2ClientTaxCalc)
       }
     }
   }

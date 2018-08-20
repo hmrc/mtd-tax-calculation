@@ -54,7 +54,7 @@ class GetTaxCalcISpec extends IntegrationBaseSpec {
 
         val response: WSResponse = await(request().get())
         response.status shouldBe Status.OK
-        response.json.toString() shouldBe TaxCalculationFixture.v3_2ClientTaxCalcJson.toString()
+        response.json shouldBe TaxCalculationFixture.v3_2ClientTaxCalcJson
       }
     }
 

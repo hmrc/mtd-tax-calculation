@@ -16,103 +16,243 @@
 
 package v2.models.taxcalculation
 
-import play.api.libs.json.Json
-import uk.gov.hmrc.play.test.UnitSpec
+import play.api.libs.json._
+import support.UnitSpec
 import v2.models._
+import v2.models.utils.JsonErrorValidators
 
-class TaxCalculationSpec extends UnitSpec {
+class TaxCalculationSpec extends JsonErrorValidators with UnitSpec {
 
-  "A tax calculation" should {
+  val bvrErrorTaxCalc = TaxCalculation(
+    None,
+    false, false, 5,
+    None, None, None, None, None, None, None, None, None, None, None)
+
+  "reads" should {
+    import JsonError._
     import v2.fixtures.{TaxCalculationFixture => TestData}
+    "return correct validation errors" when {
 
-    "be parsed from correct JSON" in {
-      val result = TestData.v3_2DesTaxCalcJson.as[TaxCalculation]
-      result shouldEqual TestData.v3_2ClientTaxCalc
+      testPropertyType[TaxCalculation](TestData.v3_2DesTaxCalcJson)(
+        path = "/calcOutput/year",
+        replacement = "test".toJson,
+        expectedError = JSNUMBER_FORMAT_EXCEPTION
+      )
+      testPropertyType[TaxCalculation](TestData.v3_2DesTaxCalcJson)(
+        path = "/calcOutput/intentToCrystallise",
+        replacement = "test".toJson,
+        expectedError = BOOLEAN_FORMAT_EXCEPTION
+      )
+      testPropertyType[TaxCalculation](TestData.v3_2DesTaxCalcJson)(
+        path = "/calcOutput/calcResult/crystallised",
+        replacement = "test".toJson,
+        expectedError = BOOLEAN_FORMAT_EXCEPTION
+      )
+      testPropertyType[TaxCalculation](TestData.v3_2DesTaxCalcJson)(
+        path = "/calcOutput/bvrErrors",
+        replacement = "test".toJson,
+        expectedError = JSNUMBER_FORMAT_EXCEPTION
+      )
+      testPropertyType[TaxCalculation](TestData.v3_2DesTaxCalcJson)(
+        path = "/calcOutput/bvrWarnings",
+        replacement = "test".toJson,
+        expectedError = JSNUMBER_FORMAT_EXCEPTION
+      )
+      testPropertyType[TaxCalculation](TestData.v3_2DesTaxCalcJson)(
+        path = "/calcOutput/calcResult/incomeTaxNicYtd",
+        replacement = "test".toJson,
+        expectedError = NUMBER_FORMAT_EXCEPTION
+      )
+      testPropertyType[TaxCalculation](TestData.v3_2DesTaxCalcJson)(
+        path = "/calcOutput/calcResult/nationalRegime",
+        replacement = 10001.toJson,
+        expectedError = STRING_FORMAT_EXCEPTION
+      )
+      testPropertyType[TaxCalculation](TestData.v3_2DesTaxCalcJson)(
+        path = "/calcOutput/calcResult/totalBeforeTaxDeducted",
+        replacement = "test".toJson,
+        expectedError = NUMBER_FORMAT_EXCEPTION
+      )
+      testPropertyType[TaxCalculation](TestData.v3_2DesTaxCalcJson)(
+        path = "/calcOutput/calcResult/msg",
+        replacement = "test".toJson,
+        expectedError = JSARRAY_FORMAT_EXCEPTION
+      )
+      testPropertyType[TaxCalculation](TestData.v3_2DesTaxCalcJson)(
+        path = "/calcOutput/calcResult/msgCount",
+        replacement = "test".toJson,
+        expectedError = JSNUMBER_FORMAT_EXCEPTION
+      )
     }
 
-    val validJsonPayloadsForVersion3_2 = Map(
-    "JSON representing self employment with UK property" -> TestData.selfEmploymentUkPropertyJson,
-    "JSON representing self employment with periodic updates" -> TestData.selfEmploymentPeriodicJson,
-    "JSON representing UK property with non-FHL with periodic and annual updates" -> TestData.ukPropertyOtherPeriodicAndAnnualJson,
-    "JSON representing self employment with periodic and annual updates" -> TestData.selfEmploymentPeriodicAndAnnualsJson,
-    "JSON representing UK property with FHL with periodic and annual updates" -> TestData.ukPropertyFhlPeriodicAndAnnualsJson,
-    "JSON representing Scottish self employment with multiple income sources" -> TestData.selfEmploymentScottishMultipleIncomeSourcesJson
-    )
+    "create the correct optional field" when {
 
-    validJsonPayloadsForVersion3_2.foreach{
-      case (description, payload) => s"be able to parse $description without falling over" in { payload.as[TaxCalculation] }
+      val json = TestData.v3_2DesTaxCalcJson
+
+      "the 'year' field is not received" in {
+        val updatedJson = removeJsonProperty[TaxCalculation](json)(pathToProperty = "calcOutput/year")
+        val model = updatedJson.as[TaxCalculation]
+        model.year shouldBe None
+      }
+
+      "the 'incomeTaxAndNicYtd' field is not received" in {
+        val updatedJson = removeJsonProperty[TaxCalculation](json)(pathToProperty = "calcOutput/calcResult/incomeTaxNicYtd")
+        val model = updatedJson.as[TaxCalculation]
+        model.incomeTaxAndNicYTD shouldBe None
+      }
+
+      "the 'nationalRegime' field is not received" in {
+        val updatedJson = removeJsonProperty[TaxCalculation](json)(pathToProperty = "calcOutput/calcResult/nationalRegime")
+        val model = updatedJson.as[TaxCalculation]
+        model.nationalRegime shouldBe None
+      }
+
+      "the 'totalBeforeTaxDeducted' field is not received" in {
+        val updatedJson = removeJsonProperty[TaxCalculation](json)(pathToProperty = "calcOutput/calcResult/totalBeforeTaxDeducted")
+        val model = updatedJson.as[TaxCalculation]
+        model.totalBeforeTaxDeducted shouldBe None
+      }
+
+      "the entire 'calcResult' jsobject is not received" in {
+        val updatedJson = removeJsonProperty[TaxCalculation](json)(pathToProperty = "calcOutput/calcResult")
+        val model = updatedJson.as[TaxCalculation]
+        model shouldBe
+          TaxCalculation(
+            year = Some(2016),
+            intentToCrystallise = true,
+            crystallised = false,
+            validationMessageCount = 1,
+            incomeTaxAndNicYTD = None,
+            nationalRegime = None,
+            taxableIncome = None,
+            incomeTax = None,
+            nic = None,
+            totalBeforeTaxDeducted = None,
+            taxDeducted = None,
+            eoyEstimate = None,
+            calculationMessageCount = None,
+            calculationMessages = None,
+            annualAllowances = None
+          )
+      }
+    }
+    "create the correct fields" when {
+      "at least one 'bvrError' is returned" in {
+        TaxCalculation.reads.reads(TestData.bvrErrorJson).get shouldEqual bvrErrorTaxCalc
+      }
+      "all fields are present" in {
+        TaxCalculation.reads.reads(TestData.v3_2DesTaxCalcJson).get shouldEqual TestData.v3_2ClientTaxCalc
+      }
     }
   }
 
-  "EoyEstimate" should {
-    "be parsed correctly from valid JSON" in {
+  "write" should {
+    import v2.fixtures.{TaxCalculationFixture => TestData}
 
-      val eoyEstimateJson = Json.parse(
+    val taxCalculation: TaxCalculation = TestData.v3_2ClientTaxCalc
+    val taxCalcJson: JsValue = TestData.v3_2ClientTaxCalcJson
+
+    s"not render the 'year' field" when {
+      "the value is not present" in {
+        val model = taxCalculation.copy(year = None)
+        val json = taxCalcJson.as[JsObject] - "year"
+        Json.toJson(model) shouldBe json
+      }
+    }
+    s"not render the 'incomeTaxAndNicYTD' field" when {
+      "the value is not present" in {
+        val model = taxCalculation.copy(incomeTaxAndNicYTD = None)
+        val json = taxCalcJson.as[JsObject] - "incomeTaxAndNicYTD"
+        Json.toJson(model) shouldBe json
+      }
+    }
+    s"not render the 'nationalRegime' field" when {
+      "the value is not present" in {
+        val model = taxCalculation.copy(nationalRegime = None)
+        val json = taxCalcJson.as[JsObject] - "nationalRegime"
+        Json.toJson(model) shouldBe json
+      }
+    }
+    s"not render the 'taxableIncome' field" when {
+      "the value is not present" in {
+        val model = taxCalculation.copy(taxableIncome = None)
+        val json = taxCalcJson.as[JsObject] - "taxableIncome"
+        Json.toJson(model) shouldBe json
+      }
+    }
+    s"not render the 'incomeTax' field" when {
+      "the value is not present" in {
+        val model = taxCalculation.copy(incomeTax = None)
+        val json = taxCalcJson.as[JsObject] - "incomeTax"
+        Json.toJson(model) shouldBe json
+      }
+    }
+    s"not render the 'nic' field" when {
+      "the value is not present" in {
+        val model = taxCalculation.copy(nic = None)
+        val json = taxCalcJson.as[JsObject] - "nic"
+        Json.toJson(model) shouldBe json
+      }
+    }
+    s"not render the 'totalBeforeTaxDeducted' field" when {
+      "the value is not present" in {
+        val model = taxCalculation.copy(totalBeforeTaxDeducted = None)
+        val json = taxCalcJson.as[JsObject] - "totalBeforeTaxDeducted"
+        Json.toJson(model) shouldBe json
+      }
+    }
+    s"not render the 'taxDeducted' field" when {
+      "the value is not present" in {
+        val model = taxCalculation.copy(taxDeducted = None)
+        val json = taxCalcJson.as[JsObject] - "taxDeducted"
+        Json.toJson(model) shouldBe json
+      }
+    }
+    s"not render the 'eoyEstimate' field" when {
+      "the value is not present" in {
+        val model = taxCalculation.copy(eoyEstimate = None)
+        val json = taxCalcJson.as[JsObject] - "eoyEstimate"
+        Json.toJson(model) shouldBe json
+      }
+    }
+    s"not render the 'calculationMessageCount' field" when {
+      "the value is not present" in {
+        val model = taxCalculation.copy(calculationMessageCount = None)
+        val json = taxCalcJson.as[JsObject] - "calculationMessageCount"
+        Json.toJson(model) shouldBe json
+      }
+    }
+    s"not render the 'calculationMessages' field" when {
+      "the value is not present" in {
+        val model = taxCalculation.copy(calculationMessages = None)
+        val json = taxCalcJson.as[JsObject] - "calculationMessages"
+        Json.toJson(model) shouldBe json
+      }
+    }
+    s"not render the 'annualAllowances' field" when {
+      "the value is not present" in {
+        val model = taxCalculation.copy(annualAllowances = None)
+        val json = taxCalcJson.as[JsObject] - "annualAllowances"
+        Json.toJson(model) shouldBe json
+      }
+    }
+
+
+    "at least one 'bvrError' is returned" in {
+      val clientJson = Json.parse(
         """
           |{
-          |  "totalTaxableIncome":1234.56,
-          |  "incomeTaxAmount":9938.22,
-          |  "nic2":7738.33,
-          |  "nic4":228.22,
-          |  "totalNicAmount":3321.11,
-          |  "incomeTaxNicAmount":99.22,
-          |  "incomeSource" : [
-          |    {
-          |      "id":"id1",
-          |      "type":"05",
-          |      "taxableIncome":62345.67,
-          |      "supplied":true,
-          |      "finalised":true
-          |    },
-          |    {
-          |      "id":"id2",
-          |      "type":"05",
-          |      "taxableIncome":423.22,
-          |      "supplied":false,
-          |      "finalised":true
-          |    },
-          |    {
-          |      "id":"id3",
-          |      "type":"01",
-          |      "taxableIncome":12443.22,
-          |      "supplied":false,
-          |      "finalised":false
-          |    },
-          |    {
-          |      "type":"02",
-          |      "taxableIncome":9982.03,
-          |      "supplied":true,
-          |      "finalised":true
-          |    },
-          |    {
-          |      "type":"10",
-          |      "taxableIncome":1123.2,
-          |      "supplied":true,
-          |      "finalised":false
-          |    }
-          |  ]
+          | "intentToCrystallise": false,
+          | "crystallised": false,
+          | "validationMessageCount": 5
           |}
         """.stripMargin)
 
-      val expectedEoyEstimate = EoyEstimate(
-        employments = Some(List(
-          EoyEmployment("id1", 62345.67, true, Some(true)),
-          EoyEmployment("id2", 423.22, false, Some(true))
-        )),
-        selfEmployments = Some(List(
-          EoySelfEmployment("id3", 12443.22, false, Some(false))
-        )),
-        ukProperty = Some(EoyItem(9982.03, supplied = true, Some(true))),
-        ukDividends = Some(EoyItem(1123.2, supplied = true, Some(false))),
-        totalTaxableIncome = 1234.56,
-        incomeTaxAmount = 9938.22,
-        nic2 = 7738.33,
-        nic4 = 228.22,
-        totalNicAmount = 3321.11,
-        incomeTaxNicAmount = 99.22
-      )
-
-      eoyEstimateJson.as[EoyEstimate](EoyEstimate.reads) shouldBe expectedEoyEstimate
+      TaxCalculation.writes.writes(bvrErrorTaxCalc) shouldBe clientJson
+    }
+    "all fields are present" in {
+      TaxCalculation.writes.writes(taxCalculation) shouldBe TestData.v3_2ClientTaxCalcJson
     }
   }
+
 }

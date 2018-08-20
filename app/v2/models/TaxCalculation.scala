@@ -21,50 +21,50 @@ import play.api.libs.json.Reads._
 import play.api.libs.json.{Json, _}
 
 case class TaxCalculation(year: Option[Int],
-                          intentToCrystallise: Option[Boolean],
-                          crystallised: Option[Boolean],
-                          validationMessageCount: Option[Int],
+                          intentToCrystallise: Boolean,
+                          crystallised: Boolean,
+                          validationMessageCount: Int,
                           incomeTaxAndNicYTD: Option[BigDecimal],
                           nationalRegime: Option[String],
-                          taxableIncome: TaxableIncome,
-                          incomeTax: IncomeTax,
-                          nic: Nic,
+                          taxableIncome: Option[TaxableIncome],
+                          incomeTax: Option[IncomeTax],
+                          nic: Option[Nic],
                           totalBeforeTaxDeducted: Option[BigDecimal],
                           taxDeducted: Option[TaxDeducted],
-                          eoyEstimate: EoyEstimate,
-                          calculationMessageCount: Option[Double],
+                          eoyEstimate: Option[EoyEstimate],
+                          calculationMessageCount: Option[Int],
                           calculationMessages: Option[Seq[CalculationMessage]],
-                          annualAllowances: AnnualAllowances)
+                          annualAllowances: Option[AnnualAllowances])
 
 object TaxCalculation {
   implicit val writes: OWrites[TaxCalculation] = Json.writes[TaxCalculation]
 
   implicit val reads: Reads[TaxCalculation] = (
-    (__ \ "calcOutput" \ "year").readNullable[Int].orElse(Reads.pure(None)) and
-      (__ \ "calcOutput" \ "intentToCrystallise").readNullable[Boolean].orElse(Reads.pure(None)) and
-      (__ \ "calcOutput" \ "calcResult" \ "crystallised").readNullable[Boolean].orElse(Reads.pure(None)) and
-      ((__ \ "calcOutput" \ "bvrErrors").readNullable[Int].orElse(Reads.pure(None)) and
-        (__ \ "calcOutput" \ "bvrWarnings").readNullable[Int].orElse(Reads.pure(None)))
-        ((errs, warns) => (errs ++ warns).reduceOption(_ + _)) and
-      (__ \ "calcOutput" \ "calcResult" \ "incomeTaxNicYtd").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "calcOutput" \ "calcResult" \ "nationalRegime").readNullable[String].orElse(Reads.pure(None)) and
-      (__ \ "calcOutput" \ "calcResult").read[TaxableIncome] and
-      (__ \ "calcOutput" \ "calcResult").read[IncomeTax] and
-      (__ \ "calcOutput" \ "calcResult").read[Nic] and
-      (__ \ "calcOutput" \ "calcResult" \ "totalBeforeTaxDeducted").readNullable[BigDecimal].orElse(Reads.pure(None)) and
-      (__ \ "calcOutput" \ "calcResult").readNullable[TaxDeducted].orElse(Reads.pure(None))
-        .map(_.flatMap {
-          case TaxDeducted(None, None) => None
-          case x => Some(x)
-        }) and
-      (__ \ "calcOutput" \ "calcResult" \ "eoyEstimate").read[EoyEstimate] and
-      (__ \ "calcOutput" \ "calcResult" \ "msgCount").readNullable[Double].orElse(Reads.pure(None)) and
-      (__ \ "calcOutput" \ "calcResult" \ "msg").readNullable[Seq[CalculationMessage]].orElse(Reads.pure(None))
-        .map(_.flatMap {
-          case Nil => None
-          case xs => Some(xs)
-        }) and
-      (__ \ "calcOutput" \ "calcResult" \ "annualAllowances").read[AnnualAllowances]
-    ) (TaxCalculation.apply _)
+      (__ \ "calcOutput" \ "year").readNestedNullable[Int] and
+        (__ \ "calcOutput" \ "intentToCrystallise").readNestedNullable[Boolean].map(_.exists(identity)) and
+        (__ \ "calcOutput" \ "calcResult" \ "crystallised").readNestedNullable[Boolean].map(_.exists(identity)) and
+        ((__ \ "calcOutput" \ "bvrErrors").readNestedNullable[Int] and
+          (__ \ "calcOutput" \ "bvrWarnings").readNestedNullable[Int])
+          ((errs, warns) => (errs ++ warns).reduceOption(_ + _)).map(_.fold(0)(identity)) and
+        (__ \ "calcOutput" \ "calcResult" \ "incomeTaxNicYtd").readNestedNullable[BigDecimal] and
+        (__ \ "calcOutput" \ "calcResult" \ "nationalRegime").readNestedNullable[String] and
+        (__ \ "calcOutput" \ "calcResult").readNestedNullable[TaxableIncome] and
+        (__ \ "calcOutput" \ "calcResult").readNestedNullable[IncomeTax] and
+        (__ \ "calcOutput" \ "calcResult").readNestedNullable[Nic] and
+        (__ \ "calcOutput" \ "calcResult" \ "totalBeforeTaxDeducted").readNestedNullable[BigDecimal] and
+        (__ \ "calcOutput" \ "calcResult").readNestedNullable[TaxDeducted]
+          .map(_.flatMap {
+            case TaxDeducted(None, None) => None
+            case x => Some(x)
+          }) and
+        (__ \ "calcOutput" \ "calcResult" \ "eoyEstimate").readNestedNullable[EoyEstimate] and
+        (__ \ "calcOutput" \ "calcResult" \ "msgCount").readNestedNullable[Int] and
+        (__ \ "calcOutput" \ "calcResult" \ "msg").readNestedNullable[Seq[CalculationMessage]]
+          .map(_.flatMap {
+            case Nil => None
+            case xs => Some(xs)
+          }) and
+        (__ \ "calcOutput" \ "calcResult" \ "annualAllowances").readNestedNullable[AnnualAllowances]
+      ) (TaxCalculation.apply _)
 
 }
