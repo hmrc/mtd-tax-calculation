@@ -22,7 +22,7 @@ import v2.models.errors.DesErrorCode.DesErrorCode
 
 object TaxCalculationFixture {
 
-  val v3_2ClientTaxCalc = TaxCalculation(
+  val taxCalc = TaxCalculation(
     year = Some(2016),
     intentToCrystallise = true,
     crystallised = true,
@@ -205,7 +205,7 @@ object TaxCalculationFixture {
     ))
   )
 
-  val v3_2ClientTaxCalcJson: JsValue = Json.parse(
+  val taxCalcClientJson: JsValue = Json.parse(
     """
       |{
       | "year": 2016,
@@ -384,7 +384,7 @@ object TaxCalculationFixture {
       |}
 """.stripMargin)
 
-  val v3_2DesTaxCalcJson: JsValue = Json.parse(
+  val taxCalcDesJson: JsValue = Json.parse(
     """
       |{
       |	"calcOutput": {

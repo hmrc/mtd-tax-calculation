@@ -49,12 +49,12 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
         .returns(Future.successful(Right(mtdId)))
 
       MockedTaxCalcService.getTaxCalculation(nino, calcId)
-        .returns(Future.successful(Right(TaxCalculationFixture.v3_2ClientTaxCalc)))
+        .returns(Future.successful(Right(TaxCalculationFixture.taxCalc)))
 
       val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
 
       status(result) shouldBe OK
-      contentAsJson(result) shouldBe TaxCalculationFixture.v3_2ClientTaxCalcJson
+      contentAsJson(result) shouldBe TaxCalculationFixture.taxCalcClientJson
     }
 
     "return a 204" when {

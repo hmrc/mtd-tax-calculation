@@ -37,7 +37,7 @@ object TaxCalcStub extends WireMockMethods {
   }
 
   lazy val successfulTaxCalcResponse: JsValue = {
-    TestData.v3_2DesTaxCalcJson
+    TestData.taxCalcDesJson
   }
   lazy val unsuccessfulTaxCalcResponse: JsValue = {
     DESErrorsFixture.serverErrorJson

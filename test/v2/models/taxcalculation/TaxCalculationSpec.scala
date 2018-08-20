@@ -33,52 +33,52 @@ class TaxCalculationSpec extends JsonErrorValidators with UnitSpec {
     import v2.fixtures.{TaxCalculationFixture => TestData}
     "return correct validation errors" when {
 
-      testPropertyType[TaxCalculation](TestData.v3_2DesTaxCalcJson)(
+      testPropertyType[TaxCalculation](TestData.taxCalcDesJson)(
         path = "/calcOutput/year",
         replacement = "test".toJson,
         expectedError = JSNUMBER_FORMAT_EXCEPTION
       )
-      testPropertyType[TaxCalculation](TestData.v3_2DesTaxCalcJson)(
+      testPropertyType[TaxCalculation](TestData.taxCalcDesJson)(
         path = "/calcOutput/intentToCrystallise",
         replacement = "test".toJson,
         expectedError = BOOLEAN_FORMAT_EXCEPTION
       )
-      testPropertyType[TaxCalculation](TestData.v3_2DesTaxCalcJson)(
+      testPropertyType[TaxCalculation](TestData.taxCalcDesJson)(
         path = "/calcOutput/calcResult/crystallised",
         replacement = "test".toJson,
         expectedError = BOOLEAN_FORMAT_EXCEPTION
       )
-      testPropertyType[TaxCalculation](TestData.v3_2DesTaxCalcJson)(
+      testPropertyType[TaxCalculation](TestData.taxCalcDesJson)(
         path = "/calcOutput/bvrErrors",
         replacement = "test".toJson,
         expectedError = JSNUMBER_FORMAT_EXCEPTION
       )
-      testPropertyType[TaxCalculation](TestData.v3_2DesTaxCalcJson)(
+      testPropertyType[TaxCalculation](TestData.taxCalcDesJson)(
         path = "/calcOutput/bvrWarnings",
         replacement = "test".toJson,
         expectedError = JSNUMBER_FORMAT_EXCEPTION
       )
-      testPropertyType[TaxCalculation](TestData.v3_2DesTaxCalcJson)(
+      testPropertyType[TaxCalculation](TestData.taxCalcDesJson)(
         path = "/calcOutput/calcResult/incomeTaxNicYtd",
         replacement = "test".toJson,
         expectedError = NUMBER_FORMAT_EXCEPTION
       )
-      testPropertyType[TaxCalculation](TestData.v3_2DesTaxCalcJson)(
+      testPropertyType[TaxCalculation](TestData.taxCalcDesJson)(
         path = "/calcOutput/calcResult/nationalRegime",
         replacement = 10001.toJson,
         expectedError = STRING_FORMAT_EXCEPTION
       )
-      testPropertyType[TaxCalculation](TestData.v3_2DesTaxCalcJson)(
+      testPropertyType[TaxCalculation](TestData.taxCalcDesJson)(
         path = "/calcOutput/calcResult/totalBeforeTaxDeducted",
         replacement = "test".toJson,
         expectedError = NUMBER_FORMAT_EXCEPTION
       )
-      testPropertyType[TaxCalculation](TestData.v3_2DesTaxCalcJson)(
+      testPropertyType[TaxCalculation](TestData.taxCalcDesJson)(
         path = "/calcOutput/calcResult/msg",
         replacement = "test".toJson,
         expectedError = JSARRAY_FORMAT_EXCEPTION
       )
-      testPropertyType[TaxCalculation](TestData.v3_2DesTaxCalcJson)(
+      testPropertyType[TaxCalculation](TestData.taxCalcDesJson)(
         path = "/calcOutput/calcResult/msgCount",
         replacement = "test".toJson,
         expectedError = JSNUMBER_FORMAT_EXCEPTION
@@ -87,7 +87,7 @@ class TaxCalculationSpec extends JsonErrorValidators with UnitSpec {
 
     "create the correct optional field" when {
 
-      val json = TestData.v3_2DesTaxCalcJson
+      val json = TestData.taxCalcDesJson
 
       "the 'year' field is not received" in {
         val updatedJson = removeJsonProperty[TaxCalculation](json)(pathToProperty = "calcOutput/year")
@@ -141,7 +141,7 @@ class TaxCalculationSpec extends JsonErrorValidators with UnitSpec {
         TaxCalculation.reads.reads(TestData.bvrErrorJson).get shouldEqual bvrErrorTaxCalc
       }
       "all fields are present" in {
-        TaxCalculation.reads.reads(TestData.v3_2DesTaxCalcJson).get shouldEqual TestData.v3_2ClientTaxCalc
+        TaxCalculation.reads.reads(TestData.taxCalcDesJson).get shouldEqual TestData.taxCalc
       }
     }
   }
@@ -149,8 +149,8 @@ class TaxCalculationSpec extends JsonErrorValidators with UnitSpec {
   "write" should {
     import v2.fixtures.{TaxCalculationFixture => TestData}
 
-    val taxCalculation: TaxCalculation = TestData.v3_2ClientTaxCalc
-    val taxCalcJson: JsValue = TestData.v3_2ClientTaxCalcJson
+    val taxCalculation: TaxCalculation = TestData.taxCalc
+    val taxCalcJson: JsValue = TestData.taxCalcClientJson
 
     s"not render the 'year' field" when {
       "the value is not present" in {
@@ -251,7 +251,7 @@ class TaxCalculationSpec extends JsonErrorValidators with UnitSpec {
       TaxCalculation.writes.writes(bvrErrorTaxCalc) shouldBe clientJson
     }
     "all fields are present" in {
-      TaxCalculation.writes.writes(taxCalculation) shouldBe TestData.v3_2ClientTaxCalcJson
+      TaxCalculation.writes.writes(taxCalculation) shouldBe TestData.taxCalcClientJson
     }
   }
 

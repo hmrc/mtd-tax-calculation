@@ -52,10 +52,10 @@ class TaxCalcConnectorSpec extends ConnectorSpec {
     "return a TaxCalculation model" when {
       "the http parser returns a TaxCalculation model" in new Test {
         MockedHttpClient.get[TaxCalcOutcome](url)
-          .returns(Future.successful(Right(TaxCalculationFixture.v3_2ClientTaxCalc)))
+          .returns(Future.successful(Right(TaxCalculationFixture.taxCalc)))
 
         val result: TaxCalcOutcome = await(connector.getTaxCalculation(mtdId, calculationId))
-        result shouldBe Right(TaxCalculationFixture.v3_2ClientTaxCalc)
+        result shouldBe Right(TaxCalculationFixture.taxCalc)
       }
     }
 

@@ -32,12 +32,26 @@ object TaxableIncome {
 
   implicit val reads: Reads[TaxableIncome] = (
     (__ \ "taxableIncome" \ "incomeReceived" \ "employments").readNestedNullable[JsObject].flatMap{
-      case Some(_) => (__ \ "taxableIncome" \ "incomeReceived").readNullable[Employments]
+      case Some(_) => (__ \ "taxableIncome" \ "incomeReceived").readNestedNullable[Employments]
       case None => Reads.pure[Option[Employments]](None)
     } and
-       (__ \ "taxableIncome" \ "incomeReceived").readNullable[SelfEmployments] and
-      (__ \ "taxableIncome" \ "incomeReceived").readNullable[UKProperty] and
-      (__ \ "taxableIncome" \ "incomeReceived").readNullable[UKDividends] and
+      (__ \ "taxableIncome" \ "incomeReceived").readNestedNullable[SelfEmployments]
+        .map(_.flatMap {
+          case SelfEmployments(None, None) => None
+          case x => Some(x)
+        })
+      and
+      (__ \ "taxableIncome" \ "incomeReceived").readNestedNullable[UKProperty]
+        .map(_.flatMap {
+          case UKProperty(None, None, None, None, None, None) => None
+          case x => Some(x)
+        })
+      and
+      (__ \ "taxableIncome" \ "incomeReceived").readNestedNullable[UKDividends].map(_.flatMap{
+        case UKDividends(None) => None
+        case x => Some(x)
+      })
+      and
       (__ \ "taxableIncome" \ "totalIncomeReceived").read[BigDecimal] and
       (__ \ "taxableIncome").read[AllowancesAndDeductions] and
       (__ \ "totalTaxableIncome").readNullable[BigDecimal]

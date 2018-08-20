@@ -77,6 +77,26 @@ class TaxableIncomeSpec extends UnitSpec
           )
           json.as[TaxableIncome] shouldBe model
         }
+
+        "selfEmployments property is present but fields are empty" in {
+          val json = removeJsonProperty(Json.parse(validTaxableIncomeInputString))(pathToProperty = "taxableIncome/incomeReceived/selfEmployment")
+          val noSelfEmploymentJson = removeJsonProperty(json)(pathToProperty = "taxableIncome/incomeReceived/selfEmploymentIncome")
+          val model = validTaxableIncomeModel.copy(selfEmployments = None)
+          noSelfEmploymentJson.as[TaxableIncome] shouldBe model
+        }
+
+        "ukProperty property is present but fields are empty" in {
+          val json = removeJsonProperty(Json.parse(validTaxableIncomeInputString))(pathToProperty = "taxableIncome/incomeReceived/ukProperty")
+          val noUkPropertyJson = removeJsonProperty(json)(pathToProperty = "taxableIncome/incomeReceived/ukPropertyIncome")
+          val model = validTaxableIncomeModel.copy(ukProperty = None)
+          noUkPropertyJson.as[TaxableIncome] shouldBe model
+        }
+        "ukDividends property is present but fields are empty" in {
+          val json = removeJsonProperty(Json.parse(validTaxableIncomeInputString))(pathToProperty = "taxableIncome/incomeReceived/ukDividends")
+          val noUkDividendjson = removeJsonProperty(json)(pathToProperty = "taxableIncome/incomeReceived/ukDividendIncome")
+          val model = validTaxableIncomeModel.copy(ukDividends = None)
+          noUkDividendjson.as[TaxableIncome] shouldBe model
+        }
       }
     }
   }
@@ -108,6 +128,7 @@ class TaxableIncomeSpec extends UnitSpec
       "it has no value" in {
         val model = validTaxableIncomeModel.copy(ukProperty = None)
         val json: JsValue = validTaxableIncomeOutputJson.as[JsObject] - "ukProperty"
+        println(s"\n\n$model\n$json\n\n")
         Json.toJson(model) shouldBe json
       }
     }
