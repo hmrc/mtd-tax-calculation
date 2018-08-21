@@ -16,12 +16,15 @@
 
 package v2.outcomes
 
-import v2.models.TaxCalculation
 import v2.models.errors.MtdError
+import v2.models.{TaxCalcMessages, TaxCalculation}
 
 object TaxCalcOutcome {
 
+  type Outcome[M] = Either[MtdError, M]
+
   type TaxCalcOutcome = Either[MtdError, TaxCalculation]
+  type TaxCalcMessagesOutcome = Either[MtdError, TaxCalcMessages]
 
   sealed trait TaxCalcError extends MtdError
 }

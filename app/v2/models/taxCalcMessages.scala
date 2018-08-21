@@ -16,8 +16,8 @@
 
 package v2.models
 
-import play.api.libs.json.{Json, OWrites, Reads, __}
 import play.api.libs.functional.syntax._
+import play.api.libs.json.{Json, OWrites, Reads, __}
 
 case class TaxCalcMessages(warningCount: Int,
                            errorCount: Int,

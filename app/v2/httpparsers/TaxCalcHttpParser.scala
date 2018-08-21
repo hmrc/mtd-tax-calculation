@@ -17,15 +17,20 @@
 package v2.httpparsers
 
 import play.api.http.Status._
+import play.api.libs.json.Reads
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 import v2.models._
 import v2.models.errors._
-import v2.outcomes.TaxCalcOutcome.TaxCalcOutcome
+import v2.outcomes.TaxCalcOutcome.{Outcome, TaxCalcMessagesOutcome, TaxCalcOutcome}
 
 object TaxCalcHttpParser extends HttpParser {
 
-  implicit val taxCalcHttpReads: HttpReads[TaxCalcOutcome] = new HttpReads[TaxCalcOutcome] {
-    override def read(method: String, url: String, response: HttpResponse): TaxCalcOutcome = {
+  implicit val taxCalcHttpReads: HttpReads[TaxCalcOutcome] = reads[TaxCalculation]
+
+  implicit val taxCalcMessagesHttpReads: HttpReads[TaxCalcMessagesOutcome] = reads[TaxCalcMessages]
+
+  private def reads[M:Reads] = new HttpReads[Outcome[M]] {
+    override def read(method: String, url: String, response: HttpResponse): Outcome[M] = {
       (response.status, response.jsonOpt) match {
         case (OK, _) => parseResponse(response)
         case (NO_CONTENT, _) => Left(CalculationNotReady)
@@ -37,10 +42,10 @@ object TaxCalcHttpParser extends HttpParser {
         case (INTERNAL_SERVER_ERROR, ErrorCode(DesErrorCode.SERVICE_UNAVAILABLE)) => Left(InternalServerError)
       }
     }
-
-    private def parseResponse(response: HttpResponse): TaxCalcOutcome = response.validateJson[TaxCalculation] match {
+    private def parseResponse(response: HttpResponse): Outcome[M] = response.validateJson[M] match {
       case Some(taxCalc) => Right(taxCalc)
       case None => Left(InternalServerError)
     }
+
   }
 }

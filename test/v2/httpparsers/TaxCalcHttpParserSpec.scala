@@ -19,17 +19,17 @@ package v2.httpparsers
 import play.api.test.Helpers._
 import support.UnitSpec
 import uk.gov.hmrc.http.HttpResponse
-import v2.fixtures.{DESErrorsFixture, TaxCalculationFixture}
-import v2.httpparsers.TaxCalcHttpParser.taxCalcHttpReads
+import v2.fixtures.{DESErrorsFixture, TaxCalcMessagesFixture, TaxCalculationFixture}
+import v2.httpparsers.TaxCalcHttpParser.{taxCalcHttpReads, taxCalcMessagesHttpReads}
 import v2.models.errors._
-import v2.outcomes.TaxCalcOutcome.TaxCalcOutcome
+import v2.outcomes.TaxCalcOutcome.{TaxCalcMessagesOutcome, TaxCalcOutcome}
 
 class TaxCalcHttpParserSpec extends UnitSpec {
 
   val method = "GET"
   val url = "test-url"
 
-  "read" should {
+  "read taxCalc" should {
 
     "return a TaxCalculation model" when {
       "the HttpResponse contains a 200 status and correct response body" in {
@@ -111,4 +111,87 @@ class TaxCalcHttpParserSpec extends UnitSpec {
       }
     }
   }
+
+  "read taxCalcMessages" should {
+    "return a TaxCalculationMessages model" when {
+      "the HttpResponse contains a 200 status and correct response body" in {
+        val response = HttpResponse(OK, Some(TaxCalcMessagesFixture.taxCalcDesWarningsAndErrors))
+        val result: TaxCalcMessagesOutcome = taxCalcMessagesHttpReads.read(method, url, response)
+
+        result shouldBe Right(TaxCalcMessagesFixture.taxCalcMessages)
+      }
+    }
+
+    "return a NotReady response" when {
+      "the HttpResponse contains a 204 status" in {
+        val response = HttpResponse(NO_CONTENT, None)
+        val result: TaxCalcMessagesOutcome = taxCalcMessagesHttpReads.read(method, url, response)
+
+        result shouldBe Left(CalculationNotReady)
+      }
+    }
+
+    "return an Invalid NINO error" when {
+      "the HttpResponse contains a 400 status and InvalidNino code" in {
+        val response = HttpResponse(BAD_REQUEST, Some(DESErrorsFixture.invalidIdentifierJson))
+        val result: TaxCalcMessagesOutcome = taxCalcMessagesHttpReads.read(method, url, response)
+
+        result shouldBe Left(InvalidNinoError)
+      }
+    }
+
+    "return an Invalid CalcID error" when {
+      "the HttpResponse contains a 400 status and InvalidCalcID code" in {
+        val response = HttpResponse(BAD_REQUEST, Some(DESErrorsFixture.invalidCalcIDJson))
+        val result: TaxCalcMessagesOutcome = taxCalcMessagesHttpReads.read(method, url, response)
+
+        result shouldBe Left(InvalidCalcIDError)
+      }
+
+    }
+
+    "return a Not Found error" when {
+      "the HttpResponse contains a 404 status and NotFound code" in {
+        val response = HttpResponse(NOT_FOUND, Some(DESErrorsFixture.notFoundJson))
+        val result: TaxCalcMessagesOutcome = taxCalcMessagesHttpReads.read(method, url, response)
+
+        result shouldBe Left(MatchingResourceNotFound)
+      }
+
+      "the HttpResponse contains a 404 status and a list of errors" in {
+        val errorListJson = TaxCalculationFixture.v3_2DesTaxCalcErrorJson(
+          DesErrorCode.INVALID_IDENTIFIER -> "some reason",
+          DesErrorCode.INVALID_CALCID -> "some reason"
+        )
+        val response = HttpResponse(NOT_FOUND, Some(errorListJson))
+        val result: TaxCalcMessagesOutcome = taxCalcMessagesHttpReads.read(method, url, response)
+
+        result shouldBe Left(MatchingResourceNotFound)
+      }
+    }
+
+    "return an Internal Server Error" when {
+      "the HttpResponse contains a 403 status" in {
+        val response = HttpResponse(FORBIDDEN, None)
+        val result: TaxCalcMessagesOutcome = taxCalcMessagesHttpReads.read(method, url, response)
+
+        result shouldBe Left(InternalServerError)
+      }
+
+      "the HttpResponse contains a 500 status and ServerError code" in {
+        val response = HttpResponse(INTERNAL_SERVER_ERROR, Some(DESErrorsFixture.serverErrorJson))
+        val result: TaxCalcMessagesOutcome = taxCalcMessagesHttpReads.read(method, url, response)
+
+        result shouldBe Left(InternalServerError)
+      }
+
+      "the HttpResponse contains a 500 status and ServiceUnavailable code" in {
+        val response = HttpResponse(INTERNAL_SERVER_ERROR, Some(DESErrorsFixture.serviceUnavailableJson))
+        val result: TaxCalcMessagesOutcome = taxCalcMessagesHttpReads.read(method, url, response)
+
+        result shouldBe Left(InternalServerError)
+      }
+    }
+  }
+
 }

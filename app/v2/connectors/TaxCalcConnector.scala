@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import v2.config.AppConfig
-import v2.outcomes.TaxCalcOutcome.TaxCalcOutcome
+import v2.outcomes.TaxCalcOutcome.{TaxCalcMessagesOutcome, TaxCalcOutcome}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -31,5 +31,10 @@ class TaxCalcConnector @Inject()(http: HttpClient,
   def getTaxCalculation(nino: String, calculationId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[TaxCalcOutcome] = {
     import v2.httpparsers.TaxCalcHttpParser.taxCalcHttpReads
     http.GET[TaxCalcOutcome](s"${appConfig.desBaseUrl}/income-tax/calculation-data/$nino/calcId/$calculationId")(implicitly, hc.withDesHeaders(), ec)
+  }
+
+  def getTaxCalculationMessages(nino: String, calculationId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[TaxCalcMessagesOutcome] = {
+    import v2.httpparsers.TaxCalcHttpParser.taxCalcMessagesHttpReads
+    http.GET[TaxCalcMessagesOutcome](s"${appConfig.desBaseUrl}/income-tax/calculation-data/$nino/calcId/$calculationId")(implicitly, hc.withDesHeaders(), ec)
   }
 }
