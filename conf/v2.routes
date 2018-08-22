@@ -1,2 +1,3 @@
 
-GET  /ni/:nino/calculations/:calcId         v2.controllers.TaxCalcController.getTaxCalculation(nino:String, calcId:String)
+GET  /ni/:nino/calculations/:calcId                              v2.controllers.TaxCalcController.getTaxCalculation(nino:String, calcId:String)
+GET  /ni/:nino/calculations/:calcId/validation-messages          v2.controllers.TaxCalcController.getTaxCalculationMessages(nino:String, calcId:String)
