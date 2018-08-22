@@ -19,7 +19,7 @@ package v2.mocks.services
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
-import v2.outcomes.TaxCalcOutcome.TaxCalcOutcome
+import v2.outcomes.TaxCalcOutcome.{TaxCalcMessagesOutcome, TaxCalcOutcome}
 import v2.services.TaxCalcService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -32,6 +32,11 @@ trait MockTaxCalcService extends MockFactory {
     def getTaxCalculation(nino: String, calcId: String): CallHandler[Future[TaxCalcOutcome]] =
     {
       (mockTaxCalcService.getTaxCalculation(_:String, _: String)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(nino, calcId, *, *)
+    }
+    def getTaxCalculationMessages(nino: String, calcId: String): CallHandler[Future[TaxCalcMessagesOutcome]] =
+    {
+      (mockTaxCalcService.getTaxCalculationMessages(_:String, _: String)(_: HeaderCarrier, _: ExecutionContext))
         .expects(nino, calcId, *, *)
     }
   }
