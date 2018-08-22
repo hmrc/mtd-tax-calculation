@@ -20,7 +20,7 @@ import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.http.HeaderCarrier
 import v2.connectors.TaxCalcConnector
-import v2.outcomes.TaxCalcOutcome.TaxCalcOutcome
+import v2.outcomes.TaxCalcOutcome.{TaxCalcMessagesOutcome, TaxCalcOutcome}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -32,6 +32,11 @@ trait MockTaxCalcConnector extends MockFactory {
     def getTaxCalculation(mtdid: String, calcId: String): CallHandler[Future[TaxCalcOutcome]] =
     {
       (mockTaxCalcConnector.getTaxCalculation(_:String, _:String)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(mtdid, calcId, *, *)
+    }
+    def getTaxCalculationMessages(mtdid: String, calcId: String): CallHandler[Future[TaxCalcMessagesOutcome]] =
+    {
+      (mockTaxCalcConnector.getTaxCalculationMessages(_:String, _:String)(_: HeaderCarrier, _: ExecutionContext))
         .expects(mtdid, calcId, *, *)
     }
   }
