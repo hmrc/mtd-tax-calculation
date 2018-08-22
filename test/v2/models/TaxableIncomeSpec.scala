@@ -128,7 +128,6 @@ class TaxableIncomeSpec extends UnitSpec
       "it has no value" in {
         val model = validTaxableIncomeModel.copy(ukProperty = None)
         val json: JsValue = validTaxableIncomeOutputJson.as[JsObject] - "ukProperty"
-        println(s"\n\n$model\n$json\n\n")
         Json.toJson(model) shouldBe json
       }
     }
