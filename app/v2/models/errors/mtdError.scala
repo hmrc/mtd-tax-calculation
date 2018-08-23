@@ -24,6 +24,7 @@ case class Error(code: String, message: String) extends MtdError
 
 //2xx
 object CalculationNotReady extends MtdError
+object NoContentReturned extends MtdError
 
 //4xx
 object InvalidNinoError extends Error("FORMAT_NINO", "The format of the National Insurance number is invalid")

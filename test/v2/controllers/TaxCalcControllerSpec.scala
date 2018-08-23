@@ -190,6 +190,20 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
 
         status(result) shouldBe NO_CONTENT
       }
+      "the result contains no validation messages" in new Test {
+
+        MockedEnrolmentsAuthService.authoriseUser()
+
+        MockedMtdIdLookupService.lookup(nino)
+          .returns(Future.successful(Right(mtdId)))
+
+        MockedTaxCalcService.getTaxCalculationMessages(nino, calcId)
+          .returns(Future.successful(Left(NoContentReturned)))
+
+        private val result: Future[Result] = controller.getTaxCalculationMessages(nino, calcId)(fakeRequest)
+
+        status(result) shouldBe NO_CONTENT
+      }
     }
 
     "return a 400" when {

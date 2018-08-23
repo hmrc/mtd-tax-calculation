@@ -43,7 +43,12 @@ object TaxCalcHttpParser extends HttpParser {
       }
     }
     private def parseResponse(response: HttpResponse): Outcome[M] = response.validateJson[M] match {
-      case Some(taxCalc) => Right(taxCalc)
+      case Some(taxCalc) if taxCalc.isInstanceOf[TaxCalculation] => Right(taxCalc)
+      case Some(taxCalcMessages) if taxCalcMessages.isInstanceOf[TaxCalcMessages] =>
+        taxCalcMessages match {
+          case TaxCalcMessages(0,0,_) => Left(NoContentReturned)
+          case _ => Right(taxCalcMessages)
+        }
       case None => Left(InternalServerError)
     }
   }
