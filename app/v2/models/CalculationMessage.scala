@@ -28,8 +28,8 @@ object CalculationMessage {
 
   implicit val reads: Reads[CalculationMessage] = (
     (__ \ "type").read[String].map {
-      case "INFO" => "Information"
-      case "WARN" => "Warning"
+      case "INFO" => "information"
+      case "WARN" => "warning"
     } and
       (__ \ "text").read[String]
     ) (CalculationMessage.apply _)

@@ -193,7 +193,7 @@ object TaxCalculationFixture {
     calculationMessageCount = Some(1),
     calculationMessages = Some(Seq(
       CalculationMessage(
-        `type`= "Warning",
+        `type`= "warning",
         text = "You have entered a large amount in total Gift Aid payments. Please check."
       )
     )),
@@ -372,7 +372,7 @@ object TaxCalculationFixture {
       |	"calculationMessageCount": 1,
       |	"calculationMessages": [
       |		{
-      |			"type": "Warning",
+      |			"type": "warning",
       |			"text": "You have entered a large amount in total Gift Aid payments. Please check."
       |		}
       |	],
