@@ -27,7 +27,10 @@ object CalculationMessage {
   implicit val writes: Writes[CalculationMessage] = Json.writes[CalculationMessage]
 
   implicit val reads: Reads[CalculationMessage] = (
-    (__ \ "type").read[String] and
+    (__ \ "type").read[String].map {
+      case "INFO" => "Information"
+      case "WARN" => "Warning"
+    } and
       (__ \ "text").read[String]
     ) (CalculationMessage.apply _)
 

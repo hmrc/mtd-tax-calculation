@@ -46,6 +46,5 @@ object TaxCalcHttpParser extends HttpParser {
       case Some(taxCalc) => Right(taxCalc)
       case None => Left(InternalServerError)
     }
-
   }
 }

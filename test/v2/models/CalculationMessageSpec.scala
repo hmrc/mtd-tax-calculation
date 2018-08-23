@@ -26,14 +26,14 @@ class CalculationMessageSpec extends JsonErrorValidators with UnitSpec {
 
   val calculationMessage =
     CalculationMessage(
-      `type` = "WARN",
+      `type` = "Warning"  ,
       text = "You have entered a large amount in total Gift Aid payments. Please check."
     )
 
   val calculationMessageJson: JsValue = Json.parse(
     s"""
        |{
-       | "type": "WARN",
+       | "type": "Warning",
        | "text": "You have entered a large amount in total Gift Aid payments. Please check."
        |}
       """.stripMargin)
