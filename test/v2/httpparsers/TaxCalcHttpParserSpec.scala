@@ -122,6 +122,15 @@ class TaxCalcHttpParserSpec extends UnitSpec {
       }
     }
 
+    "return a NoContent response" when {
+      "the HttpResponse contains a 200 status and response body warning and error counts of 0" in {
+        val response = HttpResponse(OK, Some(TaxCalcMessagesFixture.taxCalcDesNoWarningsAndErrors))
+        val result: TaxCalcMessagesOutcome = taxCalcMessagesHttpReads.read(method, url, response)
+
+        result shouldBe Left(NoContentReturned)
+      }
+    }
+
     "return a NotReady response" when {
       "the HttpResponse contains a 204 status" in {
         val response = HttpResponse(NO_CONTENT, None)

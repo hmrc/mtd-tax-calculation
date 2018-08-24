@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.Writes
 import play.api.mvc.{Action, AnyContent, Result}
-import v2.models.errors.{CalculationNotReady, InvalidCalcIDError, InvalidNinoError, MatchingResourceNotFound, InternalServerError => ISE}
+import v2.models.errors.{CalculationNotReady, InvalidCalcIDError, InvalidNinoError, MatchingResourceNotFound, NoContentReturned, InternalServerError => ISE}
 import v2.models.{TaxCalcMessages, TaxCalculation}
 import v2.outcomes.TaxCalcOutcome.Outcome
 import v2.services.{EnrolmentsAuthService, MtdIdLookupService, TaxCalcService}
@@ -47,7 +47,7 @@ class TaxCalcController @Inject()(val authService: EnrolmentsAuthService,
       case Right(model) => Ok(toJson(model))
       case Left(mtdError) =>
         mtdError match {
-          case CalculationNotReady => NoContent
+          case CalculationNotReady | NoContentReturned => NoContent
           case InvalidCalcIDError | InvalidNinoError => BadRequest(toJson(mtdError))
           case MatchingResourceNotFound => NotFound(toJson(mtdError))
           case ISE => InternalServerError(toJson(mtdError))
