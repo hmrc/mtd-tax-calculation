@@ -22,7 +22,7 @@ import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.controller.BaseController
-import v2.models.errors.{AuthError, InvalidNinoError, UnauthorisedError}
+import v2.models.errors.{AuthError, InvalidNinoError, MtdError, UnauthorisedError}
 import v2.outcomes.MtdIdLookupOutcome._
 import v2.services.{EnrolmentsAuthService, MtdIdLookupService}
 
@@ -48,7 +48,7 @@ abstract class AuthorisedController extends BaseController {
                                    (implicit headerCarrier: HeaderCarrier): Future[Result] = {
       authService.authorised(predicate(mtdId)).flatMap[Result] {
         case Right(_) => block(UserRequest(mtdId, request))
-        case Left(AuthError(false, _)) => Future.successful(Forbidden(Json.toJson(Unauthorised.error)))
+        case Left(UnauthorisedError) => Future.successful(Forbidden(Json.toJson(Unauthorised.error)))
         case Left(_) => Future.successful(Forbidden(Json.toJson(Unauthorised.error)))
       }
     }

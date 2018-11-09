@@ -14,19 +14,6 @@
  * limitations under the License.
  */
 
-package v2.outcomes
+package v2.models.auth
 
-import v2.models.auth.UserDetails
-import v2.models.errors.MtdError
-import v2.models.{TaxCalcMessages, TaxCalculation}
-
-object TaxCalcOutcome {
-
-  type Outcome[M] = Either[MtdError, M]
-
-  type TaxCalcOutcome = Either[MtdError, TaxCalculation]
-  type TaxCalcMessagesOutcome = Either[MtdError, TaxCalcMessages]
-  type AuthOutcome = Either[MtdError, UserDetails]
-
-  sealed trait TaxCalcError extends MtdError
-}
+case class UserDetails(mtdId: String, userType: String, agentReferenceNumber: Option[String])

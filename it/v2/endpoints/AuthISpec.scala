@@ -20,7 +20,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
 import support.IntegrationBaseSpec
-import v2.stubs.{AuthStub, MtdIdLookupStub, TaxCalcStub}
+import v2.stubs._
 
 class AuthISpec extends IntegrationBaseSpec {
 
@@ -44,7 +44,6 @@ class AuthISpec extends IntegrationBaseSpec {
       "return 500" in new Test {
         override val nino: String = "AA123456A"
         override def setupStubs(): StubMapping = {
-          MtdIdLookupStub.ninoFound(nino)
           MtdIdLookupStub.internalServerError(nino)
         }
 
@@ -60,6 +59,22 @@ class AuthISpec extends IntegrationBaseSpec {
         override def setupStubs(): StubMapping = {
           MtdIdLookupStub.ninoFound(nino, mtdId)
           AuthStub.authorised()
+          TaxCalcStub.successfulTaxCalc(nino, calcId)
+        }
+
+        val response: WSResponse = await(request().get())
+        response.status shouldBe Status.OK
+      }
+    }
+
+    "an MTD ID is successfully retrieve from the NINO and the agent is authorised" should {
+
+      "return 200" in new Test {
+        override val nino: String = "AA123456A"
+
+        override def setupStubs(): StubMapping = {
+          MtdIdLookupStub.ninoFound(nino)
+          AuthStub.authorisedAgent()
           TaxCalcStub.successfulTaxCalc(nino, calcId)
         }
 

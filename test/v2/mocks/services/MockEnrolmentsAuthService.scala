@@ -16,10 +16,12 @@
 
 package v2.mocks.services
 
+import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-import v2.services.EnrolmentsAuthService
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.http.HeaderCarrier
+import v2.outcomes.TaxCalcOutcome.AuthOutcome
+import v2.services.EnrolmentsAuthService
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -28,10 +30,9 @@ trait MockEnrolmentsAuthService extends MockFactory {
   val mockEnrolmentsAuthService: EnrolmentsAuthService = mock[EnrolmentsAuthService]
 
   object MockedEnrolmentsAuthService {
-    def authoriseUser(): Unit = {
+    def authoriseUser(): CallHandler[Future[AuthOutcome]] = {
       (mockEnrolmentsAuthService.authorised(_: Predicate)(_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *)
-        .returns(Future.successful(Right(true)))
     }
   }
 }

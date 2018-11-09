@@ -21,6 +21,7 @@ import play.api.mvc.Result
 import uk.gov.hmrc.http.HeaderCarrier
 import v2.fixtures.{TaxCalcMessagesFixture, TaxCalculationFixture}
 import v2.mocks.services.{MockEnrolmentsAuthService, MockMtdIdLookupService, MockTaxCalcService}
+import v2.models.auth.UserDetails
 import v2.models.errors._
 
 import scala.concurrent.Future
@@ -32,6 +33,9 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
 
     val mtdId = "test-mtd-id"
     val calcId = "12345678"
+    val expected = Right(UserDetails("", "Individual", None))
+
+    MockedEnrolmentsAuthService.authoriseUser().returns(Future.successful(expected))
 
     lazy val controller = new TaxCalcController(
       authService = mockEnrolmentsAuthService,
@@ -41,9 +45,10 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
 
   val nino = "test-nino"
 
+
+
   "getTaxCalculation" should {
     "return a 200 with the correct body" in new Test {
-      MockedEnrolmentsAuthService.authoriseUser()
 
       MockedMtdIdLookupService.lookup(nino)
         .returns(Future.successful(Right(mtdId)))
@@ -59,8 +64,6 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
 
     "return a 204" when {
       "the calculation is not ready" in new Test {
-
-        MockedEnrolmentsAuthService.authoriseUser()
 
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
@@ -85,8 +88,6 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
       }
 
       "the service returns an Invalid Identifier error" in new Test {
-        MockedEnrolmentsAuthService.authoriseUser()
-
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
 
@@ -100,8 +101,6 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
       }
 
       "the service returns an Invalid CalcID error" in new Test {
-        MockedEnrolmentsAuthService.authoriseUser()
-
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
 
@@ -117,7 +116,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
 
     "return a 404" when {
       "the service returns a NotFound error" in new Test {
-        MockedEnrolmentsAuthService.authoriseUser()
+        MockedEnrolmentsAuthService.authoriseUser().returns(Future.successful(expected))
 
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
@@ -143,8 +142,6 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
       }
 
       "the service returns an InternalServerError response" in new Test {
-        MockedEnrolmentsAuthService.authoriseUser()
-
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
 
@@ -161,8 +158,6 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
   
   "getTaxCalculationMessages" should {
     "return a 200 with the correct body" in new Test {
-      MockedEnrolmentsAuthService.authoriseUser()
-
       MockedMtdIdLookupService.lookup(nino)
         .returns(Future.successful(Right(mtdId)))
 
@@ -178,8 +173,6 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
     "return a 204" when {
       "the calculation is not ready" in new Test {
 
-        MockedEnrolmentsAuthService.authoriseUser()
-
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
 
@@ -191,8 +184,6 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
         status(result) shouldBe NO_CONTENT
       }
       "the result contains no validation messages" in new Test {
-
-        MockedEnrolmentsAuthService.authoriseUser()
 
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
@@ -217,8 +208,6 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
       }
 
       "the service returns an Invalid Identifier error" in new Test {
-        MockedEnrolmentsAuthService.authoriseUser()
-
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
 
@@ -232,8 +221,6 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
       }
 
       "the service returns an Invalid CalcID error" in new Test {
-        MockedEnrolmentsAuthService.authoriseUser()
-
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
 
@@ -249,8 +236,6 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
 
     "return a 404" when {
       "the service returns a NotFound error" in new Test {
-        MockedEnrolmentsAuthService.authoriseUser()
-
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
 
@@ -275,8 +260,6 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
       }
 
       "the service returns an InternalServerError response" in new Test {
-        MockedEnrolmentsAuthService.authoriseUser()
-
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
 
