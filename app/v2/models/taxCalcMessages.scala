@@ -45,8 +45,16 @@ case class Message(id: String,
 object Message {
   implicit val reads: Reads[Message] = (
     (__ \ "id").read[String] and
-    (__ \ "type").read[String] and
+      (__ \ "type").read[String].map(mapErrors) and
       (__ \ "text").read[String]
     ) (Message.apply _)
   implicit val writes: OWrites[Message] = Json.writes[Message]
+
+  def mapErrors(str: String): String = {
+    str match {
+      case "WARN" => "warning"
+      case "ERR" => "error"
+      case _ => str
+    }
+  }
 }

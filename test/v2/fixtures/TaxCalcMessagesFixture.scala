@@ -26,18 +26,26 @@ object TaxCalcMessagesFixture {
     warningCount = 1,
     errorCount = 4,
     messages = Some(List(
-      Message("C11101", "WARN", "You have entered a large amount in total Gift Aid payments. Please check."),
-      Message("C15102", "ERR", "Total amount of one-off Gift Aid payments cannot exceed the total gift aid payments. Please check."),
-      Message("C15103", "ERR",
+      Message("C11101", "warning", "You have entered a large amount in total Gift Aid payments. Please check."),
+      Message("C15102", "error", "Total amount of one-off Gift Aid payments cannot exceed the total gift aid payments. Please check."),
+      Message("C15103", "error",
         "Gift aid payments made this year treated as paid in the previous year cannot exceed the total gift aid payments. Please check."),
-      Message("C15104", "ERR",
+      Message("C15104", "error",
         "Value of qualifying investments gifted to non-UK charities cannot exceed the sum of 'Value of qualifying shares and " +
           "securities gifted to charity' and 'Value of qualifying land and buildings gifted to charity'. Please check."),
-      Message("C15105", "ERR", "Gift aid payments to non-UK charities cannot exceed the total gift aid payments. Please check."))))
+      Message("C15105", "error", "Gift aid payments to non-UK charities cannot exceed the total gift aid payments. Please check."))))
 
-  val bvrMessage = Message("C11101", "WARN", "You have entered a large amount in total Gift Aid payments. Please check.")
-
+  val bvrMessage = Message("C11101", "warning", "You have entered a large amount in total Gift Aid payments. Please check.")
   val bvrMessageString: String =
+    """
+      |{
+      |    "id": "C11101",
+      |    "type": "warning",
+      |    "text": "You have entered a large amount in total Gift Aid payments. Please check."
+      | }
+    """.stripMargin
+
+  val bvrDesMessageString: String =
     """
       |{
       |    "id": "C11101",
@@ -128,27 +136,27 @@ object TaxCalcMessagesFixture {
       |   "messages":[
       |      {
       |         "id":"C11101",
-      |         "type":"WARN",
+      |         "type":"warning",
       |         "text":"You have entered a large amount in total Gift Aid payments. Please check."
       |      },
       |      {
       |         "id":"C15102",
-      |         "type":"ERR",
+      |         "type":"error",
       |         "text":"Total amount of one-off Gift Aid payments cannot exceed the total gift aid payments. Please check."
       |      },
       |      {
       |         "id":"C15103",
-      |         "type":"ERR",
+      |         "type":"error",
       |         "text":"Gift aid payments made this year treated as paid in the previous year cannot exceed the total gift aid payments. Please check."
       |      },
       |      {
       |         "id":"C15104",
-      |         "type":"ERR",
+      |         "type":"error",
       |         "text":"Value of qualifying investments gifted to non-UK charities cannot exceed the sum of 'Value of qualifying shares and securities gifted to charity' and 'Value of qualifying land and buildings gifted to charity'. Please check."
       |      },
       |      {
       |         "id":"C15105",
-      |         "type":"ERR",
+      |         "type":"error",
       |         "text":"Gift aid payments to non-UK charities cannot exceed the total gift aid payments. Please check."
       |      }
       |   ]

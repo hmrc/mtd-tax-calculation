@@ -32,9 +32,9 @@ class TaxCalcMessagesSpec extends JsonErrorValidators with UnitSpec {
       testMandatoryProperty[TaxCalcMessages](Json.stringify(TestData.taxCalcDesWarningsAndErrors))(property = "bvrWarnings")
       testMandatoryProperty[TaxCalcMessages](Json.stringify(TestData.taxCalcDesWarningsAndErrors))(property = "bvrErrors")
 
-      testMandatoryProperty[Message](TestData.bvrMessageString)(property = "id")
-      testMandatoryProperty[Message](TestData.bvrMessageString)(property = "type")
-      testMandatoryProperty[Message](TestData.bvrMessageString)(property = "text")
+      testMandatoryProperty[Message](TestData.bvrDesMessageString)(property = "id")
+      testMandatoryProperty[Message](TestData.bvrDesMessageString)(property = "type")
+      testMandatoryProperty[Message](TestData.bvrDesMessageString)(property = "text")
 
       testPropertyType[TaxCalcMessages](TestData.taxCalcDesWarningsAndErrors)(
         path = "/calcOutput/bvrWarnings",
@@ -52,17 +52,17 @@ class TaxCalcMessagesSpec extends JsonErrorValidators with UnitSpec {
         expectedError = JSARRAY_FORMAT_EXCEPTION
       )
 
-      testPropertyType[Message](TestData.bvrMessageString)(
+      testPropertyType[Message](TestData.bvrDesMessageString)(
         property = "id",
         invalidValue = "1",
         errorPathAndError = ".id" -> STRING_FORMAT_EXCEPTION
       )
-      testPropertyType[Message](TestData.bvrMessageString)(
+      testPropertyType[Message](TestData.bvrDesMessageString)(
         property = "type",
         invalidValue = "1",
         errorPathAndError = ".type" -> STRING_FORMAT_EXCEPTION
       )
-      testPropertyType[Message](TestData.bvrMessageString)(
+      testPropertyType[Message](TestData.bvrDesMessageString)(
         property = "text",
         invalidValue = "1",
         errorPathAndError = ".text" -> STRING_FORMAT_EXCEPTION
@@ -72,7 +72,7 @@ class TaxCalcMessagesSpec extends JsonErrorValidators with UnitSpec {
     "return a valid json" when {
       "all fields exist" in {
         TaxCalcMessages.reads.reads(TestData.taxCalcDesWarningsAndErrors).get shouldBe TestData.taxCalcMessages
-        Message.reads.reads(Json.parse(TestData.bvrMessageString)).get shouldBe TestData.bvrMessage
+        Message.reads.reads(Json.parse(TestData.bvrDesMessageString)).get shouldBe TestData.bvrMessage
       }
 
       "only mandatory fields exist" in {
