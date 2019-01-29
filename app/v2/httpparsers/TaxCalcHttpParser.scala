@@ -16,6 +16,7 @@
 
 package v2.httpparsers
 
+import play.api.Logger
 import play.api.http.Status._
 import play.api.libs.json.Reads
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
@@ -24,6 +25,8 @@ import v2.models.errors._
 import v2.outcomes.TaxCalcOutcome.{Outcome, TaxCalcMessagesOutcome, TaxCalcOutcome}
 
 object TaxCalcHttpParser extends HttpParser {
+
+  val logger = Logger(this.getClass)
 
   implicit val taxCalcHttpReads: HttpReads[TaxCalcOutcome] = reads[TaxCalculation]
 
@@ -39,7 +42,9 @@ object TaxCalcHttpParser extends HttpParser {
         case (FORBIDDEN, _) => Left(InternalServerError)
         case (NOT_FOUND, _) => Left(MatchingResourceNotFound)
         case (INTERNAL_SERVER_ERROR, ErrorCode(DesErrorCode.SERVER_ERROR)) => Left(InternalServerError)
-        case (INTERNAL_SERVER_ERROR, ErrorCode(DesErrorCode.SERVICE_UNAVAILABLE)) => Left(InternalServerError)
+        case (SERVICE_UNAVAILABLE, ErrorCode(DesErrorCode.SERVICE_UNAVAILABLE)) => Left(InternalServerError)
+        case (_, _) => logger.warn(s"Unexpected error received from DES with status ${response.status} and body ${response.jsonOpt}")
+          Left(InternalServerError)
       }
     }
     private def parseResponse(response: HttpResponse): Outcome[M] = response.validateJson[M] match {
