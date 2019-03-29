@@ -28,7 +28,9 @@ case class EoyEstimate(employments: Option[Seq[EoyEmployment]],
                        nic2: BigDecimal,
                        nic4: BigDecimal,
                        totalNicAmount: BigDecimal,
-                       incomeTaxNicAmount: BigDecimal)
+                       incomeTaxNicAmount: BigDecimal,
+                       charitableGiving: Option[CharitableGiving],
+                       savings: Option[Savings])
 
 object EoyEstimate {
   implicit val writes: OWrites[EoyEstimate] = Json.writes[EoyEstimate]
@@ -49,7 +51,9 @@ object EoyEstimate {
         selfEmployments = None,
         ukProperty = None,
         ukDividends = None,
-        totalTaxableIncome, incomeTaxAmount, nic2, nic4, totalNicAmount, incomeTaxNicAmount
+        totalTaxableIncome, incomeTaxAmount, nic2, nic4, totalNicAmount, incomeTaxNicAmount,
+        charitableGiving = None,
+        savings = None
       )
 
       incomeSource.foldLeft(estimate){ (old, json) =>
