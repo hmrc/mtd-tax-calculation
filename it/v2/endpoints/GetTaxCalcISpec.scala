@@ -21,7 +21,7 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.libs.ws.{WSRequest, WSResponse}
 import support.IntegrationBaseSpec
-import v2.fixtures.TaxCalculationFixture
+import v2.fixtures.old.TaxCalculationFixture
 import v2.models.errors.InternalServerError
 import v2.stubs.{AuthStub, MtdIdLookupStub, TaxCalcStub}
 

@@ -22,7 +22,7 @@ import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.controller.BaseController
-import v2.models.errors.{AuthError, InvalidNinoError, MtdError, UnauthorisedError}
+import v2.models.errors.{InvalidNinoError, UnauthorisedError}
 import v2.outcomes.MtdIdLookupOutcome._
 import v2.services.{EnrolmentsAuthService, MtdIdLookupService}
 

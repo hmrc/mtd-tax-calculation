@@ -17,8 +17,8 @@
 package v2.config
 
 import javax.inject.{Inject, Singleton}
-import play.api.{Configuration, Environment}
 import play.api.Mode.Mode
+import play.api.{Configuration, Environment}
 import uk.gov.hmrc.play.config.ServicesConfig
 
 trait AppConfig {
@@ -26,6 +26,7 @@ trait AppConfig {
   def mtdIdBaseUrl: String
   def desEnv: String
   def desToken: String
+  def featureSwitch: Option[Configuration]
 }
 
 @Singleton
@@ -39,4 +40,7 @@ class AppConfigImpl @Inject()(environment: Environment,
   val mtdIdBaseUrl: String = baseUrl("mtd-id-lookup")
   val desEnv: String = getString("microservice.services.des.env")
   val desToken: String = getString("microservice.services.des.token")
+
+  def featureSwitch: Option[Configuration] = config.getConfig(s"feature-switch")
+
 }

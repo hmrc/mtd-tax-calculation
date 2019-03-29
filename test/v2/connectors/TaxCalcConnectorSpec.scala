@@ -17,10 +17,11 @@
 package v2.connectors
 
 import uk.gov.hmrc.http.HttpResponse
-import v2.fixtures.{TaxCalcMessagesFixture, TaxCalculationFixture}
+import v2.fixtures.old.{TaxCalcMessagesFixture, TaxCalculationFixture}
 import v2.mocks.{MockAppConfig, MockHttpClient}
 import v2.models.errors.MatchingResourceNotFound
-import v2.outcomes.TaxCalcOutcome.{TaxCalcMessagesOutcome, TaxCalcOutcome}
+import v2.models.old.{TaxCalcMessages, TaxCalculation}
+import v2.outcomes.TaxCalcOutcome.{Outcome, TaxCalcMessagesOutcome, TaxCalcOutcome}
 
 import scala.concurrent.Future
 
@@ -54,7 +55,7 @@ class TaxCalcConnectorSpec extends ConnectorSpec {
         MockedHttpClient.get[TaxCalcOutcome](url)
           .returns(Future.successful(Right(TaxCalculationFixture.taxCalc)))
 
-        val result: TaxCalcOutcome = await(connector.getTaxCalculation(mtdId, calculationId))
+        val result = await(connector.getTaxCalculation[TaxCalculation](mtdId, calculationId))
         result shouldBe Right(TaxCalculationFixture.taxCalc)
       }
     }
@@ -64,7 +65,7 @@ class TaxCalcConnectorSpec extends ConnectorSpec {
         MockedHttpClient.get[TaxCalcOutcome](url)
           .returns(Future.successful(Left(MatchingResourceNotFound)))
 
-        val result: TaxCalcOutcome = await(connector.getTaxCalculation(mtdId, calculationId))
+        val result = await(connector.getTaxCalculation[TaxCalculation](mtdId, calculationId))
         result shouldBe Left(MatchingResourceNotFound)
       }
     }
@@ -73,10 +74,10 @@ class TaxCalcConnectorSpec extends ConnectorSpec {
   "getTaxCalculationMessages" should {
     "return a TaxCalculation model" when {
       "the http parser returns a TaxCalculation model" in new Test {
-        MockedHttpClient.get[TaxCalcMessagesOutcome](url)
+        MockedHttpClient.get[Outcome[TaxCalcMessages]](url)
           .returns(Future.successful(Right(TaxCalcMessagesFixture.taxCalcMessages)))
 
-        val result: TaxCalcMessagesOutcome = await(connector.getTaxCalculationMessages(mtdId, calculationId))
+        val result = await(connector.getTaxCalculationMessages[TaxCalcMessages](mtdId, calculationId))
         result shouldBe Right(TaxCalcMessagesFixture.taxCalcMessages)
       }
     }
@@ -86,7 +87,7 @@ class TaxCalcConnectorSpec extends ConnectorSpec {
         MockedHttpClient.get[TaxCalcMessagesOutcome](url)
           .returns(Future.successful(Left(MatchingResourceNotFound)))
 
-        val result: TaxCalcMessagesOutcome = await(connector.getTaxCalculationMessages(mtdId, calculationId))
+        val result = await(connector.getTaxCalculationMessages[TaxCalcMessages](mtdId, calculationId))
         result shouldBe Left(MatchingResourceNotFound)
       }
     }

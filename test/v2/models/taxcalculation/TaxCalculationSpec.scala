@@ -18,6 +18,7 @@ package v2.models.taxcalculation
 
 import play.api.libs.json._
 import support.UnitSpec
+import v2.fixtures.{TaxCalculationFixture => TestData}
 import v2.models._
 import v2.models.utils.JsonErrorValidators
 
@@ -30,7 +31,6 @@ class TaxCalculationSpec extends JsonErrorValidators with UnitSpec {
 
   "reads" should {
     import JsonError._
-    import v2.fixtures.{TaxCalculationFixture => TestData}
     "return correct validation errors" when {
 
       testPropertyType[TaxCalculation](TestData.taxCalcDesJson)(
@@ -147,7 +147,6 @@ class TaxCalculationSpec extends JsonErrorValidators with UnitSpec {
   }
 
   "write" should {
-    import v2.fixtures.{TaxCalculationFixture => TestData}
 
     val taxCalculation: TaxCalculation = TestData.taxCalc
     val taxCalcJson: JsValue = TestData.taxCalcClientJson

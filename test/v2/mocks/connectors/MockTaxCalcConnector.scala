@@ -18,9 +18,10 @@ package v2.mocks.connectors
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
+import play.api.libs.json.Reads
 import uk.gov.hmrc.http.HeaderCarrier
 import v2.connectors.TaxCalcConnector
-import v2.outcomes.TaxCalcOutcome.{TaxCalcMessagesOutcome, TaxCalcOutcome}
+import v2.outcomes.TaxCalcOutcome.Outcome
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -29,15 +30,15 @@ trait MockTaxCalcConnector extends MockFactory {
   val mockTaxCalcConnector: TaxCalcConnector = mock[TaxCalcConnector]
 
   object MockedTaxCalcConnector {
-    def getTaxCalculation(mtdid: String, calcId: String): CallHandler[Future[TaxCalcOutcome]] =
-    {
-      (mockTaxCalcConnector.getTaxCalculation(_:String, _:String)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(mtdid, calcId, *, *)
+    def getTaxCalculation[A: Reads](mtdid: String, calcId: String): CallHandler[Future[Outcome[A]]] = {
+      (mockTaxCalcConnector.getTaxCalculation(_: String, _: String)(_: Reads[A], _: HeaderCarrier, _: ExecutionContext))
+        .expects(mtdid, calcId, *, *, *)
     }
-    def getTaxCalculationMessages(mtdid: String, calcId: String): CallHandler[Future[TaxCalcMessagesOutcome]] =
-    {
-      (mockTaxCalcConnector.getTaxCalculationMessages(_:String, _:String)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(mtdid, calcId, *, *)
+
+    def getTaxCalculationMessages[A: Reads](mtdid: String, calcId: String): CallHandler[Future[Outcome[A]]] = {
+      (mockTaxCalcConnector.getTaxCalculationMessages(_: String, _: String)(_: Reads[A], _: HeaderCarrier, _: ExecutionContext))
+        .expects(mtdid, calcId, *, *, *)
     }
   }
+
 }

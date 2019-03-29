@@ -17,7 +17,6 @@
 package v2.services
 
 import javax.inject.{Inject, Singleton}
-
 import play.api.Logger
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
 import uk.gov.hmrc.auth.core._

@@ -20,8 +20,9 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.Writes
 import play.api.mvc.{Action, AnyContent, Result}
+import v2.config.{AppConfig, FeatureSwitch}
+import v2.models._
 import v2.models.errors.{CalculationNotReady, InvalidCalcIDError, InvalidNinoError, MatchingResourceNotFound, NoContentReturned, InternalServerError => ISE}
-import v2.models.{TaxCalcMessages, TaxCalculation}
 import v2.outcomes.TaxCalcOutcome.Outcome
 import v2.services.{EnrolmentsAuthService, MtdIdLookupService, TaxCalcService}
 
@@ -31,19 +32,35 @@ import scala.concurrent.Future
 @Singleton
 class TaxCalcController @Inject()(val authService: EnrolmentsAuthService,
                                   val lookupService: MtdIdLookupService,
-                                  val service: TaxCalcService) extends AuthorisedController {
+                                  val service: TaxCalcService,
+                                  appConfig: AppConfig) extends AuthorisedController {
+
+  private val featureSwitch = FeatureSwitch(appConfig.featureSwitch)
 
   def getTaxCalculation(nino: String, calcId: String): Action[AnyContent] = authorisedAction(nino).async { implicit request =>
-    get[TaxCalculation](nino,calcId)(service.getTaxCalculation(_,_)(hc,implicitly))
+
+    if (featureSwitch.isRelease2Enabled) {
+      get[TaxCalculation](nino, calcId)(service.getTaxCalculation[TaxCalculation](_, _))
+    } else {
+      get[old.TaxCalculation](nino, calcId)(service.getTaxCalculation[old.TaxCalculation](_, _))
+    }
+
   }
 
   def getTaxCalculationMessages(nino: String, calcId: String): Action[AnyContent] = authorisedAction(nino).async { implicit request =>
-    get[TaxCalcMessages](nino,calcId)(service.getTaxCalculationMessages(_,_)(hc,implicitly))
+
+    if (featureSwitch.isRelease2Enabled) {
+      get[TaxCalcMessages](nino, calcId)(service.getTaxCalculationMessages[TaxCalcMessages](_, _))
+    } else {
+      get[old.TaxCalcMessages](nino, calcId)(service.getTaxCalculationMessages[old.TaxCalcMessages](_, _))
+    }
+
+
   }
 
-  private def get[M:Writes](nino: String, c: String)
-                          (f: (String, String) => Future[Outcome[M]]): Future[Result] = {
-    f(nino,c).map {
+  private def get[M: Writes](nino: String, c: String)
+                            (f: (String, String) => Future[Outcome[M]]): Future[Result] = {
+    f(nino, c).map {
       case Right(model) => Ok(toJson(model))
       case Left(mtdError) =>
         mtdError match {

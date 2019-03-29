@@ -18,7 +18,7 @@ package v2.outcomes
 
 import v2.models.auth.UserDetails
 import v2.models.errors.MtdError
-import v2.models.{TaxCalcMessages, TaxCalculation}
+import v2.models.old.{TaxCalcMessages, TaxCalculation}
 
 object TaxCalcOutcome {
 

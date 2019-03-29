@@ -21,7 +21,7 @@ import play.api.libs.json.{Json, OWrites, Reads, __}
 
 case class TaxCalcMessages(warningCount: Int,
                            errorCount: Int,
-                           messages: Option[Seq[Message]])
+                           messages: Option[Seq[Message]]) extends ITaxCalcMessages
 
 object TaxCalcMessages{
 

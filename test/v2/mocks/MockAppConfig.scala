@@ -16,9 +16,10 @@
 
 package v2.mocks
 
-import v2.config.AppConfig
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
+import play.api.Configuration
+import v2.config.AppConfig
 
 trait MockAppConfig extends MockFactory {
 
@@ -29,5 +30,6 @@ trait MockAppConfig extends MockFactory {
     def desBaseUrl: CallHandler[String] = (mockAppConfig.desBaseUrl _: () => String).expects()
     def desToken: CallHandler[String] = (mockAppConfig.desToken _: () => String).expects()
     def mtdIdBaseUrl: CallHandler[String] = (mockAppConfig.mtdIdBaseUrl _: () => String).expects()
+    def featureSwitch: CallHandler[Option[Configuration]] = (mockAppConfig.featureSwitch _: () => Option[Configuration]).expects()
   }
 }

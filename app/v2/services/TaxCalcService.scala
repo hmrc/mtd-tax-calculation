@@ -18,11 +18,11 @@ package v2.services
 
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
+import play.api.libs.json.Reads
 import uk.gov.hmrc.http.HeaderCarrier
 import v2.connectors.TaxCalcConnector
 import v2.models.errors.InvalidCalcIDError
-import v2.models.{TaxCalcMessages, TaxCalculation}
-import v2.outcomes.TaxCalcOutcome.{Outcome, TaxCalcMessagesOutcome, TaxCalcOutcome}
+import v2.outcomes.TaxCalcOutcome.Outcome
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -31,16 +31,16 @@ class TaxCalcService @Inject()(connector: TaxCalcConnector) {
 
   private val calcIdRegex = "^[0-9]{8}$|^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
 
-  def getTaxCalculation(nino: String, calcId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[TaxCalcOutcome] =
-    get[TaxCalculation](nino,calcId)(connector.getTaxCalculation)
+  def getTaxCalculation[A:Reads](nino: String, calcId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Outcome[A]] =
+    get[A](nino,calcId)(connector.getTaxCalculation)
 
-  def getTaxCalculationMessages(nino: String, calcId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[TaxCalcMessagesOutcome] =
-    get[TaxCalcMessages](nino, calcId)(connector.getTaxCalculationMessages)
+  def getTaxCalculationMessages[A:Reads](nino: String, calcId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Outcome[A]] =
+    get[A](nino, calcId)(connector.getTaxCalculationMessages)
 
-  private def get[T](nino: String, calcId: String)
-                            (f: (String,String) => Future[Outcome[T]])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Outcome[T]] = {
+  private def get[A:Reads](nino: String, calcId: String)
+                            (f: (String,String) => Future[Outcome[A]])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Outcome[A]] = {
     if (!calcId.matches(calcIdRegex)) {
-      Logger.warn(s"[TaxCalcService] [getTaxCalculation] Invalid CalculationID supplied.")
+      Logger.warn(s"[TaxCalcService] [get] Invalid CalculationID supplied.")
       Future.successful(Left(InvalidCalcIDError))
     } else {
       f(nino,calcId)

@@ -17,10 +17,11 @@
 package v2.connectors
 
 import javax.inject.{Inject, Singleton}
+import play.api.libs.json.Reads
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import v2.config.AppConfig
-import v2.outcomes.TaxCalcOutcome.{TaxCalcMessagesOutcome, TaxCalcOutcome}
+import v2.outcomes.TaxCalcOutcome.Outcome
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -28,13 +29,13 @@ import scala.concurrent.{ExecutionContext, Future}
 class TaxCalcConnector @Inject()(http: HttpClient,
                                  implicit val appConfig: AppConfig) extends DesConnector {
 
-  def getTaxCalculation(nino: String, calculationId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[TaxCalcOutcome] = {
-    import v2.httpparsers.TaxCalcHttpParser.taxCalcHttpReads
-    http.GET[TaxCalcOutcome](s"${appConfig.desBaseUrl}/income-tax/calculation-data/$nino/calcId/$calculationId")(implicitly, hc.withDesHeaders(), ec)
+  def getTaxCalculation[A: Reads](nino: String, calculationId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Outcome[A]] = {
+  import v2.httpparsers.TaxCalcHttpParser.genericHttpReads
+    http.GET[Outcome[A]](s"${appConfig.desBaseUrl}/income-tax/calculation-data/$nino/calcId/$calculationId")(implicitly, hc.withDesHeaders(), ec)
   }
 
-  def getTaxCalculationMessages(nino: String, calculationId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[TaxCalcMessagesOutcome] = {
-    import v2.httpparsers.TaxCalcHttpParser.taxCalcMessagesHttpReads
-    http.GET[TaxCalcMessagesOutcome](s"${appConfig.desBaseUrl}/income-tax/calculation-data/$nino/calcId/$calculationId")(implicitly, hc.withDesHeaders(), ec)
+  def getTaxCalculationMessages[A:Reads](nino: String, calculationId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Outcome[A]] = {
+    import v2.httpparsers.TaxCalcHttpParser.genericHttpReads
+    http.GET[Outcome[A]](s"${appConfig.desBaseUrl}/income-tax/calculation-data/$nino/calcId/$calculationId")(implicitly, hc.withDesHeaders(), ec)
   }
 }

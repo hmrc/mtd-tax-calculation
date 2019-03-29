@@ -20,7 +20,8 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status._
 import play.api.libs.json.JsValue
 import support.WireMockMethods
-import v2.fixtures.{DESErrorsFixture, TaxCalculationFixture => TestData}
+import v2.fixtures.DESErrorsFixture
+import v2.fixtures.old.{TaxCalculationFixture => TestData}
 
 object TaxCalcStub extends WireMockMethods {
 

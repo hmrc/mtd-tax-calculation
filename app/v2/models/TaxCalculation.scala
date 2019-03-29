@@ -34,7 +34,7 @@ case class TaxCalculation(year: Option[Int],
                           eoyEstimate: Option[EoyEstimate],
                           calculationMessageCount: Option[Int],
                           calculationMessages: Option[Seq[CalculationMessage]],
-                          annualAllowances: Option[AnnualAllowances])
+                          annualAllowances: Option[AnnualAllowances]) extends ITaxCalc
 
 object TaxCalculation {
   implicit val writes: OWrites[TaxCalculation] = Json.writes[TaxCalculation]

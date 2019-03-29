@@ -18,9 +18,9 @@ package v2.models.taxcalculation
 
 import play.api.libs.json.{JsObject, JsValue, Json}
 import support.UnitSpec
-import v2.models.{Message, TaxCalcMessages}
-import v2.models.utils.JsonErrorValidators
 import v2.fixtures.{TaxCalcMessagesFixture => TestData}
+import v2.models.utils.JsonErrorValidators
+import v2.models.{Message, TaxCalcMessages}
 
 class TaxCalcMessagesSpec extends JsonErrorValidators with UnitSpec {
 

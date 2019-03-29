@@ -20,20 +20,18 @@ import play.api.Logger
 import play.api.http.Status._
 import play.api.libs.json.Reads
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
-import v2.models._
+import v2.models.{TaxCalcMessages, _}
 import v2.models.errors._
-import v2.outcomes.TaxCalcOutcome.{Outcome, TaxCalcMessagesOutcome, TaxCalcOutcome}
+import v2.outcomes.TaxCalcOutcome.Outcome
 
 object TaxCalcHttpParser extends HttpParser {
 
   val logger = Logger(this.getClass)
 
-  implicit val taxCalcHttpReads: HttpReads[TaxCalcOutcome] = reads[TaxCalculation]
+  implicit def genericHttpReads[A: Reads]: HttpReads[Outcome[A]] = reads[A]
 
-  implicit val taxCalcMessagesHttpReads: HttpReads[TaxCalcMessagesOutcome] = reads[TaxCalcMessages]
-
-  private def reads[M:Reads] = new HttpReads[Outcome[M]] {
-    override def read(method: String, url: String, response: HttpResponse): Outcome[M] = {
+  private def reads[A: Reads] = new HttpReads[Outcome[A]] {
+    override def read(method: String, url: String, response: HttpResponse): Outcome[A] = {
       (response.status, response.jsonOpt) match {
         case (OK, _) => parseResponse(response)
         case (NO_CONTENT, _) => Left(CalculationNotReady)
@@ -47,11 +45,13 @@ object TaxCalcHttpParser extends HttpParser {
           Left(InternalServerError)
       }
     }
-    private def parseResponse(response: HttpResponse): Outcome[M] = response.validateJson[M] match {
-      case Some(taxCalc) if taxCalc.isInstanceOf[TaxCalculation] => Right(taxCalc)
-      case Some(taxCalcMessages) if taxCalcMessages.isInstanceOf[TaxCalcMessages] =>
+
+    private def parseResponse(response: HttpResponse): Outcome[A] = response.validateJson[A] match {
+      case Some(taxCalc) if taxCalc.isInstanceOf[ITaxCalc] => Right(taxCalc)
+      case Some(taxCalcMessages) if taxCalcMessages.isInstanceOf[ITaxCalcMessages] =>
         taxCalcMessages match {
-          case TaxCalcMessages(0,0,_) => Left(NoContentReturned)
+          case TaxCalcMessages(0, 0, _) => Left(NoContentReturned)
+          case old.TaxCalcMessages(0, 0, _) => Left(NoContentReturned)
           case _ => Right(taxCalcMessages)
         }
       case None => Left(InternalServerError)
