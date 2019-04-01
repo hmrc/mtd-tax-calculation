@@ -30,8 +30,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class TaxCalcService @Inject()(connector: TaxCalcConnector) {
 
   private val calcIdRegex = "^[0-9]{8}$|^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-  private val savingsAccountIdRegex = "^[A-Za-z0-9]{15}$"
-
 
   def getTaxCalculation[A:Reads](nino: String, calcId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Outcome[A]] =
     get[A](nino,calcId)(connector.getTaxCalculation)
