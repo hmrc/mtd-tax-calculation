@@ -29,8 +29,8 @@ case class EoyEstimate(employments: Option[Seq[EoyEmployment]],
                        nic4: BigDecimal,
                        totalNicAmount: BigDecimal,
                        incomeTaxNicAmount: BigDecimal,
-                       charitableGiving: Option[CharitableGiving],
-                       savings: Option[Savings])
+                       charitableGiving: Option[EoyCharitableGiving],
+                       savings: Option[EoySavings])
 
 object EoyEstimate {
   implicit val writes: OWrites[EoyEstimate] = Json.writes[EoyEstimate]
@@ -62,6 +62,8 @@ object EoyEstimate {
           case "01" => old.copy(selfEmployments = Some(old.selfEmployments.getOrElse(Seq()) ++ Seq(json.as[EoySelfEmployment])))
           case "02" => old.copy(ukProperty = Some(json.as[EoyItem]))
           case "10" => old.copy(ukDividends = Some(json.as[EoyItem]))
+          case "09" => old.copy(savings = Some(json.as[EoySavings]))
+          case "98" => old.copy(charitableGiving = Some(json.as[EoyCharitableGiving]))
         }
       }
 

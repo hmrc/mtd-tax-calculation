@@ -20,15 +20,19 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json.{Json, _}
 
-case class CharitableGiving(taxableIncome: BigDecimal,
-                            supplied: Boolean)
+case class EoySavings(savingsAccountId: String,
+                      taxableIncome: BigDecimal,
+                      supplied: Boolean,
+                      finalised: Option[Boolean])
 
-object CharitableGiving {
-  implicit val writes: Writes[CharitableGiving] = Json.writes[CharitableGiving]
+object EoySavings {
+  implicit val writes: Writes[EoySavings] = Json.writes[EoySavings]
 
-  implicit val reads: Reads[CharitableGiving] = (
+  implicit val reads: Reads[EoySavings] = (
+      (__ \ "savingsAccountId").read[String] and
       (__ \ "taxableIncome").read[BigDecimal] and
-      (__ \ "supplied").read[Boolean]
-    )(CharitableGiving.apply _)
+      (__ \ "supplied").read[Boolean] and
+        (__ \ "finalised").readNullable[Boolean]
+    )(EoySavings.apply _)
 
 }
