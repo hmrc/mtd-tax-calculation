@@ -29,7 +29,8 @@ case class IncomeTax(taxableIncome: BigDecimal,
                      totalAfterReliefs: BigDecimal,
                      giftAid: Option[GiftAid],
                      totalAfterGiftAid: Option[BigDecimal],
-                     totalIncomeTax: BigDecimal)
+                     totalIncomeTax: BigDecimal,
+                     residentialFinanceCosts: Option[ResidentialFinanceCosts])
 
 object IncomeTax {
   implicit val writes: Writes[IncomeTax] = Json.writes[IncomeTax]
@@ -44,7 +45,8 @@ object IncomeTax {
       (__ \ "incomeTax" \ "totalAfterReliefs").read[BigDecimal] and
       (__ \ "incomeTax" \ "giftAid").readNullable[GiftAid].orElse(Reads.pure(None)) and
       (__ \ "incomeTax" \ "totalAfterGiftAid").readNullable[BigDecimal] and
-      (__ \ "totalIncomeTax").read[BigDecimal]
+      (__ \ "totalIncomeTax").read[BigDecimal] and
+      (__ \ "incomeTax" \ "residentialFinanceCosts").readNullable[ResidentialFinanceCosts].orElse(Reads.pure(None))
     ) (IncomeTax.apply _)
 
 }

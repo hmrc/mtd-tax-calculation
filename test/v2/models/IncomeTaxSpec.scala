@@ -88,7 +88,12 @@ class IncomeTaxSpec extends JsonErrorValidators with UnitSpec {
         taxableAmount = 1000.25
       )),
       totalAfterGiftAid = Some(1000.25),
-      totalIncomeTax = 1000.25
+      totalIncomeTax = 1000.25,
+      residentialFinanceCosts = Some(ResidentialFinanceCosts(
+        amountClaimed = 1000.25,
+        allowableAmount = Some(1000.25),
+        rate = 10.25
+      ))
     )
 
   val incomeTaxJson: JsValue = Json.parse(
@@ -152,75 +157,85 @@ class IncomeTaxSpec extends JsonErrorValidators with UnitSpec {
        |			"taxableAmount": 1000.25
        |		},
        |		"totalAfterGiftAid": 1000.25,
-       |		"totalIncomeTax": 1000.25
+       |		"totalIncomeTax": 1000.25,
+       |    "residentialFinanceCosts": {
+       |        "amountClaimed": 1000.25,
+       |        "allowableAmount": 1000.25,
+       |        "rate": 10.25
+       |    }
        |	}
       """.stripMargin)
 
   val incomeTaxDesJson: String =
     s"""
        |{
-       |   "incomeTax": {
-       |   "taxableIncome": 1000.25,
-       |      	"payPensionsProfit": {
-       |      		"totalAmount": 1000.25,
-       |      		"band": [
-       |      			{
-       |      				"name": "ZRT",
-       |      				"rate": 99.99,
-       |      				"threshold": 99999999,
-       |      				"apportionedThreshold": 99999999,
-       |      				"income": 1000.25,
-       |      				"taxAmount": 1000.25
-       |      			}
-       |      		],
-       |      		"personalAllowanceUsed": 1000.25,
-       |      		"taxableIncome": 1000.25
-       |      	},
-       |      	"savingsAndGains": {
-       |      		"totalAmount": 1000.25,
-       |      		"band": [
-       |      			{
-       |      				"name": "BRT",
-       |      				"rate": 99.99,
-       |      				"threshold": 99999999,
-       |      				"apportionedThreshold": 99999999,
-       |      				"income": 1000.25,
-       |      				"taxAmount": 1000.25
-       |      			}
-       |      		],
-       |      		"personalAllowanceUsed": 1000.25,
-       |      		"taxableIncome": 1000.25
-       |      	},
-       |      	"dividends": {
-       |      		"totalAmount": 1000.25,
-       |      		"band": [
-       |      			{
-       |      				"name": "BRT",
-       |      				"rate": 99.99,
-       |      				"threshold": 99999999,
-       |      				"apportionedThreshold": 99999999,
-       |      				"income": 1000.25,
-       |      				"taxAmount": 1000.25
-       |      			}
-       |      		],
-       |      		"personalAllowanceUsed": 1000.25,
-       |      		"taxableIncome": 1000.25
-       |      	},
-       |      	"totalBeforeReliefs": 1000.25,
-       |      	"allowancesAndReliefs": {
-       |      		"propertyFinanceRelief": 1000.25
-       |      	},
-       |       "totalAllowancesAndReliefs": 1000.25,
-       |      	"totalAfterReliefs": 1000.25,
-       |      	"giftAid": {
-       |      		"paymentsMade": 1000.25,
-       |      		"rate": 99.99,
-       |      		"taxableAmount": 1000.25
-       |      	},
-       |      	"totalAfterGiftAid": 1000.25
-       |      },
-       |      "totalIncomeTax": 1000.25
-       |  }
+       |  "incomeTax": {
+       |    "taxableIncome": 1000.25,
+       |    "payPensionsProfit": {
+       |      "totalAmount": 1000.25,
+       |      "band": [
+       |        {
+       |          "name": "ZRT",
+       |          "rate": 99.99,
+       |          "threshold": 99999999,
+       |          "apportionedThreshold": 99999999,
+       |          "income": 1000.25,
+       |          "taxAmount": 1000.25
+       |        }
+       |      ],
+       |      "personalAllowanceUsed": 1000.25,
+       |      "taxableIncome": 1000.25
+       |    },
+       |    "savingsAndGains": {
+       |      "totalAmount": 1000.25,
+       |      "band": [
+       |        {
+       |          "name": "BRT",
+       |          "rate": 99.99,
+       |          "threshold": 99999999,
+       |          "apportionedThreshold": 99999999,
+       |          "income": 1000.25,
+       |          "taxAmount": 1000.25
+       |        }
+       |      ],
+       |      "personalAllowanceUsed": 1000.25,
+       |      "taxableIncome": 1000.25
+       |    },
+       |    "dividends": {
+       |      "totalAmount": 1000.25,
+       |      "band": [
+       |        {
+       |          "name": "BRT",
+       |          "rate": 99.99,
+       |          "threshold": 99999999,
+       |          "apportionedThreshold": 99999999,
+       |          "income": 1000.25,
+       |          "taxAmount": 1000.25
+       |        }
+       |      ],
+       |      "personalAllowanceUsed": 1000.25,
+       |      "taxableIncome": 1000.25
+       |    },
+       |    "totalBeforeReliefs": 1000.25,
+       |    "allowancesAndReliefs": {
+       |      "propertyFinanceRelief": 1000.25
+       |    },
+       |    "totalAllowancesAndReliefs": 1000.25,
+       |    "totalAfterReliefs": 1000.25,
+       |    "giftAid": {
+       |      "paymentsMade": 1000.25,
+       |      "rate": 99.99,
+       |      "taxableAmount": 1000.25
+       |    },
+       |    "totalAfterGiftAid": 1000.25,
+       |    "residentialFinanceCosts": {
+       |      "amountClaimed": 1000.25,
+       |      "allowableAmount": 1000.25,
+       |      "rate": 10.25
+       |    }
+       |  },
+       |  "totalIncomeTax": 1000.25
+       |}
       """.stripMargin
 
 

@@ -129,7 +129,12 @@ object TaxCalculationFixture {
       totalAfterReliefs = 1000.25,
       giftAid = None,
       totalAfterGiftAid = None,
-      totalIncomeTax = 1000.25
+      totalIncomeTax = 1000.25,
+      residentialFinanceCosts = Some(ResidentialFinanceCosts(
+        amountClaimed = 1000.25,
+        allowableAmount = Some(1000.25),
+        rate = 10.25
+      ))
     )),
     nic = Some(Nic(
       totalNic = 1000.25,
@@ -319,7 +324,12 @@ object TaxCalculationFixture {
       |			"totalAllowancesAndReliefs": 1000.25
       |		},
       |  "totalAfterReliefs":1000.25,
-      |		"totalIncomeTax": 1000.25
+      |	 "totalIncomeTax": 1000.25,
+      |  "residentialFinanceCosts": {
+      |   "amountClaimed": 1000.25,
+      |   "allowableAmount": 1000.25,
+      |   "rate": 10.25
+      |  }
       |	},
       |	"nic": {
       |		"totalNic": 1000.25,
@@ -633,7 +643,12 @@ object TaxCalculationFixture {
       |					"notionalTaxFromDividendsAndOtherIncome": 1000.25,
       |					"foreignTaxCreditRelief": 1000.25,
       |					"propertyFinanceRelief": 1000.25
-      |				}
+      |				},
+      |       "residentialFinanceCosts": {
+      |         "amountClaimed": 1000.25,
+      |         "allowableAmount": 1000.25,
+      |         "rate": 10.25
+      |       }
       |			},
       |			"totalNic": 1000.25,
       |			"nic": {
