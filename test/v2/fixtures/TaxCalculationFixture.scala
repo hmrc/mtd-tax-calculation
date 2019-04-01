@@ -155,7 +155,7 @@ object TaxCalculationFixture {
       ))
     )),
     totalBeforeTaxDeducted = Some(1000.25),
-    taxDeducted = None,
+    taxDeducted = Some(TaxDeducted(Some(1000.25), Some(1000.25))),
     eoyEstimate = Some(EoyEstimate(
       employments = Some(Seq(
         EoyEmployment(
@@ -182,6 +182,15 @@ object TaxCalculationFixture {
         taxableIncome = 99999999.99,
         supplied = true,
         finalised = Some(true)
+      )),
+      charitableGiving = Some(EoyCharitableGiving(
+        taxableIncome = 99999999.99,
+        supplied = true
+      )),
+      savings = Some(EoySavings(
+        savingsAccountId = "Some ID",
+        taxableIncome = 99999999.99,
+        supplied = true
       )),
       totalTaxableIncome = 99999999.99,
       incomeTaxAmount = 99999999.99,
@@ -335,6 +344,10 @@ object TaxCalculationFixture {
       |			]
       |		}
       |	},
+      | "taxDeducted": {
+      |    "totalTaxDeducted": 1000.25,
+      |    "ukLandAndProperty": 1000.25
+      | },
       |	"eoyEstimate": {
       |		"employments": [
       |			{
@@ -362,6 +375,15 @@ object TaxCalculationFixture {
       |			"supplied": true,
       |			"finalised": true
       |		},
+      |  "charitableGiving" : {
+      |     "taxableIncome": 99999999.99,
+      |     "supplied":true
+      |   },
+      |  "savings" : {
+      |     "savingsAccountId":"Some ID",
+      |     "taxableIncome":99999999.99,
+      |     "supplied":true
+      |   },
       |		"totalTaxableIncome": 99999999.99,
       |		"incomeTaxAmount": 99999999.99,
       |		"nic2": 99999999,
@@ -382,7 +404,7 @@ object TaxCalculationFixture {
       |		"reducedPersonalAllowance": 99999999
       |	}
       |}
-""".stripMargin)
+    """.stripMargin)
 
   val taxCalcDesJson: JsValue = Json.parse(
     """
@@ -409,7 +431,6 @@ object TaxCalculationFixture {
       |			"incomeTaxNicDelta": 1000.25,
       |			"nationalRegime": "UK",
       |			"totalTaxableIncome": 1000.25,
-      |     "totalBeforeTaxDeducted": 1000.25,
       |			"taxableIncome": {
       |				"totalIncomeReceived": 1000.25,
       |				"incomeReceived": {
@@ -482,11 +503,35 @@ object TaxCalculationFixture {
       |						"latestDate": "2016-01-01",
       |						"interestReceived": 1000.25
       |					},
+      |         "totalTaxedIncome":1000.25,
+      |         "totalUntaxedIncome":1000.25,
+      |         "taxedAccounts":[
+      |          {
+      |           "gross":1000.25,
+      |           "incomeSourceID":"ABIS10000000001",
+      |           "name":"accountName",
+      |           "net":1000.25,
+      |           "taxDeducted":1000.25,
+      |           "totalTaxedIncome":1000.25,
+      |           "totalUntaxedIncome":1000.25
+      |          }
+      |         ],
+      |         "untaxedAccounts":[
+      |          {
+      |           "gross":1000.25,
+      |           "incomeSourceID":"ABIS10000000001",
+      |           "name":"accountName"
+      |          }
+      |         ],
       |					"ukDividendIncome": 1000.25,
       |					"ukDividends": {
       |						"incomeSourceID": "ABIS10000000001",
       |						"latestDate": "2016-01-01"
       |					},
+      |         "ukDividend":{
+      |           "ukDividends":1000.25,
+      |           "otherUkDividends":1000.25
+      |         },
       |					"ukPensionsIncome": 1000.25,
       |					"ukPensions": {
       |						"incomeSourceID": "ABIS10000000001",
@@ -563,6 +608,11 @@ object TaxCalculationFixture {
       |					],
       |         "personalAllowanceUsed":1000.25
       |				},
+      |       "residentialFinanceCosts": {
+      |          "amountClaimed": 1000.25,
+      |          "allowableAmount": 1000.25,
+      |          "rate": 10.25
+      |       },
       |				"excludedIncome": 1000.25,
       |				"totalAllowancesAndReliefs": 1000.25,
       |				"allowancesAndReliefs": {
@@ -607,6 +657,12 @@ object TaxCalculationFixture {
       |					]
       |				}
       |			},
+      |     "totalBeforeTaxDeducted": 1000.25,
+      |     "totalTaxDeducted" : 1000.25,
+      |     "taxDeducted": {
+      |        "bbsi": 1000.25,
+      |        "ukLandAndProperty": 1000.25
+      |     },
       |			"eoyEstimate": {
       |				"incomeSource": [
       |					{
@@ -634,6 +690,17 @@ object TaxCalculationFixture {
       |						"taxableIncome": 99999999.99,
       |						"supplied": true,
       |						"finalised": true
+      |					},
+      |         {
+      |						"type": "98",
+      |						"taxableIncome": 99999999.99,
+      |						"supplied": true
+      |					},
+      |         {
+      |						"type": "09",
+      |           "savingsAccountId" : "Some ID",
+      |						"taxableIncome": 99999999.99,
+      |						"supplied": true
       |					}
       |				],
       |				"totalTaxableIncome": 99999999.99,

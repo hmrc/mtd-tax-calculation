@@ -41,11 +41,16 @@ class EoyEstimateSpec extends UnitSpec with JsonErrorValidators {
     finalised = Some(true)
   )
 
+  val charitableGiving = Some(EoyCharitableGiving(1234567.89, true))
+  val savings = Some(EoySavings("Some ID", 1234567.89, true))
+
   val validEoyEstimateModel = EoyEstimate(
     employments = Some(Seq(validEoyEmploymentModel)),
     selfEmployments = Some(Seq(validEoySelfEmploymentModel)),
     ukProperty = Some(validEoyItemModel),
     ukDividends = Some(validEoyItemModel),
+    charitableGiving = charitableGiving,
+    savings = savings,
     totalTaxableIncome= 123.45,
     incomeTaxAmount= 123.45,
     nic2= 123.45,
@@ -83,6 +88,17 @@ class EoyEstimateSpec extends UnitSpec with JsonErrorValidators {
       |     "taxableIncome": 1234567.89,
       |     "supplied": true,
       |     "finalised": true
+      |   },
+      |   {
+      |     "type": "98",
+      |     "taxableIncome": 1234567.89,
+      |     "supplied": true
+      |   },
+      |   {
+      |     "type": "09",
+      |     "savingsAccountId": "Some ID",
+      |     "taxableIncome": 1234567.89,
+      |     "supplied": true
       |   }
       | ],
       | "totalTaxableIncome": 123.45,
@@ -110,6 +126,8 @@ class EoyEstimateSpec extends UnitSpec with JsonErrorValidators {
       |  "selfEmployments" : [${validEoyItemInputJson.as[JsObject] + ("selfEmploymentId" -> Json.parse("\"Some ID\""))}],
       |  "ukProperty" : $validEoyItemInputJson,
       |  "ukDividends" : $validEoyItemInputJson,
+      |  "charitableGiving" : ${validEoyItemInputJson.as[JsObject] - "finalised"},
+      |  "savings" : ${validEoyItemInputJson.as[JsObject]  - "finalised" + ("savingsAccountId" -> Json.parse("\"Some ID\""))},
       |  "totalTaxableIncome": 123.45,
       |  "incomeTaxAmount": 123.45,
       |  "nic2": 123.45,
@@ -171,7 +189,8 @@ class EoyEstimateSpec extends UnitSpec with JsonErrorValidators {
 
     "only mandatory fields exist" in {
       val json = Json.parse(validEoyEstimateJson).as[JsObject] - "incomeSource" + ("incomeSource" -> JsArray.apply())
-      val model = validEoyEstimateModel.copy(employments = None, selfEmployments = None, ukProperty = None, ukDividends = None)
+      val model = validEoyEstimateModel.copy(employments = None, selfEmployments = None, ukProperty = None, ukDividends = None,
+        charitableGiving = None, savings = None)
       json.as[EoyEstimate] shouldBe model
     }
 
