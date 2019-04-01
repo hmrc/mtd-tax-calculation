@@ -22,8 +22,7 @@ import play.api.libs.json.{Json, _}
 
 case class EoySavings(savingsAccountId: String,
                       taxableIncome: BigDecimal,
-                      supplied: Boolean,
-                      finalised: Option[Boolean])
+                      supplied: Boolean)
 
 object EoySavings {
   implicit val writes: Writes[EoySavings] = Json.writes[EoySavings]
@@ -31,8 +30,7 @@ object EoySavings {
   implicit val reads: Reads[EoySavings] = (
       (__ \ "savingsAccountId").read[String] and
       (__ \ "taxableIncome").read[BigDecimal] and
-      (__ \ "supplied").read[Boolean] and
-        (__ \ "finalised").readNullable[Boolean]
+      (__ \ "supplied").read[Boolean]
     )(EoySavings.apply _)
 
 }

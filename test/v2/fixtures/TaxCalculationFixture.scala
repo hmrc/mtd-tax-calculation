@@ -185,14 +185,12 @@ object TaxCalculationFixture {
       )),
       charitableGiving = Some(EoyCharitableGiving(
         taxableIncome = 99999999.99,
-        supplied = true,
-        finalised = Some(true)
+        supplied = true
       )),
       savings = Some(EoySavings(
         savingsAccountId = "Some ID",
         taxableIncome = 99999999.99,
-        supplied = true,
-        finalised = Some(true)
+        supplied = true
       )),
       totalTaxableIncome = 99999999.99,
       incomeTaxAmount = 99999999.99,
@@ -379,14 +377,12 @@ object TaxCalculationFixture {
       |		},
       |  "charitableGiving" : {
       |     "taxableIncome": 99999999.99,
-      |     "supplied":true,
-      |			"finalised": true
+      |     "supplied":true
       |   },
       |  "savings" : {
       |     "savingsAccountId":"Some ID",
       |     "taxableIncome":99999999.99,
-      |     "supplied":true,
-      |			"finalised": true
+      |     "supplied":true
       |   },
       |		"totalTaxableIncome": 99999999.99,
       |		"incomeTaxAmount": 99999999.99,
@@ -698,15 +694,13 @@ object TaxCalculationFixture {
       |         {
       |						"type": "98",
       |						"taxableIncome": 99999999.99,
-      |						"supplied": true,
-      |						"finalised": true
+      |						"supplied": true
       |					},
       |         {
       |						"type": "09",
       |           "savingsAccountId" : "Some ID",
       |						"taxableIncome": 99999999.99,
-      |						"supplied": true,
-      |						"finalised": true
+      |						"supplied": true
       |					}
       |				],
       |				"totalTaxableIncome": 99999999.99,

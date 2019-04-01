@@ -21,16 +21,14 @@ import play.api.libs.json.Reads._
 import play.api.libs.json.{Json, _}
 
 case class EoyCharitableGiving(taxableIncome: BigDecimal,
-                               supplied: Boolean,
-                               finalised: Option[Boolean])
+                               supplied: Boolean)
 
 object EoyCharitableGiving {
   implicit val writes: Writes[EoyCharitableGiving] = Json.writes[EoyCharitableGiving]
 
   implicit val reads: Reads[EoyCharitableGiving] = (
       (__ \ "taxableIncome").read[BigDecimal] and
-      (__ \ "supplied").read[Boolean] and
-        (__ \ "finalised").readNullable[Boolean]
+      (__ \ "supplied").read[Boolean]
     )(EoyCharitableGiving.apply _)
 
 }
