@@ -26,17 +26,22 @@ class UKDividendsSpec extends UnitSpec with JsonErrorValidators {
 
   val ukDividends =
     UKDividends(
-      totalIncome = Some(123.45)
+      totalIncome = Some( 123.45),
+      ukDividends = Some(234.56),
+      otherUkDividends = Some(345.67)
     )
 
   val ukDividendsDesJson: String =
-    """
-      |{
-      |"ukDividendIncome": 123.45
+    """{
+      | "ukDividendIncome": 123.45,
+      | "ukDividend" : {
+      |  "ukDividends": 234.56,
+      |  "otherUkDividends": 345.67
+      | }
       |}
     """.stripMargin
 
-  val emptyUkDividends = UKDividends(None)
+  val emptyUkDividends = UKDividends(None,None,None)
 
   val emptyJson: JsValue = Json.parse("{}")
 
@@ -47,6 +52,18 @@ class UKDividendsSpec extends UnitSpec with JsonErrorValidators {
         property = "ukDividendIncome",
         invalidValue = "\"nan\"",
         errorPathAndError = ".ukDividendIncome" -> NUMBER_FORMAT_EXCEPTION
+      )
+
+      testPropertyType[UKDividends](ukDividendsDesJson)(
+        property = "ukDividends",
+        invalidValue = "\"nan\"",
+        errorPathAndError = ".ukDividends" -> NUMBER_FORMAT_EXCEPTION
+      )
+
+      testPropertyType[UKDividends](ukDividendsDesJson)(
+        property = "otherUkDividends",
+        invalidValue = "\"nan\"",
+        errorPathAndError = ".otherUkDividends" -> NUMBER_FORMAT_EXCEPTION
       )
     }
 
@@ -68,7 +85,9 @@ class UKDividendsSpec extends UnitSpec with JsonErrorValidators {
         val clientJson = Json.parse(
           s"""
              |{
-             |  "totalIncome": 123.45
+             |  "totalIncome": 123.45,
+             |  "ukDividends": 234.56,
+             |  "otherUkDividends": 345.67
              |}
            """.stripMargin)
 

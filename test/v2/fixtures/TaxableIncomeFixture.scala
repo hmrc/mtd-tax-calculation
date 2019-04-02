@@ -17,7 +17,7 @@
 package v2.fixtures
 
 import play.api.libs.json.{JsValue, Json}
-import v2.models.{AllowancesAndDeductions, Employment, Employments, SelfEmployment, SelfEmployments, TaxableIncome, UKDividends, UKProperty}
+import v2.models.{AllowancesAndDeductions, Employment, Employments, SavingsIncome, SelfEmployment, SelfEmployments, TaxableIncome, TaxedSavingsAccount, UKDividends, UKProperty, UntaxedSavingsAccount}
 
 trait TaxableIncomeFixture {
 
@@ -62,11 +62,29 @@ trait TaxableIncomeFixture {
       |            "taxableProfitFhlUk": 1234567.89,
       |            "finalised": false
       |          },
+      |          "bbsiIncome": 1234567.89,
+      |          "bbsi": {
+      |             "totalTaxedInterestIncome": 1234567.89,
+      |             "totalUntaxedInterestIncome": 1234567.89,
+      |             "taxedAccounts": [{
+      |               "incomeSourceId": "accountId",
+      |               "name": "accountName",
+      |               "gross": 1234567.89,
+      |               "net": 1234567.89,
+      |               "taxDeducted": 1234567.89
+      |             }],
+      |             "untaxedAccounts": [{
+      |               "incomeSourceId": "accountId",
+      |               "name": "accountName",
+      |               "gross": 1234567.89
+      |             }]
+      |           },
       |          "ukDividendIncome": 1234567.89,
-      |          "ukDividends": {
-      |            "incomeSourceID": "XDIS00000000114",
-      |            "latestDate": "2018-07-12"
-      |          }
+      |          "ukDividend": {
+      |             "otherUkDividends": 1234567.89,
+      |             "ukDividends": 1234567.89
+      |          },
+      |          "ukDividendIncome": 1234567.89
       |        },
       |        "totalAllowancesAndDeductions": 1234567.89,
       |        "allowancesAndDeductions": {
@@ -129,8 +147,27 @@ trait TaxableIncomeFixture {
       finalised = Some(true)
     )),
     ukDividends = Some(UKDividends(
-      totalIncome = Some(bigDecimal)
+      totalIncome = Some(bigDecimal),
+      ukDividends = Some(bigDecimal),
+      otherUkDividends = Some(bigDecimal)
     )),
+    savings = Some(SavingsIncome(
+      totalIncome = Some(bigDecimal),
+      totalTaxedInterestIncome = Some(bigDecimal),
+      totalUntaxedInterestIncome = Some(bigDecimal),
+      taxedAccounts = Some(Seq(TaxedSavingsAccount(
+        savingsAccountId = "accountId",
+        name = Some("accountName"),
+        gross = Some(bigDecimal),
+        net = Some(bigDecimal),
+        taxDeducted = Some(bigDecimal)
+      ))),
+      untaxedAccounts = Some(Seq(UntaxedSavingsAccount(
+        savingsAccountId = "accountId",
+        name = Some("accountName"),
+        gross = Some(bigDecimal)
+      ))
+      ))),
     totalIncomeReceived = bigDecimal,
     allowancesAndDeductions = AllowancesAndDeductions(
       totalAllowancesAndDeductions = bigDecimal,
@@ -182,14 +219,27 @@ trait TaxableIncomeFixture {
       |            "lossesFhlUk": 1234567.89,
       |            "losses":1234567.89
       |          },
+      |          "bbsiIncome": 1234567.89,
       |          "bbsi": {
-      |            "incomeSourceID": "XDIS00000000114",
-      |            "latestDate": "2018-07-12"
+      |             "totalTaxedInterestIncome": 1234567.89,
+      |             "totalUntaxedInterestIncome": 1234567.89,
+      |             "taxedAccounts": [{
+      |               "incomeSourceId": "accountId",
+      |               "name": "accountName",
+      |               "gross": 1234567.89,
+      |               "net": 1234567.89,
+      |               "taxDeducted": 1234567.89
+      |             }],
+      |             "untaxedAccounts": [{
+      |               "incomeSourceId": "accountId",
+      |               "name": "accountName",
+      |               "gross": 1234567.89
+      |             }]
       |          },
       |          "ukDividendIncome": 1234567.89,
-      |          "ukDividends": {
-      |            "incomeSourceID": "XDIS00000000114",
-      |            "latestDate": "2018-07-12"
+      |          "ukDividend": {
+      |            "ukDividends": 1234567.89,
+      |            "otherUkDividends": 1234567.89
       |          }
       |        },
       |        "totalAllowancesAndDeductions": 1234567.89,
@@ -238,7 +288,26 @@ trait TaxableIncomeFixture {
       |      "finalised":true
       |   },
       |   "ukDividends":{
-      |      "totalIncome":1234567.89
+      |      "totalIncome":1234567.89,
+      |      "otherUkDividends": 1234567.89,
+      |      "ukDividends": 1234567.89
+      |   },
+      |   "savings": {
+      |     "totalIncome": 1234567.89,
+      |     "totalTaxedInterestIncome": 1234567.89,
+      |     "totalUntaxedInterestIncome": 1234567.89,
+      |     "taxedAccounts": [{
+      |        "savingsAccountId": "accountId",
+      |        "name": "accountName",
+      |        "gross": 1234567.89,
+      |        "net": 1234567.89,
+      |        "taxDeducted": 1234567.89
+      |     }],
+      |     "untaxedAccounts": [{
+      |        "savingsAccountId": "accountId",
+      |        "name": "accountName",
+      |        "gross": 1234567.89
+      |     }]
       |   },
       |   "totalIncomeReceived":1234567.89,
       |   "allowancesAndDeductions":{

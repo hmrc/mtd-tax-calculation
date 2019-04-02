@@ -19,13 +19,19 @@ package v2.models
 import play.api.libs.json.Reads._
 import play.api.libs.json.{Json, _}
 
-case class UKDividends(totalIncome: Option[BigDecimal])
+import play.api.libs.functional.syntax._
+
+case class UKDividends(totalIncome: Option[BigDecimal],
+                       ukDividends: Option[BigDecimal],
+                       otherUkDividends: Option[BigDecimal])
 
 object UKDividends {
   implicit val writes: Writes[UKDividends] = Json.writes[UKDividends]
 
   implicit val reads: Reads[UKDividends] = {
-    (__ \ "ukDividendIncome").readNullable[BigDecimal].map(UKDividends.apply)
+    ((__ \ "ukDividendIncome").readNullable[BigDecimal] and
+      (__ \ "ukDividend" \ "ukDividends").readNestedNullable[BigDecimal] and
+      (__ \ "ukDividend" \ "otherUkDividends").readNestedNullable[BigDecimal]) (UKDividends.apply _)
   }
 
 }

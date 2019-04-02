@@ -21,13 +21,15 @@ import play.api.libs.json.Reads._
 import play.api.libs.json.{Json, _}
 
 case class TaxDeducted(ukLandAndProperty: Option[BigDecimal],
+                       savings: Option[BigDecimal],
                        totalTaxDeducted: Option[BigDecimal])
 
 object TaxDeducted {
   implicit val writes: Writes[TaxDeducted] = Json.writes[TaxDeducted]
 
   implicit val reads: Reads[TaxDeducted] = (
-    (__ \\ "ukLandAndProperty").readNullable[BigDecimal] and
+    (__ \ "taxDeducted" \ "ukLandAndProperty").readNestedNullable[BigDecimal] and
+      (__ \ "taxDeducted" \ "bbsi").readNestedNullable[BigDecimal] and
       (__ \ "totalTaxDeducted").readNullable[BigDecimal]
     ) (TaxDeducted.apply _)
 

@@ -73,7 +73,8 @@ class TaxableIncomeSpec extends UnitSpec
             employments = None,
             selfEmployments = None,
             ukProperty = None,
-            ukDividends = None
+            ukDividends = None,
+            savings = None
           )
           json.as[TaxableIncome] shouldBe model
         }
@@ -92,10 +93,16 @@ class TaxableIncomeSpec extends UnitSpec
           noUkPropertyJson.as[TaxableIncome] shouldBe model
         }
         "ukDividends property is present but fields are empty" in {
-          val json = removeJsonProperty(Json.parse(validTaxableIncomeInputString))(pathToProperty = "taxableIncome/incomeReceived/ukDividends")
+          val json = removeJsonProperty(Json.parse(validTaxableIncomeInputString))(pathToProperty = "taxableIncome/incomeReceived/ukDividend")
           val noUkDividendjson = removeJsonProperty(json)(pathToProperty = "taxableIncome/incomeReceived/ukDividendIncome")
           val model = validTaxableIncomeModel.copy(ukDividends = None)
           noUkDividendjson.as[TaxableIncome] shouldBe model
+        }
+        "savings property is present but fields are empty" in {
+          val json = removeJsonProperty(Json.parse(validTaxableIncomeInputString))(pathToProperty = "taxableIncome/incomeReceived/bbsi")
+          val noSavingsJson = removeJsonProperty(json)(pathToProperty = "taxableIncome/incomeReceived/bbsiIncome")
+          val model = validTaxableIncomeModel.copy(savings = None)
+          noSavingsJson.as[TaxableIncome] shouldBe model
         }
       }
     }
@@ -136,6 +143,14 @@ class TaxableIncomeSpec extends UnitSpec
       "it has no value" in {
         val model = validTaxableIncomeModel.copy(ukDividends = None)
         val json: JsValue = validTaxableIncomeOutputJson.as[JsObject] - "ukDividends"
+        Json.toJson(model) shouldBe json
+      }
+    }
+
+    "not render the savings object" when {
+      "it has no value" in {
+        val model = validTaxableIncomeModel.copy(savings = None)
+        val json: JsValue = validTaxableIncomeOutputJson.as[JsObject] - "savings"
         Json.toJson(model) shouldBe json
       }
     }

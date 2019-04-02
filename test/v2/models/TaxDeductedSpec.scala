@@ -28,31 +28,40 @@ class TaxDeductedSpec extends UnitSpec with JsonErrorValidators {
     """
       |{
       | "taxDeducted": {
-      |   "ukLandAndProperty": 123.45
+      |   "ukLandAndProperty": 123.45,
+      |   "bbsi": 345.67
       | },
-      | "totalTaxDeducted": 123.45
+      | "totalTaxDeducted": 234.56
       |}
     """.stripMargin
 
   val taxDeducted =
     TaxDeducted(
       ukLandAndProperty = Some(123.45),
-      totalTaxDeducted = Some(123.45)
+      savings = Some(345.67),
+      totalTaxDeducted = Some(234.56)
     )
 
   val clientJson: JsValue = Json.parse(
     s"""
        |{
        |  "ukLandAndProperty": 123.45,
-       |  "totalTaxDeducted": 123.45
+       |  "totalTaxDeducted": 234.56,
+       |  "savings": 345.67
        |}
      """.stripMargin
   )
 
-  val emptyTaxDeducted = TaxDeducted(None, None)
+  val emptyTaxDeducted = TaxDeducted(None, None, None)
 
   "reads" should {
     "return correct validation errors" when {
+
+      testPropertyType[TaxDeducted](taxDeductedDesJson)(
+        property = "bbsi",
+        invalidValue = "\"nan\"",
+        errorPathAndError = "taxDeducted/bbsi" -> NUMBER_FORMAT_EXCEPTION
+      )
 
       testPropertyType[TaxDeducted](taxDeductedDesJson)(
         property = "ukLandAndProperty",
@@ -77,7 +86,8 @@ class TaxDeductedSpec extends UnitSpec with JsonErrorValidators {
         val json: JsValue = Json.parse(
           """{
             |"taxDeducted": {
-            | "ukLandAndProperty": 123.45
+            | "ukLandAndProperty": 123.45,
+            | "bbsi": 345.67
             | }
             |}
             |"""".stripMargin)
@@ -88,14 +98,30 @@ class TaxDeductedSpec extends UnitSpec with JsonErrorValidators {
 
         val json: JsValue = Json.parse(
           """{
-            | "taxDeducted": {},
-            | "totalTaxDeducted": 123.45
+            | "taxDeducted": {
+            |   "bbsi": 345.67
+            | },
+            | "totalTaxDeducted": 234.56
             |}
             |"""".stripMargin)
 
         TaxDeducted.reads.reads(json).get shouldBe taxDeducted.copy(ukLandAndProperty = None)
       }
-      "the optional ukLandAndProperty property does not exist and the parent taxDeducted does not exist" in {
+      "the optional bbsi property does not exist and the parent taxDeducted model exists" in {
+
+        val json: JsValue = Json.parse(
+          """{
+            | "taxDeducted": {
+            |   "ukLandAndProperty": 123.45
+            | },
+            | "totalTaxDeducted": 234.56
+            |}
+            |"""".stripMargin)
+
+        TaxDeducted.reads.reads(json).get shouldBe taxDeducted.copy(savings = None)
+      }
+
+      "no optional properties exist" in {
         val json: JsValue = Json.parse("{}")
 
         TaxDeducted.reads.reads(json).get shouldBe emptyTaxDeducted

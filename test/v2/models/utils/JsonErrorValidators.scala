@@ -51,7 +51,8 @@ trait JsonErrorValidators {
 
       "only throw one error" in {
         result match {
-          case Failure(e: JsResultException) => e.errors.size shouldBe 1
+          case Failure(e: JsResultException) =>
+            if (e.errors.size != 1) withClue(s"${e.errors.mkString("\n")} errors found, 1 expected : $e.errors")(e.errors.size shouldBe 1)
           case _ => fail("A JSON error was expected")
         }
       }
@@ -104,7 +105,7 @@ trait JsonErrorValidators {
 
       "only throw one error" in {
         readResult match {
-          case JsError(errs) => withClue(s"${errs.size} errors found, 1 expected : $errs")(errs.size shouldBe 1)
+          case JsError(errs) => withClue(s"${errs.mkString("\n")} errors found, 1 expected : $errs")(errs.size shouldBe 1)
           case _ => fail(s"expected to fail but didn't")
         }
       }

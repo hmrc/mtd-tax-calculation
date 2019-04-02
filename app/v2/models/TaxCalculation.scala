@@ -54,7 +54,7 @@ object TaxCalculation {
         (__ \ "calcOutput" \ "calcResult" \ "totalBeforeTaxDeducted").readNestedNullable[BigDecimal] and
         (__ \ "calcOutput" \ "calcResult").readNestedNullable[TaxDeducted]
           .map(_.flatMap {
-            case TaxDeducted(None, None) => None
+            case TaxDeducted(None, None, None) => None
             case x => Some(x)
           }) and
         (__ \ "calcOutput" \ "calcResult" \ "eoyEstimate").readNestedNullable[EoyEstimate] and

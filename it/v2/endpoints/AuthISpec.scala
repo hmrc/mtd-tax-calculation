@@ -20,6 +20,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
 import support.IntegrationBaseSpec
+import v2.fixtures.TaxCalculationFixture
 import v2.stubs._
 
 class AuthISpec extends IntegrationBaseSpec {

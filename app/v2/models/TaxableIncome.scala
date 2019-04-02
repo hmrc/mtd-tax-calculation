@@ -23,6 +23,7 @@ case class TaxableIncome(employments: Option[Employments],
                          selfEmployments: Option[SelfEmployments],
                          ukProperty: Option[UKProperty],
                          ukDividends: Option[UKDividends],
+                         savings: Option[SavingsIncome],
                          totalIncomeReceived: BigDecimal,
                          allowancesAndDeductions: AllowancesAndDeductions,
                          totalTaxableIncome: Option[BigDecimal])
@@ -31,7 +32,7 @@ object TaxableIncome {
   implicit val writes: Writes[TaxableIncome] = Json.writes[TaxableIncome]
 
   implicit val reads: Reads[TaxableIncome] = (
-    (__ \ "taxableIncome" \ "incomeReceived" \ "employments").readNestedNullable[JsObject].flatMap{
+    (__ \ "taxableIncome" \ "incomeReceived" \ "employments").readNestedNullable[JsObject].flatMap {
       case Some(_) => (__ \ "taxableIncome" \ "incomeReceived").readNestedNullable[Employments]
       case None => Reads.pure[Option[Employments]](None)
     } and
@@ -47,14 +48,19 @@ object TaxableIncome {
           case x => Some(x)
         })
       and
-      (__ \ "taxableIncome" \ "incomeReceived").readNestedNullable[UKDividends].map(_.flatMap{
-        case UKDividends(None) => None
+      (__ \ "taxableIncome" \ "incomeReceived").readNestedNullable[UKDividends].map(_.flatMap {
+        case UKDividends(None, None, None) => None
+        case x => Some(x)
+      })
+      and
+      (__ \ "taxableIncome" \ "incomeReceived").readNestedNullable[SavingsIncome].map(_.flatMap {
+        case SavingsIncome(None, None, None, None, None) => None
         case x => Some(x)
       })
       and
       (__ \ "taxableIncome" \ "totalIncomeReceived").read[BigDecimal] and
       (__ \ "taxableIncome").read[AllowancesAndDeductions] and
       (__ \ "totalTaxableIncome").readNullable[BigDecimal]
-    )(TaxableIncome.apply _)
+    ) (TaxableIncome.apply _)
 
 }
