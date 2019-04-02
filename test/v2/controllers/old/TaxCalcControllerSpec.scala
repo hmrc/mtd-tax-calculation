@@ -23,7 +23,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import v2.controllers.{ControllerBaseSpec, TaxCalcController}
 import v2.fixtures.old.{TaxCalcMessagesFixture, TaxCalculationFixture}
 import v2.mocks.MockAppConfig
-import v2.mocks.services.{MockEnrolmentsAuthService, MockMtdIdLookupService, MockTaxCalcService}
+import v2.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockMtdIdLookupService, MockTaxCalcService}
 import v2.models.auth.UserDetails
 import v2.models.errors._
 import v2.models.old.{TaxCalcMessages, TaxCalculation}
@@ -32,7 +32,12 @@ import scala.concurrent.Future
 
 class TaxCalcControllerSpec extends ControllerBaseSpec {
 
-  trait Test extends MockEnrolmentsAuthService with MockMtdIdLookupService with MockTaxCalcService with MockAppConfig {
+  trait Test
+    extends MockEnrolmentsAuthService
+      with MockMtdIdLookupService
+      with MockTaxCalcService
+      with MockAppConfig
+      with MockAuditService {
     val hc = HeaderCarrier()
 
     val mtdId = "test-mtd-id"
@@ -46,12 +51,12 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
       authService = mockEnrolmentsAuthService,
       service = mockTaxCalcService,
       lookupService = mockMtdIdLookupService,
-      appConfig = mockAppConfig
+      appConfig = mockAppConfig,
+      auditService = mockAuditService
     )
   }
 
   val nino = "test-nino"
-
 
 
   "getTaxCalculation - Pre Release 2" should {
@@ -67,6 +72,8 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
 
       status(result) shouldBe OK
       contentAsJson(result) shouldBe TaxCalculationFixture.taxCalcClientJson
+
+      fail("FIX UP THIS AND OTHER TESTS TO CHECK AUDITING FOR pre-release 2")
     }
 
     "return a 204" when {
@@ -162,7 +169,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
       }
     }
   }
-  
+
   "getTaxCalculationMessages - Pre Release 2" should {
     "return a 200 with the correct body" in new Test {
       MockedMtdIdLookupService.lookup(nino)

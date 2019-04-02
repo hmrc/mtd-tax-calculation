@@ -16,17 +16,18 @@
 
 package v2.models.audit
 
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json.{Json, OWrites, Writes}
 
-case class RetrieveTaxCalcAuditDetail (
-                                        userType: String,
-                                        arn: Option[String],
-                                        nino: String,
-                                        calculationId: String,
-                                        `X-CorrelationId`: String,
-                                        response: RetrieveTaxCalcAuditResponse
-                                      )
+case class RetrieveTaxCalcAuditDetail[T](
+                                          userType: String,
+                                          arn: Option[String],
+                                          nino: String,
+                                          calculationId: String,
+                                          `X-CorrelationId`: String,
+                                          response: RetrieveTaxCalcAuditResponse[T]
+                                        )
 
 object RetrieveTaxCalcAuditDetail {
-  implicit val writes: OWrites[RetrieveTaxCalcAuditDetail] = Json.writes[RetrieveTaxCalcAuditDetail]
+  implicit def writes[T: Writes]: OWrites[RetrieveTaxCalcAuditDetail[T]] = Json.writes[RetrieveTaxCalcAuditDetail[T]]
+  // FIXME ^^^ maybe use hand-coded Writes ???
 }

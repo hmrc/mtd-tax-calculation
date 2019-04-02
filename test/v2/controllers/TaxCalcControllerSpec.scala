@@ -22,16 +22,24 @@ import play.api.mvc.Result
 import uk.gov.hmrc.http.HeaderCarrier
 import v2.fixtures.{TaxCalcMessagesFixture, TaxCalculationFixture}
 import v2.mocks.MockAppConfig
-import v2.mocks.services.{MockEnrolmentsAuthService, MockMtdIdLookupService, MockTaxCalcService}
+import v2.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockMtdIdLookupService, MockTaxCalcService}
+import v2.models.audit._
 import v2.models.auth.UserDetails
 import v2.models.errors._
 import v2.models.{TaxCalcMessages, TaxCalculation}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class TaxCalcControllerSpec extends ControllerBaseSpec {
+class TaxCalcControllerSpec extends ControllerBaseSpec
+  with MockEnrolmentsAuthService
+  with MockMtdIdLookupService
+  with MockTaxCalcService
+  with MockAppConfig
+  with MockAuditService {
 
-  trait Test extends MockEnrolmentsAuthService with MockMtdIdLookupService with MockTaxCalcService with MockAppConfig {
+  trait Test {
+
     val hc = HeaderCarrier()
 
     val mtdId = "test-mtd-id"
@@ -45,12 +53,12 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
       authService = mockEnrolmentsAuthService,
       service = mockTaxCalcService,
       lookupService = mockMtdIdLookupService,
-      appConfig = mockAppConfig
+      appConfig = mockAppConfig,
+      auditService = mockAuditService
     )
   }
 
   val nino = "test-nino"
-
 
 
   "getTaxCalculation" should {
@@ -66,6 +74,12 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
 
       status(result) shouldBe OK
       contentAsJson(result) shouldBe TaxCalculationFixture.taxCalcClientJson
+
+      val detail = RetrieveTaxCalcAuditDetail("Individual", None, nino, calcId, "X-123",
+        RetrieveTaxCalcAuditResponse(OK, None, Some(TaxCalculationFixture.taxCalc)))
+      val event = AuditEvent("retrieveTaxCalculation",
+        "mtd-tax-calculation", detail)
+      MockedAuditService.verifyAuditEvent(event).once
     }
 
     "return a 204" when {
@@ -91,6 +105,12 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
 
         private val result = controller.getTaxCalculation(nino, "calcId")(fakeGetRequest)
         status(result) shouldBe BAD_REQUEST
+
+        val detail = RetrieveTaxCalcAuditDetail("Individual", None, nino, calcId, "X-123",
+          RetrieveTaxCalcAuditResponse(BAD_REQUEST, Some(Seq(AuditError(InvalidNinoError.code))), None))
+        val event = AuditEvent("retrieveTaxCalculation",
+          "mtd-tax-calculation", detail)
+        MockedAuditService.verifyAuditEvent(event).once
       }
 
       "the service returns an Invalid Identifier error" in new Test {
@@ -117,6 +137,12 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
 
         status(result) shouldBe BAD_REQUEST
         contentAsJson(result) shouldBe Json.toJson(InvalidCalcIDError)
+
+        val detail = RetrieveTaxCalcAuditDetail("Individual", None, nino, calcId, "X-123",
+          RetrieveTaxCalcAuditResponse(BAD_REQUEST, Some(Seq(AuditError(InvalidCalcIDError.code))), None))
+        val event = AuditEvent("retrieveTaxCalculation",
+          "mtd-tax-calculation", detail)
+        MockedAuditService.verifyAuditEvent(event).once
       }
     }
 
