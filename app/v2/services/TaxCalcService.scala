@@ -16,12 +16,14 @@
 
 package v2.services
 
+import java.util.UUID
+
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.libs.json.Reads
 import uk.gov.hmrc.http.HeaderCarrier
 import v2.connectors.TaxCalcConnector
-import v2.models.errors.InvalidCalcIDError
+import v2.models.errors.{ErrorWrapper, InvalidCalcIDError}
 import v2.outcomes.TaxCalcOutcome.Outcome
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,7 +43,7 @@ class TaxCalcService @Inject()(connector: TaxCalcConnector) {
                             (f: (String,String) => Future[Outcome[A]])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Outcome[A]] = {
     if (!calcId.matches(calcIdRegex)) {
       Logger.warn(s"[TaxCalcService] [get] Invalid CalculationID supplied.")
-      Future.successful(Left(InvalidCalcIDError))
+      Future.successful(Left(ErrorWrapper(None, InvalidCalcIDError, None)))
     } else {
       f(nino,calcId)
     }

@@ -27,6 +27,7 @@ import v2.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockMtdId
 import v2.models.auth.UserDetails
 import v2.models.errors._
 import v2.models.old.{TaxCalcMessages, TaxCalculation}
+import v2.outcomes.DesResponse
 
 import scala.concurrent.Future
 
@@ -43,6 +44,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
     val mtdId = "test-mtd-id"
     val calcId = "12345678"
     val expected = Right(UserDetails("", "Individual", None))
+    val correlationId = "X-123"
 
     MockedEnrolmentsAuthService.authoriseUser().returns(Future.successful(expected))
     MockedAppConfig.featureSwitch.returns(Some(Configuration("release-2.enabled" -> false)))
@@ -66,14 +68,12 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
         .returns(Future.successful(Right(mtdId)))
 
       MockedTaxCalcService.getTaxCalculation[TaxCalculation](nino, calcId)
-        .returns(Future.successful(Right(TaxCalculationFixture.taxCalc)))
+        .returns(Future.successful(Right(DesResponse(correlationId, TaxCalculationFixture.taxCalc))))
 
       val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
 
       status(result) shouldBe OK
       contentAsJson(result) shouldBe TaxCalculationFixture.taxCalcClientJson
-
-      fail("FIX UP THIS AND OTHER TESTS TO CHECK AUDITING FOR pre-release 2")
     }
 
     "return a 204" when {
@@ -83,7 +83,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
           .returns(Future.successful(Right(mtdId)))
 
         MockedTaxCalcService.getTaxCalculation[TaxCalculation](nino, calcId)
-          .returns(Future.successful(Left(CalculationNotReady)))
+          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), CalculationNotReady, None))))
 
         private val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
 
@@ -106,7 +106,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
           .returns(Future.successful(Right(mtdId)))
 
         MockedTaxCalcService.getTaxCalculation[TaxCalculation](nino, calcId)
-          .returns(Future.successful(Left(InvalidNinoError)))
+          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), InvalidNinoError, None))))
 
         val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
 
@@ -119,7 +119,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
           .returns(Future.successful(Right(mtdId)))
 
         MockedTaxCalcService.getTaxCalculation[TaxCalculation](nino, calcId)
-          .returns(Future.successful(Left(InvalidCalcIDError)))
+          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), InvalidCalcIDError, None))))
 
         val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
 
@@ -136,7 +136,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
           .returns(Future.successful(Right(mtdId)))
 
         MockedTaxCalcService.getTaxCalculation[TaxCalculation](nino, calcId)
-          .returns(Future.successful(Left(MatchingResourceNotFound)))
+          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), MatchingResourceNotFound, None))))
 
         val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
 
@@ -160,7 +160,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
           .returns(Future.successful(Right(mtdId)))
 
         MockedTaxCalcService.getTaxCalculation[TaxCalculation](nino, calcId)
-          .returns(Future.successful(Left(InternalServerError)))
+          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), InternalServerError, None))))
 
         val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
 
@@ -176,7 +176,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
         .returns(Future.successful(Right(mtdId)))
 
       MockedTaxCalcService.getTaxCalculationMessages[TaxCalcMessages](nino, calcId)
-        .returns(Future.successful(Right(TaxCalcMessagesFixture.taxCalcMessages)))
+        .returns(Future.successful(Right(DesResponse(correlationId, TaxCalcMessagesFixture.taxCalcMessages))))
 
       val result: Future[Result] = controller.getTaxCalculationMessages(nino, calcId)(fakeRequest)
 
@@ -191,7 +191,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
           .returns(Future.successful(Right(mtdId)))
 
         MockedTaxCalcService.getTaxCalculationMessages[TaxCalcMessages](nino, calcId)
-          .returns(Future.successful(Left(CalculationNotReady)))
+          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), CalculationNotReady, None))))
 
         private val result: Future[Result] = controller.getTaxCalculationMessages(nino, calcId)(fakeRequest)
 
@@ -203,7 +203,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
           .returns(Future.successful(Right(mtdId)))
 
         MockedTaxCalcService.getTaxCalculationMessages[TaxCalcMessages](nino, calcId)
-          .returns(Future.successful(Left(NoContentReturned)))
+          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), NoContentReturned, None))))
 
         private val result: Future[Result] = controller.getTaxCalculationMessages(nino, calcId)(fakeRequest)
 
@@ -226,7 +226,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
           .returns(Future.successful(Right(mtdId)))
 
         MockedTaxCalcService.getTaxCalculationMessages[TaxCalcMessages](nino, calcId)
-          .returns(Future.successful(Left(InvalidNinoError)))
+          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), InvalidNinoError, None))))
 
         val result: Future[Result] = controller.getTaxCalculationMessages(nino, calcId)(fakeRequest)
 
@@ -239,7 +239,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
           .returns(Future.successful(Right(mtdId)))
 
         MockedTaxCalcService.getTaxCalculationMessages[TaxCalcMessages](nino, calcId)
-          .returns(Future.successful(Left(InvalidCalcIDError)))
+          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), InvalidCalcIDError, None))))
 
         val result: Future[Result] = controller.getTaxCalculationMessages(nino, calcId)(fakeRequest)
 
@@ -255,7 +255,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
 
 
         MockedTaxCalcService.getTaxCalculationMessages[TaxCalcMessages](nino, calcId)
-          .returns(Future.successful(Left(MatchingResourceNotFound)))
+          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), MatchingResourceNotFound, None))))
 
         val result: Future[Result] = controller.getTaxCalculationMessages(nino, calcId)(fakeRequest)
 
@@ -280,7 +280,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
 
 
         MockedTaxCalcService.getTaxCalculationMessages[TaxCalcMessages](nino, calcId)
-          .returns(Future.successful(Left(InternalServerError)))
+          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), InternalServerError, None))))
 
         val result: Future[Result] = controller.getTaxCalculationMessages(nino, calcId)(fakeRequest)
 

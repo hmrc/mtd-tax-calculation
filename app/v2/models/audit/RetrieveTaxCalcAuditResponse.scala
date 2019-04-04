@@ -16,10 +16,10 @@
 
 package v2.models.audit
 
-import play.api.libs.json.{Json, OWrites, Writes}
+import play.api.libs.json.{JsValue, Json, OWrites}
 
-case class RetrieveTaxCalcAuditResponse[+T](httpStatus: Int, errors: Option[Seq[AuditError]], payload: Option[T])
+case class RetrieveTaxCalcAuditResponse(httpStatus: Int, errors: Option[Seq[AuditError]], payload: Option[JsValue])
 
 object RetrieveTaxCalcAuditResponse {
-  implicit def writes[T: Writes]: OWrites[RetrieveTaxCalcAuditResponse[T]] = Json.writes[RetrieveTaxCalcAuditResponse[T]]
+  implicit def writes: OWrites[RetrieveTaxCalcAuditResponse] = Json.writes[RetrieveTaxCalcAuditResponse]
 }

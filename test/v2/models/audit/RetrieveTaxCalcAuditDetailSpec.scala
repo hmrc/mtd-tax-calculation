@@ -28,7 +28,7 @@ class RetrieveTaxCalcAuditDetailSpec extends UnitSpec {
   private val calculationId = "77427777"
   private val nino = "AA123456A"
   private val `X-CorrelationId` = "X-123"
-  private val responseSuccess = RetrieveTaxCalcAuditResponse(Status.OK, None, Some(TaxCalculationFixture.taxCalc))
+  private val responseSuccess = RetrieveTaxCalcAuditResponse(Status.OK, None, Some(TaxCalculationFixture.taxCalcClientJson))
   private val responseFail = RetrieveTaxCalcAuditResponse(Status.BAD_REQUEST, Some(Seq(AuditError("FORMAT_NINO"))), None)
 
   "writes" when {

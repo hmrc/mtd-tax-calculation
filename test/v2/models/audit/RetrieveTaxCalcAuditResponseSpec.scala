@@ -23,7 +23,7 @@ import v2.fixtures.TaxCalculationFixture
 
 class RetrieveTaxCalcAuditResponseSpec extends UnitSpec {
 
-  private val responseSuccess = RetrieveTaxCalcAuditResponse(Status.OK, None, Some(TaxCalculationFixture.taxCalc))
+  private val responseSuccess = RetrieveTaxCalcAuditResponse(Status.OK, None, Some(TaxCalculationFixture.taxCalcClientJson))
   private val responseFail = RetrieveTaxCalcAuditResponse(Status.BAD_REQUEST, Some(Seq(AuditError("FORMAT_NINO"))), None)
 
   "writes" when {

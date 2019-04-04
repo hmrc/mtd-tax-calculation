@@ -16,9 +16,12 @@
 
 package v2.controllers
 
+import java.util.UUID
+
 import javax.inject.{Inject, Singleton}
+import play.api.Logger
 import play.api.libs.json.Json.toJson
-import play.api.libs.json.Writes
+import play.api.libs.json.{Json, Writes}
 import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
@@ -26,7 +29,7 @@ import v2.config.{AppConfig, FeatureSwitch}
 import v2.models._
 import v2.models.audit._
 import v2.models.auth.UserDetails
-import v2.models.errors.{CalculationNotReady, Error, InvalidCalcIDError, InvalidNinoError, MatchingResourceNotFound, NoContentReturned, InternalServerError => ISE}
+import v2.models.errors._
 import v2.outcomes.TaxCalcOutcome.Outcome
 import v2.services.{AuditService, EnrolmentsAuthService, MtdIdLookupService, TaxCalcService}
 
@@ -42,6 +45,8 @@ class TaxCalcController @Inject()(val authService: EnrolmentsAuthService,
                                  ) extends AuthorisedController {
 
   private val featureSwitch = FeatureSwitch(appConfig.featureSwitch)
+
+  val logger: Logger = Logger(this.getClass)
 
   def getTaxCalculation(nino: String, calcId: String): Action[AnyContent] = authorisedAction(nino).async { implicit request =>
 
@@ -64,45 +69,49 @@ class TaxCalcController @Inject()(val authService: EnrolmentsAuthService,
 
   }
 
-  private def get[M: Writes](nino: String, calcId: String, userDetails: UserDetails)
-                            (f: (String, String) => Future[Outcome[M]])(implicit hc: HeaderCarrier): Future[Result] = {
-    f(nino, calcId).map {
-      case outcome@Right(model) =>
-        val auditDetails = createAuditDetails(nino, calcId, OK, ???, userDetails, outcome)
-        auditSubmission(auditDetails)
-        Ok(toJson(model))
-
-      case outcome@Left(mtdError) =>
-        val (status, result) = mtdError match {
-          case CalculationNotReady | NoContentReturned => (NO_CONTENT, NoContent)
-          case InvalidCalcIDError | InvalidNinoError => (BAD_REQUEST, BadRequest(toJson(mtdError)))
-          case MatchingResourceNotFound => (NOT_FOUND, NotFound(toJson(mtdError)))
-          case ISE => (INTERNAL_SERVER_ERROR, InternalServerError(toJson(mtdError)))
+  private def get[M:Writes](nino: String, calcId: String, userDetails: UserDetails)
+                           (f: (String, String) => Future[Outcome[M]])(implicit hc: HeaderCarrier): Future[Result] = {
+    f(nino,calcId).map {
+      case Right(v2.outcomes.DesResponse(correlationId, responseData)) =>
+        if (featureSwitch.isRelease2Enabled) {
+          auditSubmission(RetrieveTaxCalcAuditDetail(userDetails.userType, userDetails.agentReferenceNumber,
+            nino, calcId, correlationId, RetrieveTaxCalcAuditResponse(OK, None, Some(toJson(responseData)))))
         }
-
-        val auditDetails = createAuditDetails(nino, calcId, status, ???, userDetails, outcome)
-        auditSubmission(auditDetails)
-
+        Ok(toJson(responseData))
+      case Left(errorWrapper) =>
+        val result = processError(errorWrapper)
+        if (featureSwitch.isRelease2Enabled) {
+          auditSubmission(RetrieveTaxCalcAuditDetail(userDetails.userType, userDetails.agentReferenceNumber,
+            nino, calcId, getCorrelationId(errorWrapper),
+            RetrieveTaxCalcAuditResponse(result.header.status, Some(errorWrapper.allErrors.map(error => AuditError(error.code))), None)))
+        }
         result
     }
   }
 
-  private def createAuditDetails[M](nino: String,
-                                    calcId: String,
-                                    statusCode: Int,
-                                    correlationId: String,
-                                    userDetails: UserDetails,
-                                    outcome: Outcome[M]
-                                   ): RetrieveTaxCalcAuditDetail[M] = {
-    val response = outcome match {
-      case Right(taxCalc) => RetrieveTaxCalcAuditResponse(statusCode, None, Some(taxCalc))
-      case Left(error: Error) => RetrieveTaxCalcAuditResponse(statusCode, Some(Seq(AuditError(error.code))), None)
+  private def processError(errorWrapper: ErrorWrapper): Result = {
+    errorWrapper.error match {
+      case InvalidCalcIDError | InvalidNinoError => BadRequest(Json.toJson(errorWrapper))
+      case CalculationNotReady | NoContentReturned => NoContent
+      case MatchingResourceNotFound => NotFound(Json.toJson(errorWrapper))
+      case _ => InternalServerError(Json.toJson(errorWrapper))
     }
-
-    RetrieveTaxCalcAuditDetail(userDetails.userType, userDetails.agentReferenceNumber, nino, calcId, correlationId, response)
   }
 
-  private def auditSubmission[M: Writes](details: RetrieveTaxCalcAuditDetail[M])
+  private def getCorrelationId(errorWrapper: ErrorWrapper): String = {
+    errorWrapper.correlationId match {
+      case Some(correlationId) => logger.info("[TaxCalcController][getCorrelationId] - " +
+        s"Error received from DES ${Json.toJson(errorWrapper)} with CorrelationId: $correlationId")
+        correlationId
+      case None =>
+        val correlationId = UUID.randomUUID().toString
+        logger.info("[TaxCalcController][getCorrelationId] - " +
+          s"Validation error: ${Json.toJson(errorWrapper)} with CorrelationId: $correlationId")
+        correlationId
+    }
+  }
+
+  private def auditSubmission[M: Writes](details: RetrieveTaxCalcAuditDetail)
                                         (implicit hc: HeaderCarrier,
                                          ec: ExecutionContext): Future[AuditResult] = {
     val event = AuditEvent("retrieveTaxCalculation", "mtd-tax-calculation", details)

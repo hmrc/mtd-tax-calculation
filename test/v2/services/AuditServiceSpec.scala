@@ -33,8 +33,8 @@ class AuditServiceSpec extends ServiceSpec {
     val mockAuditConnector: AuditConnector = mock[AuditConnector]
     val mockConfig: Configuration = mock[Configuration]
 
-    (mockConfig.getString(_: String))
-      .expects(*)
+    (mockConfig.getString(_: String, _: Option[Set[String]]))
+      .expects(*, *)
       .returns(Some(mockedAppName))
 
     lazy val target = new AuditService(mockAuditConnector, mockConfig)
