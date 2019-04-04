@@ -22,6 +22,15 @@ import v2.models.utils.JsonErrorValidators
 
 class EoySavingsSpec extends UnitSpec with JsonErrorValidators {
 
+  val validEoySavingsDesJson: String =
+    """
+      |{
+      |     "id": "Some ID",
+      |     "taxableIncome": 1234567.89,
+      |     "supplied": true
+      |}
+    """.stripMargin
+
   val validEoySavingsJson: String =
     """
       |{
@@ -42,23 +51,23 @@ class EoySavingsSpec extends UnitSpec with JsonErrorValidators {
     import JsonError._
 
     "return correct validation errors" when {
-      testMandatoryProperty[EoySavings](validEoySavingsJson)(property = "savingsAccountId")
-      testMandatoryProperty[EoySavings](validEoySavingsJson)(property = "taxableIncome")
-      testMandatoryProperty[EoySavings](validEoySavingsJson)(property = "supplied")
+      testMandatoryProperty[EoySavings](validEoySavingsDesJson)(property = "id")
+      testMandatoryProperty[EoySavings](validEoySavingsDesJson)(property = "taxableIncome")
+      testMandatoryProperty[EoySavings](validEoySavingsDesJson)(property = "supplied")
 
-      testPropertyType[EoySavings](validEoySavingsJson)(
-        property = "savingsAccountId",
+      testPropertyType[EoySavings](validEoySavingsDesJson)(
+        property = "id",
         invalidValue = "800",
         errorPathAndError = "/savingsAccountId" -> STRING_FORMAT_EXCEPTION
       )
 
-      testPropertyType[EoySavings](validEoySavingsJson)(
+      testPropertyType[EoySavings](validEoySavingsDesJson)(
         property = "taxableIncome",
         invalidValue = "\"some string\"",
         errorPathAndError = "/taxableIncome" -> NUMBER_FORMAT_EXCEPTION
       )
 
-      testPropertyType[EoySavings](validEoySavingsJson)(
+      testPropertyType[EoySavings](validEoySavingsDesJson)(
         property = "supplied",
         invalidValue = "800",
         errorPathAndError = "/supplied" -> BOOLEAN_FORMAT_EXCEPTION
@@ -68,7 +77,7 @@ class EoySavingsSpec extends UnitSpec with JsonErrorValidators {
 
   "return a successfully read eoy Savings model" when {
     "all fields exist" in {
-      Json.parse(validEoySavingsJson).as[EoySavings] shouldBe validEoySavingsModel
+      Json.parse(validEoySavingsDesJson).as[EoySavings] shouldBe validEoySavingsModel
     }
 
   }

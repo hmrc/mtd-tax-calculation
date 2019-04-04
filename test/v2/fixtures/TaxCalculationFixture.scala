@@ -211,11 +211,11 @@ object TaxCalculationFixture {
         taxableIncome = 99999999.99,
         supplied = true
       )),
-      savings = Some(EoySavings(
+      savings = Some(Seq(EoySavings(
         savingsAccountId = "Some ID",
         taxableIncome = 99999999.99,
         supplied = true
-      )),
+      ))),
       totalTaxableIncome = 99999999.99,
       incomeTaxAmount = 99999999.99,
       nic2 = 99999999,
@@ -431,11 +431,11 @@ object TaxCalculationFixture {
       |      "taxableIncome": 99999999.99,
       |      "supplied": true
       |    },
-      |    "savings": {
+      |    "savings": [{
       |      "savingsAccountId": "Some ID",
       |      "taxableIncome": 99999999.99,
       |      "supplied": true
-      |    },
+      |    }],
       |    "totalTaxableIncome": 99999999.99,
       |    "incomeTaxAmount": 99999999.99,
       |    "nic2": 99999999,
@@ -555,7 +555,7 @@ object TaxCalculationFixture {
       |            "taxedAccounts": [
       |              {
       |                "gross": 1000.25,
-      |                "incomeSourceId": "ABIS10000000001",
+      |                "incomeSourceID": "ABIS10000000001",
       |                "name": "accountName",
       |                "net": 1000.25,
       |                "taxDeducted": 1000.25,
@@ -566,7 +566,7 @@ object TaxCalculationFixture {
       |            "untaxedAccounts": [
       |              {
       |                "gross": 1000.25,
-      |                "incomeSourceId": "ABIS10000000001",
+      |                "incomeSourceID": "ABIS10000000001",
       |                "name": "accountName"
       |              }
       |            ]
@@ -743,7 +743,7 @@ object TaxCalculationFixture {
       |          },
       |          {
       |            "type": "09",
-      |            "savingsAccountId": "Some ID",
+      |            "id": "Some ID",
       |            "taxableIncome": 99999999.99,
       |            "supplied": true
       |          }

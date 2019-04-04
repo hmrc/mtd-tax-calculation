@@ -67,14 +67,14 @@ trait TaxableIncomeFixture {
       |             "totalTaxedInterestIncome": 1234567.89,
       |             "totalUntaxedInterestIncome": 1234567.89,
       |             "taxedAccounts": [{
-      |               "incomeSourceId": "accountId",
+      |               "incomeSourceID": "accountId",
       |               "name": "accountName",
       |               "gross": 1234567.89,
       |               "net": 1234567.89,
       |               "taxDeducted": 1234567.89
       |             }],
       |             "untaxedAccounts": [{
-      |               "incomeSourceId": "accountId",
+      |               "incomeSourceID": "accountId",
       |               "name": "accountName",
       |               "gross": 1234567.89
       |             }]
@@ -224,14 +224,14 @@ trait TaxableIncomeFixture {
       |             "totalTaxedInterestIncome": 1234567.89,
       |             "totalUntaxedInterestIncome": 1234567.89,
       |             "taxedAccounts": [{
-      |               "incomeSourceId": "accountId",
+      |               "incomeSourceID": "accountId",
       |               "name": "accountName",
       |               "gross": 1234567.89,
       |               "net": 1234567.89,
       |               "taxDeducted": 1234567.89
       |             }],
       |             "untaxedAccounts": [{
-      |               "incomeSourceId": "accountId",
+      |               "incomeSourceID": "accountId",
       |               "name": "accountName",
       |               "gross": 1234567.89
       |             }]

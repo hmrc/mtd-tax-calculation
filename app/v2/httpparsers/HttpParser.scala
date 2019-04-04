@@ -41,7 +41,7 @@ trait HttpParser {
   implicit class JsonResponseOps(response: HttpResponse) {
     def validateJson[T](implicit reads: Reads[T]): Option[T] = {
       Try(response.json) match {
-        case Success(js: JsValue) => js.asOpt
+        case Success(js: JsValue) => js.asOpt[T]
         case Success(_) =>
           Logger.warn("No JSON was returned")
           None

@@ -41,8 +41,8 @@ class EoyEstimateSpec extends UnitSpec with JsonErrorValidators {
     finalised = Some(true)
   )
 
-  val charitableGiving = Some(EoyCharitableGiving(1234567.89, true))
-  val savings = Some(EoySavings("Some ID", 1234567.89, true))
+  val charitableGiving = Some(EoyCharitableGiving(1234567.89, supplied = true))
+  val savings = EoySavings("Some ID", 1234567.89, supplied = true)
 
   val validEoyEstimateModel = EoyEstimate(
     employments = Some(Seq(validEoyEmploymentModel)),
@@ -50,7 +50,7 @@ class EoyEstimateSpec extends UnitSpec with JsonErrorValidators {
     ukProperty = Some(validEoyItemModel),
     ukDividends = Some(validEoyItemModel),
     charitableGiving = charitableGiving,
-    savings = savings,
+    savings = Some(Seq(savings)),
     totalTaxableIncome= 123.45,
     incomeTaxAmount= 123.45,
     nic2= 123.45,
@@ -96,7 +96,7 @@ class EoyEstimateSpec extends UnitSpec with JsonErrorValidators {
       |   },
       |   {
       |     "type": "09",
-      |     "savingsAccountId": "Some ID",
+      |     "id": "Some ID",
       |     "taxableIncome": 1234567.89,
       |     "supplied": true
       |   }
@@ -127,7 +127,7 @@ class EoyEstimateSpec extends UnitSpec with JsonErrorValidators {
       |  "ukProperty" : $validEoyItemInputJson,
       |  "ukDividends" : $validEoyItemInputJson,
       |  "charitableGiving" : ${validEoyItemInputJson.as[JsObject] - "finalised"},
-      |  "savings" : ${validEoyItemInputJson.as[JsObject]  - "finalised" + ("savingsAccountId" -> Json.parse("\"Some ID\""))},
+      |  "savings" : [${validEoyItemInputJson.as[JsObject]  - "finalised" + ("savingsAccountId" -> Json.parse("\"Some ID\""))}],
       |  "totalTaxableIncome": 123.45,
       |  "incomeTaxAmount": 123.45,
       |  "nic2": 123.45,

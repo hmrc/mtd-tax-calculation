@@ -28,7 +28,7 @@ object EoySavings {
   implicit val writes: Writes[EoySavings] = Json.writes[EoySavings]
 
   implicit val reads: Reads[EoySavings] = (
-      (__ \ "savingsAccountId").read[String] and
+      (__ \ "id").read[String] and
       (__ \ "taxableIncome").read[BigDecimal] and
       (__ \ "supplied").read[Boolean]
     )(EoySavings.apply _)
