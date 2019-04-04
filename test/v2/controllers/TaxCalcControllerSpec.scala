@@ -118,12 +118,19 @@ class TaxCalcControllerSpec extends ControllerBaseSpec
         MockedEnrolmentsAuthService.authoriseUser().returns(Future.successful(expected))
 
         MockedTaxCalcService.getTaxCalculation[TaxCalculation](nino, calcId)
-          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), InvalidNinoError, None))))
+          .returns(Future.successful(Left(ErrorWrapper(None, InvalidNinoError, None))))
 
         val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
 
         status(result) shouldBe BAD_REQUEST
         contentAsJson(result) shouldBe Json.toJson(InvalidNinoError)
+        header("X-CorrelationId", result).nonEmpty shouldBe true
+
+        val detail = RetrieveTaxCalcAuditDetail("Individual", None, nino, calcId, header("X-CorrelationId", result).get,
+          RetrieveTaxCalcAuditResponse(BAD_REQUEST, Some(Seq(AuditError(InvalidNinoError.code))), None))
+        val event = AuditEvent("retrieveTaxCalculation",
+          "mtd-tax-calculation", detail)
+        MockedAuditService.verifyAuditEvent(event).once
       }
 
       "the service returns an Invalid CalcID error" in new Test {
@@ -131,14 +138,15 @@ class TaxCalcControllerSpec extends ControllerBaseSpec
           .returns(Future.successful(Right(mtdId)))
         MockedEnrolmentsAuthService.authoriseUser().returns(Future.successful(expected))
         MockedTaxCalcService.getTaxCalculation[TaxCalculation](nino, calcId)
-          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), InvalidCalcIDError, None))))
+          .returns(Future.successful(Left(ErrorWrapper(None, InvalidCalcIDError, None))))
 
         val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
 
         status(result) shouldBe BAD_REQUEST
         contentAsJson(result) shouldBe Json.toJson(InvalidCalcIDError)
+        header("X-CorrelationId", result).nonEmpty shouldBe true
 
-        val detail = RetrieveTaxCalcAuditDetail("Individual", None, nino, calcId, "X-123",
+        val detail = RetrieveTaxCalcAuditDetail("Individual", None, nino, calcId, header("X-CorrelationId", result).get,
           RetrieveTaxCalcAuditResponse(BAD_REQUEST, Some(Seq(AuditError(InvalidCalcIDError.code))), None))
         val event = AuditEvent("retrieveTaxCalculation",
           "mtd-tax-calculation", detail)
@@ -160,6 +168,11 @@ class TaxCalcControllerSpec extends ControllerBaseSpec
 
         status(result) shouldBe NOT_FOUND
         contentAsJson(result) shouldBe Json.toJson(MatchingResourceNotFound)
+        val detail = RetrieveTaxCalcAuditDetail("Individual", None, nino, calcId, correlationId,
+          RetrieveTaxCalcAuditResponse(NOT_FOUND, Some(Seq(AuditError(MatchingResourceNotFound.code))), None))
+        val event = AuditEvent("retrieveTaxCalculation",
+          "mtd-tax-calculation", detail)
+        MockedAuditService.verifyAuditEvent(event).once
       }
     }
 
@@ -184,6 +197,12 @@ class TaxCalcControllerSpec extends ControllerBaseSpec
 
         status(result) shouldBe INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.toJson(InternalServerError)
+
+        val detail = RetrieveTaxCalcAuditDetail("Individual", None, nino, calcId, "X-123",
+          RetrieveTaxCalcAuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(InternalServerError.code))), None))
+        val event = AuditEvent("retrieveTaxCalculation",
+          "mtd-tax-calculation", detail)
+        MockedAuditService.verifyAuditEvent(event).once
       }
     }
   }

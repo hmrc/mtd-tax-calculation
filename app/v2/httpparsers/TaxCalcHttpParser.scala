@@ -16,18 +16,15 @@
 
 package v2.httpparsers
 
-import play.api.Logger
 import play.api.http.Status._
 import play.api.libs.json.Reads
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
-import v2.models.{TaxCalcMessages, _}
 import v2.models.errors._
+import v2.models.{TaxCalcMessages, _}
 import v2.outcomes.DesResponse
 import v2.outcomes.TaxCalcOutcome.Outcome
 
 object TaxCalcHttpParser extends HttpParser {
-
-  val logger = Logger(this.getClass)
 
   implicit def genericHttpReads[A: Reads]: HttpReads[Outcome[A]] = reads[A]
 

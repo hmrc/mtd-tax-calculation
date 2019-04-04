@@ -73,16 +73,17 @@ class TaxCalcController @Inject()(val authService: EnrolmentsAuthService,
                            (f: (String, String) => Future[Outcome[M]])(implicit hc: HeaderCarrier): Future[Result] = {
     f(nino,calcId).map {
       case Right(v2.outcomes.DesResponse(correlationId, responseData)) =>
-        if (featureSwitch.isRelease2Enabled) {
+        if (featureSwitch.isRelease2Enabled && responseData.isInstanceOf[TaxCalculation]) {
           auditSubmission(RetrieveTaxCalcAuditDetail(userDetails.userType, userDetails.agentReferenceNumber,
             nino, calcId, correlationId, RetrieveTaxCalcAuditResponse(OK, None, Some(toJson(responseData)))))
         }
         Ok(toJson(responseData))
       case Left(errorWrapper) =>
-        val result = processError(errorWrapper)
+        val correlationId = getCorrelationId(errorWrapper)
+        val result = processError(errorWrapper).withHeaders("X-CorrelationId" -> correlationId)
         if (featureSwitch.isRelease2Enabled) {
           auditSubmission(RetrieveTaxCalcAuditDetail(userDetails.userType, userDetails.agentReferenceNumber,
-            nino, calcId, getCorrelationId(errorWrapper),
+            nino, calcId, correlationId,
             RetrieveTaxCalcAuditResponse(result.header.status, Some(errorWrapper.allErrors.map(error => AuditError(error.code))), None)))
         }
         result
