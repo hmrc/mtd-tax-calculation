@@ -51,14 +51,14 @@ class SavingsIncomeSpec extends UnitSpec with JsonErrorValidators {
       |   "totalTaxedInterestIncome": 234.56,
       |   "totalUntaxedInterestIncome": 345.67,
       |   "taxedAccounts" : [ {
-      |       "incomeSourceId": "accountId",
+      |       "incomeSourceID": "accountId",
       |       "name": "accountName",
       |       "gross": 456.78,
       |       "net": 567.89,
       |      "taxDeducted": 678.90
       |   }],
       |   "untaxedAccounts" : [ {
-      |       "incomeSourceId": "accountId",
+      |       "incomeSourceID": "accountId",
       |       "name": "accountName",
       |       "gross": 456.78
       |   }]

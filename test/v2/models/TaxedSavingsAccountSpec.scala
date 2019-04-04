@@ -35,7 +35,7 @@ class TaxedSavingsAccountSpec extends UnitSpec with JsonErrorValidators {
   val desJson =
      """
       |{
-      |   "incomeSourceId": "accountId",
+      |   "incomeSourceID": "accountId",
       |   "name": "accountName",
       |   "gross": 456.78,
       |   "net": 567.89,
@@ -77,7 +77,7 @@ class TaxedSavingsAccountSpec extends UnitSpec with JsonErrorValidators {
         TaxedSavingsAccount.reads.reads(Json.parse(
           """
             |{
-            |   "incomeSourceId": "accountId"
+            |   "incomeSourceID": "accountId"
             |}
           """.stripMargin)).get shouldBe emptyModel
       }

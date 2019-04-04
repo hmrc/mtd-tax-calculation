@@ -31,7 +31,7 @@ case class TaxedSavingsAccount(
 object TaxedSavingsAccount {
   implicit val writes: Writes[TaxedSavingsAccount] = Json.writes[TaxedSavingsAccount]
   implicit val reads: Reads[TaxedSavingsAccount] = (
-    (__ \ "incomeSourceId").read[String] and
+    (__ \ "incomeSourceID").read[String] and
       (__ \ "name").readNullable[String] and
       (__ \ "gross").readNullable[BigDecimal] and
       (__ \ "net").readNullable[BigDecimal] and
@@ -49,7 +49,7 @@ case class UntaxedSavingsAccount(
 object UntaxedSavingsAccount {
   implicit val writes: Writes[UntaxedSavingsAccount] = Json.writes[UntaxedSavingsAccount]
   implicit val reads: Reads[UntaxedSavingsAccount] = (
-    (__ \ "incomeSourceId").read[String] and
+    (__ \ "incomeSourceID").read[String] and
       (__ \ "name").readNullable[String] and
       (__ \ "gross").readNullable[BigDecimal]
     ) (UntaxedSavingsAccount.apply _)
