@@ -51,9 +51,9 @@ class TaxCalcController @Inject()(val authService: EnrolmentsAuthService,
   def getTaxCalculation(nino: String, calcId: String): Action[AnyContent] = authorisedAction(nino).async { implicit request =>
 
     if (featureSwitch.isRelease2Enabled) {
-      get[TaxCalculation](nino, calcId, request.userDetails)(service.getTaxCalculation(_, _))
+      get[TaxCalculation](nino, calcId, request.userDetails, true)(service.getTaxCalculation(_, _))
     } else {
-      get[old.TaxCalculation](nino, calcId, request.userDetails)(service.getTaxCalculation(_, _))
+      get[old.TaxCalculation](nino, calcId, request.userDetails, false)(service.getTaxCalculation(_, _))
     }
 
   }
@@ -61,27 +61,27 @@ class TaxCalcController @Inject()(val authService: EnrolmentsAuthService,
   def getTaxCalculationMessages(nino: String, calcId: String): Action[AnyContent] = authorisedAction(nino).async { implicit request =>
 
     if (featureSwitch.isRelease2Enabled) {
-      get[TaxCalcMessages](nino, calcId, request.userDetails)(service.getTaxCalculationMessages(_, _))
+      get[TaxCalcMessages](nino, calcId, request.userDetails, false)(service.getTaxCalculationMessages(_, _))
     } else {
-      get[old.TaxCalcMessages](nino, calcId, request.userDetails)(service.getTaxCalculationMessages(_, _))
+      get[old.TaxCalcMessages](nino, calcId, request.userDetails, false)(service.getTaxCalculationMessages(_, _))
     }
 
 
   }
 
-  private def get[M:Writes](nino: String, calcId: String, userDetails: UserDetails)
+  private def get[M:Writes](nino: String, calcId: String, userDetails: UserDetails, isAudit: Boolean)
                            (f: (String, String) => Future[Outcome[M]])(implicit hc: HeaderCarrier): Future[Result] = {
     f(nino,calcId).map {
       case Right(v2.outcomes.DesResponse(correlationId, responseData)) =>
-        if (featureSwitch.isRelease2Enabled && responseData.isInstanceOf[TaxCalculation]) {
+        if (isAudit) {
           auditSubmission(RetrieveTaxCalcAuditDetail(userDetails.userType, userDetails.agentReferenceNumber,
             nino, calcId, correlationId, RetrieveTaxCalcAuditResponse(OK, None, Some(toJson(responseData)))))
         }
-        Ok(toJson(responseData))
+        Ok(toJson(responseData)).withHeaders("X-CorrelationId" -> correlationId)
       case Left(errorWrapper) =>
         val correlationId = getCorrelationId(errorWrapper)
         val result = processError(errorWrapper).withHeaders("X-CorrelationId" -> correlationId)
-        if (featureSwitch.isRelease2Enabled) {
+        if (isAudit) {
           auditSubmission(RetrieveTaxCalcAuditDetail(userDetails.userType, userDetails.agentReferenceNumber,
             nino, calcId, correlationId,
             RetrieveTaxCalcAuditResponse(result.header.status, Some(errorWrapper.allErrors.map(error => AuditError(error.code))), None)))

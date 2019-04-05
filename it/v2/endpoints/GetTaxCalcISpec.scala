@@ -55,6 +55,7 @@ class GetTaxCalcISpec extends IntegrationBaseSpec {
         val response: WSResponse = await(request().get())
         response.status shouldBe Status.OK
         response.json shouldBe TaxCalculationFixture.taxCalcClientJson
+        response.header("X-CorrelationId").nonEmpty shouldBe true
       }
     }
 
@@ -70,6 +71,7 @@ class GetTaxCalcISpec extends IntegrationBaseSpec {
         val response: WSResponse = await(request().get())
         response.status shouldBe Status.INTERNAL_SERVER_ERROR
         response.json shouldBe Json.toJson(InternalServerError)
+        response.header("X-CorrelationId").nonEmpty shouldBe true
       }
     }
   }
