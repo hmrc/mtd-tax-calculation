@@ -16,6 +16,7 @@
 
 package v2.httpparsers
 
+import play.api.libs.json.{JsNull, Json}
 import play.api.test.Helpers._
 import support.UnitSpec
 import uk.gov.hmrc.http.HttpResponse
@@ -79,8 +80,8 @@ class TaxCalcHttpParserSpec extends UnitSpec {
 
       "the HttpResponse contains a 404 status and a list of errors" in {
         val errorListJson = TaxCalculationFixture.v3_2DesTaxCalcErrorJson(
-          DesErrorCode.INVALID_IDENTIFIER -> "some reason",
-          DesErrorCode.INVALID_CALCID -> "some reason"
+          "INVALID_IDENTIFIER" -> "some reason",
+          "INVALID_CALCID" -> "some reason"
         )
         val response = HttpResponse(NOT_FOUND, Some(errorListJson), Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalculation].read(method, url, response)
@@ -114,6 +115,30 @@ class TaxCalcHttpParserSpec extends UnitSpec {
       "the HttpResponse contains a 200 status and invalid json" in {
         val response = HttpResponse(OK, Some(null), Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalculation].read(method, url, response)
+
+        result shouldBe Left(ErrorWrapper(Some(correlationId),InternalServerError, None))
+      }
+
+      "the HttpResponse contains a 200 status and no json" in {
+        val response = HttpResponse(OK, null, Map("CorrelationId" -> Seq(correlationId)))
+        val result = genericHttpReads[TaxCalculation].read(method, url, response)
+
+        result shouldBe Left(ErrorWrapper(Some(correlationId),InternalServerError, None))
+      }
+
+      "the HttpResponse contains a 500 status and with invalid json" in {
+        val json = Json.obj("code1" -> "code", "reason" -> "reason")
+
+        val response = HttpResponse(INTERNAL_SERVER_ERROR , Some(json), Map("CorrelationId" -> Seq(correlationId)))
+        val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
+
+        result shouldBe Left(ErrorWrapper(Some(correlationId),InternalServerError, None))
+      }
+
+      "the HttpResponse contains a 500 status and with non json body" in {
+
+        val response = HttpResponse(INTERNAL_SERVER_ERROR , null, Map("CorrelationId" -> Seq(correlationId)))
+        val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),InternalServerError, None))
       }
@@ -186,8 +211,8 @@ class TaxCalcHttpParserSpec extends UnitSpec {
 
       "the HttpResponse contains a 404 status and a list of errors" in {
         val errorListJson = TaxCalculationFixture.v3_2DesTaxCalcErrorJson(
-          DesErrorCode.INVALID_IDENTIFIER -> "some reason",
-          DesErrorCode.INVALID_CALCID -> "some reason"
+          "INVALID_IDENTIFIER" -> "some reason",
+          "INVALID_CALCID" -> "some reason"
         )
         val response = HttpResponse(NOT_FOUND, Some(errorListJson), Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
@@ -213,6 +238,23 @@ class TaxCalcHttpParserSpec extends UnitSpec {
 
       "the HttpResponse contains a 503 status and ServiceUnavailable code" in {
         val response = HttpResponse(SERVICE_UNAVAILABLE, Some(DESErrorsFixture.serviceUnavailableJson), Map("CorrelationId" -> Seq(correlationId)))
+        val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
+
+        result shouldBe Left(ErrorWrapper(Some(correlationId),InternalServerError, None))
+      }
+
+      "the HttpResponse contains a 500 status and with invalid json" in {
+        val errorListJson = Json.obj("code1" -> "code", "reason" -> "reason")
+
+        val response = HttpResponse(INTERNAL_SERVER_ERROR , Some(errorListJson), Map("CorrelationId" -> Seq(correlationId)))
+        val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
+
+        result shouldBe Left(ErrorWrapper(Some(correlationId),InternalServerError, None))
+      }
+
+      "the HttpResponse contains a 500 status and with non json body" in {
+
+        val response = HttpResponse(INTERNAL_SERVER_ERROR , null, Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),InternalServerError, None))

@@ -17,27 +17,11 @@
 package v2.models.errors
 
 import play.api.libs.json._
-import v2.models.errors.DesErrorCode.DesErrorCode
 
-object DesErrorCode extends Enumeration {
-  type DesErrorCode = Value
+object DesError {
+  val reads: Reads[Option[String]] = (__ \ "code").readNullable[String]
 
-  //4xx
-  val INVALID_CALCID,
-  INVALID_IDENTIFIER,
-  NOT_FOUND: DesErrorCode = Value
-
-  //5xx
-  val SERVER_ERROR,
-    SERVICE_UNAVAILABLE: DesErrorCode = Value
-
-  implicit val desErrorReads: Reads[DesErrorCode] = Reads.enumNameReads(DesErrorCode)
-}
-
-object ErrorCode {
-  val reads: Reads[Option[DesErrorCode]] = (__ \ "code").readNullable[DesErrorCode]
-
-  def unapply(arg: Option[JsValue]): Option[DesErrorCode] = {
+  def unapply(arg: Option[JsValue]): Option[String] = {
     arg match {
       case Some(json) => reads.reads(json).fold(_ => None, valid => valid)
       case _ => None

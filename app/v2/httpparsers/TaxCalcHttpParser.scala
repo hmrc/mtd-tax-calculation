@@ -33,15 +33,15 @@ object TaxCalcHttpParser extends HttpParser {
       (response.status, response.jsonOpt) match {
         case (OK, _) => parseResponse(response)
         case (NO_CONTENT, _) => Left(ErrorWrapper(Some(retrieveCorrelationId(response)), CalculationNotReady, None))
-        case (BAD_REQUEST, ErrorCode(DesErrorCode.INVALID_IDENTIFIER)) =>
+        case (BAD_REQUEST, DesError("INVALID_IDENTIFIER")) =>
           Left(ErrorWrapper(Some(retrieveCorrelationId(response)), InvalidNinoError, None))
-        case (BAD_REQUEST, ErrorCode(DesErrorCode.INVALID_CALCID)) =>
+        case (BAD_REQUEST, DesError("INVALID_CALCID")) =>
           Left(ErrorWrapper(Some(retrieveCorrelationId(response)), InvalidCalcIDError, None))
         case (FORBIDDEN, _) => Left(ErrorWrapper(Some(retrieveCorrelationId(response)), InternalServerError, None))
         case (NOT_FOUND, _) => Left(ErrorWrapper(Some(retrieveCorrelationId(response)), MatchingResourceNotFound, None))
-        case (INTERNAL_SERVER_ERROR, ErrorCode(DesErrorCode.SERVER_ERROR)) =>
+        case (INTERNAL_SERVER_ERROR, DesError("SERVER_ERROR")) =>
           Left(ErrorWrapper(Some(retrieveCorrelationId(response)), InternalServerError, None))
-        case (SERVICE_UNAVAILABLE, ErrorCode(DesErrorCode.SERVICE_UNAVAILABLE)) =>
+        case (SERVICE_UNAVAILABLE, DesError("SERVICE_UNAVAILABLE")) =>
           Left(ErrorWrapper(Some(retrieveCorrelationId(response)), InternalServerError, None))
         case (_, _) => logger.warn(s"Unexpected error received from DES with status ${response.status} and body ${response.jsonOpt}")
           Left(ErrorWrapper(Some(retrieveCorrelationId(response)), InternalServerError, None))

@@ -18,16 +18,10 @@ package v2.outcomes
 
 import v2.models.auth.UserDetails
 import v2.models.errors.{ErrorWrapper, MtdError}
-import v2.models.old.{TaxCalcMessages, TaxCalculation}
 
 object TaxCalcOutcome {
 
   type Outcome[M] = Either[ErrorWrapper, DesResponse[M]]
-
-  type ServiceOutcome[M] = Either[ErrorWrapper, DesResponse[M]]
-
-  type TaxCalcOutcome = Either[MtdError, TaxCalculation]
-  type TaxCalcMessagesOutcome = Either[MtdError, TaxCalcMessages]
   type AuthOutcome = Either[MtdError, UserDetails]
 
   sealed trait TaxCalcError extends MtdError
