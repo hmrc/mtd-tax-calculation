@@ -19,9 +19,10 @@ package v2.connectors
 import uk.gov.hmrc.http.HttpResponse
 import v2.fixtures.old.{TaxCalcMessagesFixture, TaxCalculationFixture}
 import v2.mocks.{MockAppConfig, MockHttpClient}
-import v2.models.errors.MatchingResourceNotFound
+import v2.models.errors.{ErrorWrapper, MatchingResourceNotFound}
 import v2.models.old.{TaxCalcMessages, TaxCalculation}
-import v2.outcomes.TaxCalcOutcome.{Outcome, TaxCalcMessagesOutcome, TaxCalcOutcome}
+import v2.outcomes.DesResponse
+import v2.outcomes.TaxCalcOutcome.Outcome
 
 import scala.concurrent.Future
 
@@ -33,6 +34,7 @@ class TaxCalcConnectorSpec extends ConnectorSpec {
   val mtdId = "123456789012345"
   val calculationId = "test-calc-id"
   val url = s"$desBaseUrl/income-tax/calculation-data/$mtdId/calcId/$calculationId"
+  val correlationId = "X-123"
 
   val httpResponseOk = HttpResponse(OK)
   val httpResponseNotFound = HttpResponse(NOT_FOUND)
@@ -52,21 +54,21 @@ class TaxCalcConnectorSpec extends ConnectorSpec {
   "getTaxCalculation" should {
     "return a TaxCalculation model" when {
       "the http parser returns a TaxCalculation model" in new Test {
-        MockedHttpClient.get[TaxCalcOutcome](url)
-          .returns(Future.successful(Right(TaxCalculationFixture.taxCalc)))
+        MockedHttpClient.get[Outcome[TaxCalculation]](url)
+          .returns(Future.successful(Right(DesResponse(correlationId, TaxCalculationFixture.taxCalc))))
 
-        val result = await(connector.getTaxCalculation[TaxCalculation](mtdId, calculationId))
-        result shouldBe Right(TaxCalculationFixture.taxCalc)
+        private val result = await(connector.getTaxCalculation[TaxCalculation](mtdId, calculationId))
+        result shouldBe Right(DesResponse(correlationId, TaxCalculationFixture.taxCalc))
       }
     }
 
     "return an NotFound error" when {
       "the http parser returns a NotFound error" in new Test {
-        MockedHttpClient.get[TaxCalcOutcome](url)
-          .returns(Future.successful(Left(MatchingResourceNotFound)))
+        MockedHttpClient.get[Outcome[TaxCalculation]](url)
+          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), MatchingResourceNotFound, None))))
 
-        val result = await(connector.getTaxCalculation[TaxCalculation](mtdId, calculationId))
-        result shouldBe Left(MatchingResourceNotFound)
+        private val result = await(connector.getTaxCalculation[TaxCalculation](mtdId, calculationId))
+        result shouldBe Left(ErrorWrapper(Some(correlationId), MatchingResourceNotFound, None))
       }
     }
   }
@@ -75,20 +77,20 @@ class TaxCalcConnectorSpec extends ConnectorSpec {
     "return a TaxCalculation model" when {
       "the http parser returns a TaxCalculation model" in new Test {
         MockedHttpClient.get[Outcome[TaxCalcMessages]](url)
-          .returns(Future.successful(Right(TaxCalcMessagesFixture.taxCalcMessages)))
+          .returns(Future.successful(Right(DesResponse(correlationId, TaxCalcMessagesFixture.taxCalcMessages))))
 
-        val result = await(connector.getTaxCalculationMessages[TaxCalcMessages](mtdId, calculationId))
-        result shouldBe Right(TaxCalcMessagesFixture.taxCalcMessages)
+        private val result = await(connector.getTaxCalculationMessages[TaxCalcMessages](mtdId, calculationId))
+        result shouldBe Right(DesResponse(correlationId, TaxCalcMessagesFixture.taxCalcMessages))
       }
     }
 
     "return an NotFound error" when {
       "the http parser returns a NotFound error" in new Test {
-        MockedHttpClient.get[TaxCalcMessagesOutcome](url)
-          .returns(Future.successful(Left(MatchingResourceNotFound)))
+        MockedHttpClient.get[Outcome[TaxCalcMessages]](url)
+          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), MatchingResourceNotFound, None))))
 
-        val result = await(connector.getTaxCalculationMessages[TaxCalcMessages](mtdId, calculationId))
-        result shouldBe Left(MatchingResourceNotFound)
+        private val result = await(connector.getTaxCalculationMessages[TaxCalcMessages](mtdId, calculationId))
+        result shouldBe Left(ErrorWrapper(Some(correlationId), MatchingResourceNotFound, None))
       }
     }
   }

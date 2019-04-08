@@ -16,33 +16,44 @@
 
 package v2.controllers
 
+import java.util.UUID
+
 import javax.inject.{Inject, Singleton}
+import play.api.Logger
 import play.api.libs.json.Json.toJson
-import play.api.libs.json.Writes
+import play.api.libs.json.{Json, Writes}
 import play.api.mvc.{Action, AnyContent, Result}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import v2.config.{AppConfig, FeatureSwitch}
 import v2.models._
-import v2.models.errors.{CalculationNotReady, InvalidCalcIDError, InvalidNinoError, MatchingResourceNotFound, NoContentReturned, InternalServerError => ISE}
+import v2.models.audit._
+import v2.models.auth.UserDetails
+import v2.models.errors._
 import v2.outcomes.TaxCalcOutcome.Outcome
-import v2.services.{EnrolmentsAuthService, MtdIdLookupService, TaxCalcService}
+import v2.services.{AuditService, EnrolmentsAuthService, MtdIdLookupService, TaxCalcService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class TaxCalcController @Inject()(val authService: EnrolmentsAuthService,
                                   val lookupService: MtdIdLookupService,
-                                  val service: TaxCalcService,
-                                  appConfig: AppConfig) extends AuthorisedController {
+                                  service: TaxCalcService,
+                                  appConfig: AppConfig,
+                                  auditService: AuditService
+                                 ) extends AuthorisedController {
 
   private val featureSwitch = FeatureSwitch(appConfig.featureSwitch)
+
+  val logger: Logger = Logger(this.getClass)
 
   def getTaxCalculation(nino: String, calcId: String): Action[AnyContent] = authorisedAction(nino).async { implicit request =>
 
     if (featureSwitch.isRelease2Enabled) {
-      get[TaxCalculation](nino, calcId)(service.getTaxCalculation[TaxCalculation](_, _))
+      get[TaxCalculation](nino, calcId, request.userDetails, true)(service.getTaxCalculation(_, _))
     } else {
-      get[old.TaxCalculation](nino, calcId)(service.getTaxCalculation[old.TaxCalculation](_, _))
+      get[old.TaxCalculation](nino, calcId, request.userDetails, false)(service.getTaxCalculation(_, _))
     }
 
   }
@@ -50,25 +61,61 @@ class TaxCalcController @Inject()(val authService: EnrolmentsAuthService,
   def getTaxCalculationMessages(nino: String, calcId: String): Action[AnyContent] = authorisedAction(nino).async { implicit request =>
 
     if (featureSwitch.isRelease2Enabled) {
-      get[TaxCalcMessages](nino, calcId)(service.getTaxCalculationMessages[TaxCalcMessages](_, _))
+      get[TaxCalcMessages](nino, calcId, request.userDetails, false)(service.getTaxCalculationMessages(_, _))
     } else {
-      get[old.TaxCalcMessages](nino, calcId)(service.getTaxCalculationMessages[old.TaxCalcMessages](_, _))
+      get[old.TaxCalcMessages](nino, calcId, request.userDetails, false)(service.getTaxCalculationMessages(_, _))
     }
 
 
   }
 
-  private def get[M: Writes](nino: String, c: String)
-                            (f: (String, String) => Future[Outcome[M]]): Future[Result] = {
-    f(nino, c).map {
-      case Right(model) => Ok(toJson(model))
-      case Left(mtdError) =>
-        mtdError match {
-          case CalculationNotReady | NoContentReturned => NoContent
-          case InvalidCalcIDError | InvalidNinoError => BadRequest(toJson(mtdError))
-          case MatchingResourceNotFound => NotFound(toJson(mtdError))
-          case ISE => InternalServerError(toJson(mtdError))
+  private def get[M:Writes](nino: String, calcId: String, userDetails: UserDetails, isAudit: Boolean)
+                           (f: (String, String) => Future[Outcome[M]])(implicit hc: HeaderCarrier): Future[Result] = {
+    f(nino,calcId).map {
+      case Right(v2.outcomes.DesResponse(correlationId, responseData)) =>
+        if (isAudit) {
+          auditSubmission(RetrieveTaxCalcAuditDetail(userDetails.userType, userDetails.agentReferenceNumber,
+            nino, calcId, correlationId, RetrieveTaxCalcAuditResponse(OK, None, Some(toJson(responseData)))))
         }
+        Ok(toJson(responseData)).withHeaders("X-CorrelationId" -> correlationId)
+      case Left(errorWrapper) =>
+        val correlationId = getCorrelationId(errorWrapper)
+        val result = processError(errorWrapper).withHeaders("X-CorrelationId" -> correlationId)
+        if (isAudit) {
+          auditSubmission(RetrieveTaxCalcAuditDetail(userDetails.userType, userDetails.agentReferenceNumber,
+            nino, calcId, correlationId,
+            RetrieveTaxCalcAuditResponse(result.header.status, Some(errorWrapper.allErrors.map(error => AuditError(error.code))), None)))
+        }
+        result
     }
+  }
+
+  private def processError(errorWrapper: ErrorWrapper): Result = {
+    errorWrapper.error match {
+      case InvalidCalcIDError | InvalidNinoError => BadRequest(Json.toJson(errorWrapper))
+      case CalculationNotReady | NoContentReturned => NoContent
+      case MatchingResourceNotFound => NotFound(Json.toJson(errorWrapper))
+      case _ => InternalServerError(Json.toJson(errorWrapper))
+    }
+  }
+
+  private def getCorrelationId(errorWrapper: ErrorWrapper): String = {
+    errorWrapper.correlationId match {
+      case Some(correlationId) => logger.info("[TaxCalcController][getCorrelationId] - " +
+        s"Error received from DES ${Json.toJson(errorWrapper)} with CorrelationId: $correlationId")
+        correlationId
+      case None =>
+        val correlationId = UUID.randomUUID().toString
+        logger.info("[TaxCalcController][getCorrelationId] - " +
+          s"Validation error: ${Json.toJson(errorWrapper)} with CorrelationId: $correlationId")
+        correlationId
+    }
+  }
+
+  private def auditSubmission[M: Writes](details: RetrieveTaxCalcAuditDetail)
+                                        (implicit hc: HeaderCarrier,
+                                         ec: ExecutionContext): Future[AuditResult] = {
+    val event = AuditEvent("retrieveTaxCalculation", "mtd-tax-calculation", details)
+    auditService.auditEvent(event)
   }
 }

@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-package v2.outcomes
+package v2.models.audit
 
-import v2.models.auth.UserDetails
-import v2.models.errors.{ErrorWrapper, MtdError}
-
-object TaxCalcOutcome {
-
-  type Outcome[M] = Either[ErrorWrapper, DesResponse[M]]
-  type AuthOutcome = Either[MtdError, UserDetails]
-
-  sealed trait TaxCalcError extends MtdError
-}
+case class AuditEvent[T](
+                          auditType: String,
+                          transactionName: String,
+                          detail: T
+                        )

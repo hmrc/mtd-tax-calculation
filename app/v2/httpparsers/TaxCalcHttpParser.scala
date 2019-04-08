@@ -16,17 +16,15 @@
 
 package v2.httpparsers
 
-import play.api.Logger
 import play.api.http.Status._
 import play.api.libs.json.Reads
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
-import v2.models.{TaxCalcMessages, _}
 import v2.models.errors._
+import v2.models.{TaxCalcMessages, _}
+import v2.outcomes.DesResponse
 import v2.outcomes.TaxCalcOutcome.Outcome
 
 object TaxCalcHttpParser extends HttpParser {
-
-  val logger = Logger(this.getClass)
 
   implicit def genericHttpReads[A: Reads]: HttpReads[Outcome[A]] = reads[A]
 
@@ -34,27 +32,32 @@ object TaxCalcHttpParser extends HttpParser {
     override def read(method: String, url: String, response: HttpResponse): Outcome[A] = {
       (response.status, response.jsonOpt) match {
         case (OK, _) => parseResponse(response)
-        case (NO_CONTENT, _) => Left(CalculationNotReady)
-        case (BAD_REQUEST, ErrorCode(DesErrorCode.INVALID_IDENTIFIER)) => Left(InvalidNinoError)
-        case (BAD_REQUEST, ErrorCode(DesErrorCode.INVALID_CALCID)) => Left(InvalidCalcIDError)
-        case (FORBIDDEN, _) => Left(InternalServerError)
-        case (NOT_FOUND, _) => Left(MatchingResourceNotFound)
-        case (INTERNAL_SERVER_ERROR, ErrorCode(DesErrorCode.SERVER_ERROR)) => Left(InternalServerError)
-        case (SERVICE_UNAVAILABLE, ErrorCode(DesErrorCode.SERVICE_UNAVAILABLE)) => Left(InternalServerError)
+        case (NO_CONTENT, _) => Left(ErrorWrapper(Some(retrieveCorrelationId(response)), CalculationNotReady, None))
+        case (BAD_REQUEST, DesError("INVALID_IDENTIFIER")) =>
+          Left(ErrorWrapper(Some(retrieveCorrelationId(response)), InvalidNinoError, None))
+        case (BAD_REQUEST, DesError("INVALID_CALCID")) =>
+          Left(ErrorWrapper(Some(retrieveCorrelationId(response)), InvalidCalcIDError, None))
+        case (FORBIDDEN, _) => Left(ErrorWrapper(Some(retrieveCorrelationId(response)), InternalServerError, None))
+        case (NOT_FOUND, _) => Left(ErrorWrapper(Some(retrieveCorrelationId(response)), MatchingResourceNotFound, None))
+        case (INTERNAL_SERVER_ERROR, DesError("SERVER_ERROR")) =>
+          Left(ErrorWrapper(Some(retrieveCorrelationId(response)), InternalServerError, None))
+        case (SERVICE_UNAVAILABLE, DesError("SERVICE_UNAVAILABLE")) =>
+          Left(ErrorWrapper(Some(retrieveCorrelationId(response)), InternalServerError, None))
         case (_, _) => logger.warn(s"Unexpected error received from DES with status ${response.status} and body ${response.jsonOpt}")
-          Left(InternalServerError)
+          Left(ErrorWrapper(Some(retrieveCorrelationId(response)), InternalServerError, None))
       }
     }
 
     private def parseResponse(response: HttpResponse): Outcome[A] = response.validateJson[A] match {
-      case Some(taxCalc) if taxCalc.isInstanceOf[ITaxCalc] => Right(taxCalc)
+      case Some(taxCalc) if taxCalc.isInstanceOf[ITaxCalc] => Right(DesResponse(retrieveCorrelationId(response), taxCalc))
       case Some(taxCalcMessages) if taxCalcMessages.isInstanceOf[ITaxCalcMessages] =>
+        val correlationId = retrieveCorrelationId(response)
         taxCalcMessages match {
-          case TaxCalcMessages(0, 0, _) => Left(NoContentReturned)
-          case old.TaxCalcMessages(0, 0, _) => Left(NoContentReturned)
-          case _ => Right(taxCalcMessages)
+          case TaxCalcMessages(0, 0, _) => Left(ErrorWrapper(Some(correlationId), NoContentReturned, None))
+          case old.TaxCalcMessages(0, 0, _) => Left(ErrorWrapper(Some(correlationId), NoContentReturned, None))
+          case _ => Right(DesResponse(retrieveCorrelationId(response), taxCalcMessages))
         }
-      case None => Left(InternalServerError)
+      case None => Left(ErrorWrapper(Some(retrieveCorrelationId(response)), InternalServerError, None))
     }
   }
 }

@@ -16,13 +16,4 @@
 
 package v2.outcomes
 
-import v2.models.auth.UserDetails
-import v2.models.errors.{ErrorWrapper, MtdError}
-
-object TaxCalcOutcome {
-
-  type Outcome[M] = Either[ErrorWrapper, DesResponse[M]]
-  type AuthOutcome = Either[MtdError, UserDetails]
-
-  sealed trait TaxCalcError extends MtdError
-}
+case class DesResponse[+T](correlationId: String, responseData: T)

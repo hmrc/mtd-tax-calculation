@@ -17,8 +17,9 @@
 package v2.services
 
 import v2.mocks.connectors.MockTaxCalcConnector
-import v2.models.errors.InvalidCalcIDError
+import v2.models.errors.{ErrorWrapper, InvalidCalcIDError}
 import v2.models.{TaxCalcMessages, TaxCalculation}
+import v2.outcomes.DesResponse
 
 import scala.concurrent.Future
 
@@ -31,14 +32,15 @@ class TaxCalcServiceSpec extends ServiceSpec {
   }
 
   val mtdId = "test-mtdId"
+  val correlationId = "X-123"
 
   "getTaxCalculation" should {
     "return an InvalidCalcId error" when {
       "the supplied calculation ID does not match the internally defined calcID format" in new Test {
         val invalidCalcId = "invalid-calc-id"
 
-        val result = await(service.getTaxCalculation[TaxCalculation](mtdId, invalidCalcId))
-        result shouldBe Left(InvalidCalcIDError)
+        private val result = await(service.getTaxCalculation[TaxCalculation](mtdId, invalidCalcId))
+          result shouldBe Left(ErrorWrapper(None, InvalidCalcIDError, None))
       }
     }
 
@@ -46,11 +48,12 @@ class TaxCalcServiceSpec extends ServiceSpec {
       import v2.fixtures.{TaxCalculationFixture => TestData}
       "a valid calcId is passed and the connector returns a tax calculation" in new Test {
         val calcId = "67918878"
-        MockedTaxCalcConnector.getTaxCalculation[TaxCalculation](mtdId, calcId)
-          .returns(Future.successful(Right(TestData.taxCalc)))
 
-        val result = await(service.getTaxCalculation[TaxCalculation](mtdId, calcId))
-        result shouldBe Right(TestData.taxCalc)
+        MockedTaxCalcConnector.getTaxCalculation[TaxCalculation](mtdId, calcId)
+          .returns(Future.successful(Right(DesResponse(correlationId, TestData.taxCalc))))
+
+        private val result = await(service.getTaxCalculation[TaxCalculation](mtdId, calcId))
+        result shouldBe Right(DesResponse(correlationId, TestData.taxCalc))
       }
     }
   }
@@ -60,8 +63,8 @@ class TaxCalcServiceSpec extends ServiceSpec {
       "the supplied calculation ID does not match the internally defined calcID format" in new Test {
         val invalidCalcId = "invalid-calc-id"
 
-        val result = await(service.getTaxCalculationMessages[TaxCalcMessages](mtdId, invalidCalcId))
-        result shouldBe Left(InvalidCalcIDError)
+        private val result = await(service.getTaxCalculationMessages[TaxCalcMessages](mtdId, invalidCalcId))
+        result shouldBe Left(ErrorWrapper(None, InvalidCalcIDError, None))
       }
     }
 
@@ -70,10 +73,10 @@ class TaxCalcServiceSpec extends ServiceSpec {
       "a valid calcId is passed and the connector returns tax calculation messages" in new Test {
         val calcId = "67918878"
         MockedTaxCalcConnector.getTaxCalculationMessages[TaxCalcMessages](mtdId, calcId)
-          .returns(Future.successful(Right(TestData.taxCalcMessages)))
+          .returns(Future.successful(Right(DesResponse(correlationId, TestData.taxCalcMessages))))
 
-        val result  = await(service.getTaxCalculationMessages[TaxCalcMessages](mtdId, calcId))
-        result shouldBe Right(TestData.taxCalcMessages)
+        private val result  = await(service.getTaxCalculationMessages[TaxCalcMessages](mtdId, calcId))
+        result shouldBe Right(DesResponse(correlationId, TestData.taxCalcMessages))
       }
     }
   }

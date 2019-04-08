@@ -134,6 +134,24 @@ class EnrolmentsAuthServiceSpec extends ServiceSpec {
         result shouldBe expected
       }
     }
+  }
 
+  "calling getAgentReferenceFromEnrolments" should {
+    "return a valid AgentReferenceNumber" when {
+      "a valid agent Enrolment is supplied" in new Test{
+        val expectedArn = "123567890"
+        val actualArn = target.getAgentReferenceFromEnrolments(Enrolments(
+          Set(
+            Enrolment(
+              "HMRC-AS-AGENT",
+              Seq(EnrolmentIdentifier("AgentReferenceNumber", expectedArn)),
+              "Active"
+            )
+          )
+        ))
+
+        actualArn shouldBe Some(expectedArn)
+      }
+    }
   }
 }

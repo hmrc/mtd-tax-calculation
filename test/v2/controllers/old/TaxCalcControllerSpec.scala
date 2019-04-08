@@ -23,21 +23,28 @@ import uk.gov.hmrc.http.HeaderCarrier
 import v2.controllers.{ControllerBaseSpec, TaxCalcController}
 import v2.fixtures.old.{TaxCalcMessagesFixture, TaxCalculationFixture}
 import v2.mocks.MockAppConfig
-import v2.mocks.services.{MockEnrolmentsAuthService, MockMtdIdLookupService, MockTaxCalcService}
+import v2.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockMtdIdLookupService, MockTaxCalcService}
 import v2.models.auth.UserDetails
 import v2.models.errors._
 import v2.models.old.{TaxCalcMessages, TaxCalculation}
+import v2.outcomes.DesResponse
 
 import scala.concurrent.Future
 
 class TaxCalcControllerSpec extends ControllerBaseSpec {
 
-  trait Test extends MockEnrolmentsAuthService with MockMtdIdLookupService with MockTaxCalcService with MockAppConfig {
+  trait Test
+    extends MockEnrolmentsAuthService
+      with MockMtdIdLookupService
+      with MockTaxCalcService
+      with MockAppConfig
+      with MockAuditService {
     val hc = HeaderCarrier()
 
     val mtdId = "test-mtd-id"
     val calcId = "12345678"
     val expected = Right(UserDetails("", "Individual", None))
+    val correlationId = "X-123"
 
     MockedEnrolmentsAuthService.authoriseUser().returns(Future.successful(expected))
     MockedAppConfig.featureSwitch.returns(Some(Configuration("release-2.enabled" -> false)))
@@ -46,12 +53,12 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
       authService = mockEnrolmentsAuthService,
       service = mockTaxCalcService,
       lookupService = mockMtdIdLookupService,
-      appConfig = mockAppConfig
+      appConfig = mockAppConfig,
+      auditService = mockAuditService
     )
   }
 
   val nino = "test-nino"
-
 
 
   "getTaxCalculation - Pre Release 2" should {
@@ -61,7 +68,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
         .returns(Future.successful(Right(mtdId)))
 
       MockedTaxCalcService.getTaxCalculation[TaxCalculation](nino, calcId)
-        .returns(Future.successful(Right(TaxCalculationFixture.taxCalc)))
+        .returns(Future.successful(Right(DesResponse(correlationId, TaxCalculationFixture.taxCalc))))
 
       val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
 
@@ -76,7 +83,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
           .returns(Future.successful(Right(mtdId)))
 
         MockedTaxCalcService.getTaxCalculation[TaxCalculation](nino, calcId)
-          .returns(Future.successful(Left(CalculationNotReady)))
+          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), CalculationNotReady, None))))
 
         private val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
 
@@ -99,7 +106,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
           .returns(Future.successful(Right(mtdId)))
 
         MockedTaxCalcService.getTaxCalculation[TaxCalculation](nino, calcId)
-          .returns(Future.successful(Left(InvalidNinoError)))
+          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), InvalidNinoError, None))))
 
         val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
 
@@ -112,7 +119,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
           .returns(Future.successful(Right(mtdId)))
 
         MockedTaxCalcService.getTaxCalculation[TaxCalculation](nino, calcId)
-          .returns(Future.successful(Left(InvalidCalcIDError)))
+          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), InvalidCalcIDError, None))))
 
         val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
 
@@ -129,7 +136,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
           .returns(Future.successful(Right(mtdId)))
 
         MockedTaxCalcService.getTaxCalculation[TaxCalculation](nino, calcId)
-          .returns(Future.successful(Left(MatchingResourceNotFound)))
+          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), MatchingResourceNotFound, None))))
 
         val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
 
@@ -153,7 +160,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
           .returns(Future.successful(Right(mtdId)))
 
         MockedTaxCalcService.getTaxCalculation[TaxCalculation](nino, calcId)
-          .returns(Future.successful(Left(InternalServerError)))
+          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), InternalServerError, None))))
 
         val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
 
@@ -162,14 +169,14 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
       }
     }
   }
-  
+
   "getTaxCalculationMessages - Pre Release 2" should {
     "return a 200 with the correct body" in new Test {
       MockedMtdIdLookupService.lookup(nino)
         .returns(Future.successful(Right(mtdId)))
 
       MockedTaxCalcService.getTaxCalculationMessages[TaxCalcMessages](nino, calcId)
-        .returns(Future.successful(Right(TaxCalcMessagesFixture.taxCalcMessages)))
+        .returns(Future.successful(Right(DesResponse(correlationId, TaxCalcMessagesFixture.taxCalcMessages))))
 
       val result: Future[Result] = controller.getTaxCalculationMessages(nino, calcId)(fakeRequest)
 
@@ -184,7 +191,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
           .returns(Future.successful(Right(mtdId)))
 
         MockedTaxCalcService.getTaxCalculationMessages[TaxCalcMessages](nino, calcId)
-          .returns(Future.successful(Left(CalculationNotReady)))
+          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), CalculationNotReady, None))))
 
         private val result: Future[Result] = controller.getTaxCalculationMessages(nino, calcId)(fakeRequest)
 
@@ -196,7 +203,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
           .returns(Future.successful(Right(mtdId)))
 
         MockedTaxCalcService.getTaxCalculationMessages[TaxCalcMessages](nino, calcId)
-          .returns(Future.successful(Left(NoContentReturned)))
+          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), NoContentReturned, None))))
 
         private val result: Future[Result] = controller.getTaxCalculationMessages(nino, calcId)(fakeRequest)
 
@@ -219,7 +226,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
           .returns(Future.successful(Right(mtdId)))
 
         MockedTaxCalcService.getTaxCalculationMessages[TaxCalcMessages](nino, calcId)
-          .returns(Future.successful(Left(InvalidNinoError)))
+          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), InvalidNinoError, None))))
 
         val result: Future[Result] = controller.getTaxCalculationMessages(nino, calcId)(fakeRequest)
 
@@ -232,7 +239,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
           .returns(Future.successful(Right(mtdId)))
 
         MockedTaxCalcService.getTaxCalculationMessages[TaxCalcMessages](nino, calcId)
-          .returns(Future.successful(Left(InvalidCalcIDError)))
+          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), InvalidCalcIDError, None))))
 
         val result: Future[Result] = controller.getTaxCalculationMessages(nino, calcId)(fakeRequest)
 
@@ -248,7 +255,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
 
 
         MockedTaxCalcService.getTaxCalculationMessages[TaxCalcMessages](nino, calcId)
-          .returns(Future.successful(Left(MatchingResourceNotFound)))
+          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), MatchingResourceNotFound, None))))
 
         val result: Future[Result] = controller.getTaxCalculationMessages(nino, calcId)(fakeRequest)
 
@@ -273,7 +280,7 @@ class TaxCalcControllerSpec extends ControllerBaseSpec {
 
 
         MockedTaxCalcService.getTaxCalculationMessages[TaxCalcMessages](nino, calcId)
-          .returns(Future.successful(Left(InternalServerError)))
+          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), InternalServerError, None))))
 
         val result: Future[Result] = controller.getTaxCalculationMessages(nino, calcId)(fakeRequest)
 

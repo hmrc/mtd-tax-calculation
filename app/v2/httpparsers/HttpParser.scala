@@ -24,15 +24,17 @@ import scala.util.{Failure, Success, Try}
 
 trait HttpParser {
 
+  val logger: Logger = Logger(this.getClass)
+
   implicit class HttpResponseOps(resp: HttpResponse) {
     def jsonOpt: Option[JsValue] = {
       Try(resp.json) match {
         case Success(json: JsValue) => Some(json)
         case Success(_) =>
-          Logger.warn("No JSON was returned")
+          logger.warn("No JSON was returned")
           None
         case Failure(error) =>
-          Logger.warn(s"Unable to retrieve JSON: ${error.getMessage}")
+          logger.warn(s"Unable to retrieve JSON: ${error.getMessage}")
           None
       }
     }
@@ -43,13 +45,15 @@ trait HttpParser {
       Try(response.json) match {
         case Success(js: JsValue) => js.asOpt[T]
         case Success(_) =>
-          Logger.warn("No JSON was returned")
+          logger.warn("No JSON was returned")
           None
         case Failure(error) =>
-          Logger.warn(s"Unable to parse JSON: ${error.getMessage}")
+          logger.warn(s"Unable to parse JSON: ${error.getMessage}")
           None
       }
     }
   }
+
+  def retrieveCorrelationId(response: HttpResponse): String = response.header("CorrelationId").getOrElse("")
 
 }

@@ -14,15 +14,27 @@
  * limitations under the License.
  */
 
-package v2.outcomes
+package v2.models.errors
 
-import v2.models.auth.UserDetails
-import v2.models.errors.{ErrorWrapper, MtdError}
+import play.api.libs.json.Json
+import support.UnitSpec
 
-object TaxCalcOutcome {
+class ErrorSpec extends UnitSpec{
 
-  type Outcome[M] = Either[ErrorWrapper, DesResponse[M]]
-  type AuthOutcome = Either[MtdError, UserDetails]
+  "reads" should {
+    val error = Error("FORMAT_NINO", "The provided NINO is invalid")
 
-  sealed trait TaxCalcError extends MtdError
+    val json = Json.parse(
+      """
+        |{
+        |   "code": "FORMAT_NINO",
+        |   "reason": "The provided NINO is invalid"
+        |}
+      """.stripMargin
+    )
+
+    "generate the correct JSON" in {
+      json.as[Error] shouldBe error
+    }
+  }
 }

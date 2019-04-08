@@ -18,26 +18,24 @@ package v2.mocks.services
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-import uk.gov.hmrc.auth.core.authorise.Predicate
+import play.api.libs.json.Writes
 import uk.gov.hmrc.http.HeaderCarrier
-import v2.outcomes.TaxCalcOutcome.AuthOutcome
-import v2.services.EnrolmentsAuthService
+import uk.gov.hmrc.play.audit.http.connector.AuditResult
+import v2.models.audit.AuditEvent
+import v2.services.AuditService
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockEnrolmentsAuthService extends MockFactory {
+trait MockAuditService extends MockFactory {
 
-  val mockEnrolmentsAuthService: EnrolmentsAuthService = mock[EnrolmentsAuthService]
+  val mockAuditService: AuditService = stub[AuditService]
 
-  object MockedEnrolmentsAuthService {
-    def authoriseUser(): CallHandler[Future[AuthOutcome]] = {
-      (mockEnrolmentsAuthService.authorised(_: Predicate)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(*, *, *)
-    }
-
-    def authorised(predicate: Predicate): CallHandler[Future[AuthOutcome]] = {
-      (mockEnrolmentsAuthService.authorised(_: Predicate)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(predicate, *, *)
+  object MockedAuditService {
+    def verifyAuditEvent[T](event: AuditEvent[T])(implicit ec: ExecutionContext): CallHandler[Future[AuditResult]] = {
+      (mockAuditService.auditEvent(_: AuditEvent[T])(_: HeaderCarrier, _: ExecutionContext, _: Writes[T]))
+        .verify(event, *, *, *)
+        .returning(Future.successful(AuditResult.Success))
     }
   }
+
 }

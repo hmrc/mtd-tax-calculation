@@ -17,7 +17,6 @@
 package v2.fixtures.old
 
 import play.api.libs.json.{JsValue, Json}
-import v2.models.errors.DesErrorCode.DesErrorCode
 import v2.models.old._
 
 object TaxCalculationFixture {
@@ -665,7 +664,7 @@ object TaxCalculationFixture {
       |}
     """.stripMargin)
 
-  def v3_2DesTaxCalcErrorJson(errors: (DesErrorCode, String)*): JsValue = {
+  def v3_2DesTaxCalcErrorJson(errors: (String, String)*): JsValue = {
     if(errors.size > 1) {
       Json.obj("failures" -> Json.arr(errors.map {
         case (code, reason) => Json.obj("code" -> code, "reason" -> reason)

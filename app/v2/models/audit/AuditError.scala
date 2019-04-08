@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package v2.outcomes
+package v2.models.audit
 
-import v2.models.auth.UserDetails
-import v2.models.errors.{ErrorWrapper, MtdError}
+import play.api.libs.json.{Json, OWrites}
 
-object TaxCalcOutcome {
+case class AuditError(errorCode: String)
 
-  type Outcome[M] = Either[ErrorWrapper, DesResponse[M]]
-  type AuthOutcome = Either[MtdError, UserDetails]
-
-  sealed trait TaxCalcError extends MtdError
+object AuditError {
+  implicit val format: OWrites[AuditError] = Json.writes[AuditError]
 }

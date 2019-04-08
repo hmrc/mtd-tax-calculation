@@ -14,15 +14,28 @@
  * limitations under the License.
  */
 
-package v2.outcomes
+package v2.models.audit
 
-import v2.models.auth.UserDetails
-import v2.models.errors.{ErrorWrapper, MtdError}
+import play.api.libs.json.Json
+import support.UnitSpec
 
-object TaxCalcOutcome {
+class AuditErrorSpec extends UnitSpec {
 
-  type Outcome[M] = Either[ErrorWrapper, DesResponse[M]]
-  type AuthOutcome = Either[MtdError, UserDetails]
+  private val auditError = AuditError("FORMAT_NINO")
 
-  sealed trait TaxCalcError extends MtdError
+  "writes" when {
+    "passed an audit error model" should {
+      "produce valid json" in {
+
+         val json = Json.parse(
+          s"""
+             |{
+             |  "errorCode": "FORMAT_NINO"
+             |}
+           """.stripMargin)
+
+        Json.toJson(auditError) shouldBe json
+      }
+    }
+  }
 }

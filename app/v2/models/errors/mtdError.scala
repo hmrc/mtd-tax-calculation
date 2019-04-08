@@ -17,14 +17,15 @@
 package v2.models.errors
 
 import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 trait MtdError
 
 case class Error(code: String, message: String) extends MtdError
 
 //2xx
-object CalculationNotReady extends MtdError
-object NoContentReturned extends MtdError
+object CalculationNotReady extends Error("NO_CONTENT", "Calculation not ready")
+object NoContentReturned extends Error("NO_CONTENT", "No content returned")
 
 //4xx
 object InvalidNinoError extends Error("FORMAT_NINO", "The format of the National Insurance number is invalid")
@@ -35,14 +36,9 @@ object MatchingResourceNotFound extends Error("MATCHING_RESOURCE_NOT_FOUND", "Ma
 object InternalServerError extends Error("INTERNAL_SERVER_ERROR", "An internal server error occurred")
 
 object Error {
-  implicit val format: OFormat[Error] = Json.format[Error]
-}
-object MtdError {
-  implicit val mtdErrorWrites: Writes[MtdError] =
-    new Writes[MtdError]{
-      def writes(o: MtdError): JsValue = o match {
-        case error: Error => Error.format.writes(error)
-        case _: MtdError => JsNull
-      }
-    }
+  implicit val writes: Writes[Error] = Json.writes[Error]
+  implicit val reads: Reads[Error] = (
+    (__ \ "code").read[String] and
+      (__ \ "reason").read[String]
+    ) (Error.apply _)
 }
