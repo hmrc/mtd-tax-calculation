@@ -34,6 +34,8 @@ class IncomeTaxBandSpec extends JsonErrorValidators with UnitSpec {
       rate = rate,
       threshold = Some(threshold),
       apportionedThreshold = Some(apportionedThreshold),
+      bandLimit = Some(200),
+      apportionedBandLimit = Some(300),
       income = 1000.00,
       amount = 2000.00
     )
@@ -44,6 +46,8 @@ class IncomeTaxBandSpec extends JsonErrorValidators with UnitSpec {
       rate = rate,
       threshold = None,
       apportionedThreshold = None,
+      bandLimit = None,
+      apportionedBandLimit = None,
       income = 1000.00,
       amount = 2000.00
     )
@@ -55,6 +59,8 @@ class IncomeTaxBandSpec extends JsonErrorValidators with UnitSpec {
        | "rate": 10,
        | "threshold" : 4,
        | "apportionedThreshold" : 10,
+       | "bandLimit" : 200,
+       | "apportionedBandLimit" : 300,
        | "income" : 1000.00,
        | "amount" : 2000.00
        |}
@@ -77,6 +83,8 @@ class IncomeTaxBandSpec extends JsonErrorValidators with UnitSpec {
        | "rate": 10,
        | "threshold" : 4,
        | "apportionedThreshold" : 10,
+       | "bandLimit" : 200,
+       | "apportionedBandLimit" : 300,
        | "income" : 1000.00,
        | "taxAmount" : 2000.00
        |}
@@ -134,6 +142,18 @@ class IncomeTaxBandSpec extends JsonErrorValidators with UnitSpec {
         property = "taxAmount",
         invalidValue = "\"nan\"",
         errorPathAndError = ".taxAmount" -> NUMBER_FORMAT_EXCEPTION
+      )
+
+      testPropertyType[IncomeTaxBand](incomeTaxBandDesJson)(
+        property = "bandLimit",
+        invalidValue = "\"nan\"",
+        errorPathAndError = ".bandLimit" -> JSNUMBER_FORMAT_EXCEPTION
+      )
+
+      testPropertyType[IncomeTaxBand](incomeTaxBandDesJson)(
+        property = "apportionedBandLimit",
+        invalidValue = "\"nan\"",
+        errorPathAndError = ".apportionedBandLimit" -> JSNUMBER_FORMAT_EXCEPTION
       )
     }
   }

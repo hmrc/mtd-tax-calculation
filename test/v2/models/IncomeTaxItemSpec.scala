@@ -34,6 +34,8 @@ class IncomeTaxItemSpec extends JsonErrorValidators with UnitSpec {
       rate = rate,
       threshold = Some(threshold),
       apportionedThreshold = Some(apportionedThreshold),
+      bandLimit = Some(200),
+      apportionedBandLimit = Some(300),
       income = 1000.00,
       amount = 2000.00
     )
@@ -64,6 +66,8 @@ class IncomeTaxItemSpec extends JsonErrorValidators with UnitSpec {
        |    "rate": 10,
        |    "threshold" : 4,
        |    "apportionedThreshold" : 10,
+       |    "bandLimit": 200,
+       |    "apportionedBandLimit": 300,
        |    "income" : 1000.00,
        |    "amount" : 2000.00
        |  },
@@ -72,6 +76,8 @@ class IncomeTaxItemSpec extends JsonErrorValidators with UnitSpec {
        |    "rate": 10,
        |    "threshold" : 4,
        |    "apportionedThreshold" : 10,
+       |    "bandLimit": 200,
+       |    "apportionedBandLimit": 300,
        |    "income" : 2000.00,
        |    "amount" : 2000.00
        |  }
@@ -91,6 +97,8 @@ class IncomeTaxItemSpec extends JsonErrorValidators with UnitSpec {
        |    "rate": 10,
        |    "threshold" : 4,
        |    "apportionedThreshold" : 10,
+       |    "bandLimit": 200,
+       |    "apportionedBandLimit": 300,
        |    "income" : 1000.00,
        |    "amount" : 2000.00
        |  }
@@ -110,6 +118,8 @@ class IncomeTaxItemSpec extends JsonErrorValidators with UnitSpec {
        |    "rate": 10,
        |    "threshold" : 4,
        |    "apportionedThreshold" : 10,
+       |    "bandLimit": 200,
+       |    "apportionedBandLimit": 300,
        |    "income" : 1000.00,
        |    "taxAmount" : 2000.00
        |  }
@@ -136,6 +146,8 @@ class IncomeTaxItemSpec extends JsonErrorValidators with UnitSpec {
        |    "rate": 10,
        |    "threshold" : 4,
        |    "apportionedThreshold" : 10,
+       |    "bandLimit": 200,
+       |    "apportionedBandLimit": 300,
        |    "income" : 1000.00,
        |    "amount" : 2000.00
        |  }
@@ -154,6 +166,8 @@ class IncomeTaxItemSpec extends JsonErrorValidators with UnitSpec {
        |    "rate": 10,
        |    "threshold" : 4,
        |    "apportionedThreshold" : 10,
+       |    "bandLimit": 200,
+       |    "apportionedBandLimit": 300,
        |    "income" : 1000.00,
        |    "taxAmount" : 2000.00
        |  }
@@ -173,6 +187,8 @@ class IncomeTaxItemSpec extends JsonErrorValidators with UnitSpec {
        |    "rate": 10,
        |    "threshold" : 4,
        |    "apportionedThreshold" : 10,
+       |    "bandLimit": 200,
+       |    "apportionedBandLimit": 300,
        |    "income" : 1000.00,
        |    "taxAmount" : 2000.00
        |  },
@@ -181,6 +197,8 @@ class IncomeTaxItemSpec extends JsonErrorValidators with UnitSpec {
        |    "rate": 10,
        |    "threshold" : 4,
        |    "apportionedThreshold" : 10,
+       |    "bandLimit": 200,
+       |    "apportionedBandLimit": 300,
        |    "income" : 2000.00,
        |    "taxAmount" : 2000.00
        |  }

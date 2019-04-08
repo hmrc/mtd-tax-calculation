@@ -100,8 +100,10 @@ object TaxCalculationFixture {
           IncomeTaxBand(
             name = "ZRT",
             rate = 99.99,
-            threshold = Some(99999999),
-            apportionedThreshold = Some(99999999),
+            threshold = Some(99999999999L),
+            apportionedThreshold = Some(99999999999L),
+            bandLimit = Some(1000),
+            apportionedBandLimit = Some(1000),
             income = 1000.25,
             amount = 1000.25
           )
@@ -115,8 +117,10 @@ object TaxCalculationFixture {
           IncomeTaxBand(
             name = "BRT",
             rate = 99.99,
-            threshold = Some(99999999),
-            apportionedThreshold = Some(99999999),
+            threshold = Some(99999999999L),
+            apportionedThreshold = Some(99999999999L),
+            bandLimit = Some(1000),
+            apportionedBandLimit = Some(1000),
             income = 1000.25,
             amount = 1000.25
           )
@@ -130,8 +134,10 @@ object TaxCalculationFixture {
           IncomeTaxBand(
             name = "HRT",
             rate = 99.99,
-            threshold = Some(99999999),
-            apportionedThreshold = Some(99999999),
+            threshold = Some(99999999999L),
+            apportionedThreshold = Some(99999999999L),
+            bandLimit = Some(1000),
+            apportionedBandLimit = Some(1000),
             income = 1000.25,
             amount = 1000.25
           )
@@ -319,8 +325,10 @@ object TaxCalculationFixture {
       |        {
       |          "name": "ZRT",
       |          "rate": 99.99,
-      |          "threshold": 99999999,
-      |          "apportionedThreshold": 99999999,
+      |          "threshold": 99999999999,
+      |          "apportionedThreshold": 99999999999,
+      |          "bandLimit": 1000,
+      |          "apportionedBandLimit": 1000,
       |          "income": 1000.25,
       |          "amount": 1000.25
       |        }
@@ -334,8 +342,10 @@ object TaxCalculationFixture {
       |        {
       |          "name": "BRT",
       |          "rate": 99.99,
-      |          "threshold": 99999999,
-      |          "apportionedThreshold": 99999999,
+      |          "threshold": 99999999999,
+      |          "apportionedThreshold": 99999999999,
+      |          "bandLimit": 1000,
+      |          "apportionedBandLimit": 1000,
       |          "income": 1000.25,
       |          "amount": 1000.25
       |        }
@@ -349,8 +359,10 @@ object TaxCalculationFixture {
       |        {
       |          "name": "HRT",
       |          "rate": 99.99,
-      |          "threshold": 99999999,
-      |          "apportionedThreshold": 99999999,
+      |          "threshold": 99999999999,
+      |          "apportionedThreshold": 99999999999,
+      |          "bandLimit": 1000,
+      |          "apportionedBandLimit": 1000,
       |          "income": 1000.25,
       |          "amount": 1000.25
       |        }
@@ -613,8 +625,10 @@ object TaxCalculationFixture {
       |            {
       |              "name": "ZRT",
       |              "rate": 99.99,
-      |              "threshold": 99999999,
-      |              "apportionedThreshold": 99999999,
+      |              "threshold": 99999999999,
+      |              "apportionedThreshold": 99999999999,
+      |              "bandLimit": 1000,
+      |              "apportionedBandLimit": 1000,
       |              "income": 1000.25,
       |              "taxAmount": 1000.25
       |            }
@@ -628,8 +642,10 @@ object TaxCalculationFixture {
       |            {
       |              "name": "BRT",
       |              "rate": 99.99,
-      |              "threshold": 99999999,
-      |              "apportionedThreshold": 99999999,
+      |              "threshold": 99999999999,
+      |              "apportionedThreshold": 99999999999,
+      |              "bandLimit": 1000,
+      |              "apportionedBandLimit": 1000,
       |              "income": 1000.25,
       |              "taxAmount": 1000.25
       |            }
@@ -643,8 +659,10 @@ object TaxCalculationFixture {
       |            {
       |              "name": "HRT",
       |              "rate": 99.99,
-      |              "threshold": 99999999,
-      |              "apportionedThreshold": 99999999,
+      |              "threshold": 99999999999,
+      |              "apportionedThreshold": 99999999999,
+      |              "bandLimit": 1000,
+      |              "apportionedBandLimit": 1000,
       |              "income": 1000.25,
       |              "taxAmount": 1000.25
       |            }

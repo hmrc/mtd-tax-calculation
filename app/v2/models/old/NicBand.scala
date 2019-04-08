@@ -22,8 +22,8 @@ import play.api.libs.json.{Json, _}
 
 case class NicBand(name: String,
                    rate: BigDecimal,
-                   threshold: Option[Int],
-                   apportionedThreshold: Option[Int],
+                   threshold: Option[Long],
+                   apportionedThreshold: Option[Long],
                    income: BigDecimal,
                    amount: BigDecimal)
 
@@ -33,8 +33,8 @@ object NicBand {
   implicit val reads: Reads[NicBand] = (
     (__ \ "name").read[String] and
       (__ \ "rate").read[BigDecimal] and
-      (__ \ "threshold").readNullable[Int] and
-      (__ \ "apportionedThreshold").readNullable[Int] and
+      (__ \ "threshold").readNullable[Long] and
+      (__ \ "apportionedThreshold").readNullable[Long] and
       (__ \ "income").read[BigDecimal] and
       (__ \ "amount").read[BigDecimal]
     ) (NicBand.apply _)

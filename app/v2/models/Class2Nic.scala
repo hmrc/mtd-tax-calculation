@@ -23,8 +23,8 @@ import play.api.libs.json.{Json, _}
 case class Class2Nic(amount: BigDecimal,
                      weekRate: BigDecimal,
                      weeks: Int,
-                     limit: Int,
-                     apportionedLimit: Int)
+                     limit: Long,
+                     apportionedLimit: Long)
 
 object Class2Nic {
   implicit val writes: Writes[Class2Nic] = Json.writes[Class2Nic]
@@ -33,8 +33,8 @@ object Class2Nic {
     (__ \ "amount").read[BigDecimal] and
       (__ \ "weekRate").read[BigDecimal] and
       (__ \ "weeks").read[Int] and
-      (__ \ "limit").read[Int] and
-      (__ \ "apportionedLimit").read[Int]
+      (__ \ "limit").read[Long] and
+      (__ \ "apportionedLimit").read[Long]
     ) (Class2Nic.apply _)
 
 }
