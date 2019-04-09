@@ -17,7 +17,7 @@
 package v2.httpparsers
 
 import play.api.http.Status._
-import play.api.libs.json.Reads
+import play.api.libs.json.{Reads, __}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 import v2.models.errors._
 import v2.models.{TaxCalcMessages, _}
@@ -30,21 +30,16 @@ object TaxCalcHttpParser extends HttpParser {
 
   private def reads[A: Reads] = new HttpReads[Outcome[A]] {
     override def read(method: String, url: String, response: HttpResponse): Outcome[A] = {
-      (response.status, response.jsonOpt) match {
-        case (OK, _) => parseResponse(response)
-        case (NO_CONTENT, _) => Left(ErrorWrapper(Some(retrieveCorrelationId(response)), CalculationNotReady, None))
-        case (BAD_REQUEST, DesError("INVALID_IDENTIFIER")) =>
-          Left(ErrorWrapper(Some(retrieveCorrelationId(response)), InvalidNinoError, None))
-        case (BAD_REQUEST, DesError("INVALID_CALCID")) =>
-          Left(ErrorWrapper(Some(retrieveCorrelationId(response)), InvalidCalcIDError, None))
-        case (FORBIDDEN, _) => Left(ErrorWrapper(Some(retrieveCorrelationId(response)), InternalServerError, None))
-        case (NOT_FOUND, _) => Left(ErrorWrapper(Some(retrieveCorrelationId(response)), MatchingResourceNotFound, None))
-        case (INTERNAL_SERVER_ERROR, DesError("SERVER_ERROR")) =>
-          Left(ErrorWrapper(Some(retrieveCorrelationId(response)), InternalServerError, None))
-        case (SERVICE_UNAVAILABLE, DesError("SERVICE_UNAVAILABLE")) =>
-          Left(ErrorWrapper(Some(retrieveCorrelationId(response)), InternalServerError, None))
-        case (_, _) => logger.warn(s"Unexpected error received from DES with status ${response.status} and body ${response.jsonOpt}")
-          Left(ErrorWrapper(Some(retrieveCorrelationId(response)), InternalServerError, None))
+      response.status match {
+        case OK => parseResponse(response)
+        case NO_CONTENT => Left(ErrorWrapper(Some(retrieveCorrelationId(response)), CalculationNotReady, None))
+        case BAD_REQUEST => Left(parseError(response))
+        case FORBIDDEN => Left(ErrorWrapper(Some(retrieveCorrelationId(response)), InternalServerError, None))
+        case NOT_FOUND => Left(ErrorWrapper(Some(retrieveCorrelationId(response)), MatchingResourceNotFound, None))
+        case INTERNAL_SERVER_ERROR | SERVICE_UNAVAILABLE =>
+          Left(parseError(response))
+        case _ => logger.info(s"Unexpected error received from DES with status ${response.status} and body ${response.body}")
+          Left(parseError(response))
       }
     }
 
@@ -59,5 +54,25 @@ object TaxCalcHttpParser extends HttpParser {
         }
       case None => Left(ErrorWrapper(Some(retrieveCorrelationId(response)), InternalServerError, None))
     }
+
+    private def parseError(response: HttpResponse): ErrorWrapper = {
+      val errorReads: Reads[Option[String]] = (__ \ "code").readNullable[String]
+      val default = ErrorWrapper(Some(retrieveCorrelationId(response)), InternalServerError, None)
+
+      response.validateJson(errorReads).fold(default) {
+        case Some(error) => ErrorWrapper(Some(retrieveCorrelationId(response)), desErrorToMtdErrorCreate(error), None)
+        case _ => default
+      }
+    }
+  }
+
+  private def desErrorToMtdErrorCreate: Map[String, Error] = Map(
+    "INVALID_IDENTIFIER" -> InvalidNinoError,
+    "INVALID_CALCID" -> InvalidCalcIDError,
+    "SERVER_ERROR" -> InternalServerError,
+    "SERVICE_UNAVAILABLE" -> InternalServerError
+  ).withDefault { error =>
+    logger.info(s"[TaxCalcHttpParser] [desErrorToMtdErrorCreate] - No mapping found for error code $error")
+    InternalServerError
   }
 }

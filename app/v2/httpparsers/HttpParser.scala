@@ -26,20 +26,6 @@ trait HttpParser {
 
   val logger: Logger = Logger(this.getClass)
 
-  implicit class HttpResponseOps(resp: HttpResponse) {
-    def jsonOpt: Option[JsValue] = {
-      Try(resp.json) match {
-        case Success(json: JsValue) => Some(json)
-        case Success(_) =>
-          logger.warn("No JSON was returned")
-          None
-        case Failure(error) =>
-          logger.warn(s"Unable to retrieve JSON: ${error.getMessage}")
-          None
-      }
-    }
-  }
-
   implicit class JsonResponseOps(response: HttpResponse) {
     def validateJson[T](implicit reads: Reads[T]): Option[T] = {
       Try(response.json) match {

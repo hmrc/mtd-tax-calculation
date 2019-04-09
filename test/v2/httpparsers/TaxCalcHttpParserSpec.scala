@@ -16,7 +16,7 @@
 
 package v2.httpparsers
 
-import play.api.libs.json.{JsNull, Json}
+import play.api.libs.json.Json
 import play.api.test.Helpers._
 import support.UnitSpec
 import uk.gov.hmrc.http.HttpResponse
@@ -135,9 +135,26 @@ class TaxCalcHttpParserSpec extends UnitSpec {
         result shouldBe Left(ErrorWrapper(Some(correlationId),InternalServerError, None))
       }
 
-      "the HttpResponse contains a 500 status and with non json body" in {
+      "the HttpResponse contains a 500 status and with no json body" in {
 
-        val response = HttpResponse(INTERNAL_SERVER_ERROR , null, Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(INTERNAL_SERVER_ERROR, null, Map("CorrelationId" -> Seq(correlationId)))
+        val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
+
+        result shouldBe Left(ErrorWrapper(Some(correlationId),InternalServerError, None))
+      }
+
+      "the HttpResponse contains a 500 status and with invalid DES error code" in {
+
+        val response = HttpResponse(INTERNAL_SERVER_ERROR, Some(DESErrorsFixture.invalidErrorCodeJson),
+          Map("CorrelationId" -> Seq(correlationId)))
+        val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
+
+        result shouldBe Left(ErrorWrapper(Some(correlationId),InternalServerError, None))
+      }
+
+      "the HttpResponse contains a 502 status" in {
+        val json = Json.obj("code" -> "code", "reason" -> "reason")
+        val response = HttpResponse(BAD_GATEWAY , Some(json), Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),InternalServerError, None))

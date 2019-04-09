@@ -36,5 +36,5 @@ object DESErrorsFixture {
   val notFoundJson: JsValue = desError("NOT_FOUND")
   val serverErrorJson: JsValue = desError("SERVER_ERROR")
   val serviceUnavailableJson: JsValue = desError("SERVICE_UNAVAILABLE")
-
+  val invalidErrorCodeJson: JsValue = desError("INVALID_NINO")
 }
