@@ -29,7 +29,6 @@ case class EoyEstimate(employments: Option[Seq[EoyEmployment]],
                        nic4: BigDecimal,
                        totalNicAmount: BigDecimal,
                        incomeTaxNicAmount: BigDecimal,
-                       charitableGiving: Option[EoyCharitableGiving],
                        savings: Option[Seq[EoySavings]])
 
 object EoyEstimate {
@@ -52,7 +51,6 @@ object EoyEstimate {
         ukProperty = None,
         ukDividends = None,
         totalTaxableIncome, incomeTaxAmount, nic2, nic4, totalNicAmount, incomeTaxNicAmount,
-        charitableGiving = None,
         savings = None
       )
 
@@ -63,7 +61,6 @@ object EoyEstimate {
           case "02" => old.copy(ukProperty = Some(json.as[EoyItem]))
           case "10" => old.copy(ukDividends = Some(json.as[EoyItem]))
           case "09" => old.copy(savings = Some(old.savings.getOrElse(Seq()) ++  Seq(json.as[EoySavings])))
-          case "98" => old.copy(charitableGiving = Some(json.as[EoyCharitableGiving]))
           case _ => old
         }
       }
