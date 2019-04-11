@@ -124,7 +124,6 @@ class EoyEstimateSpec extends UnitSpec with JsonErrorValidators {
       |  "selfEmployments" : [${validEoyItemInputJson.as[JsObject] + ("selfEmploymentId" -> Json.parse("\"Some ID\""))}],
       |  "ukProperty" : $validEoyItemInputJson,
       |  "ukDividends" : $validEoyItemInputJson,
-      |  "charitableGiving" : ${validEoyItemInputJson.as[JsObject] - "finalised"},
       |  "savings" : [${validEoyItemInputJson.as[JsObject]  - "finalised" + ("savingsAccountId" -> Json.parse("\"Some ID\""))}],
       |  "totalTaxableIncome": 123.45,
       |  "incomeTaxAmount": 123.45,

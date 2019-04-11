@@ -87,7 +87,7 @@ object TaxCalculationFixture {
       totalIncomeReceived = 1000.25,
       allowancesAndDeductions = AllowancesAndDeductions(
         totalAllowancesAndDeductions = 1000.25,
-        giftOfInvestmentsAndPropertyToCharity = Some(1000.25),
+            giftOfInvestmentsAndPropertyToCharity = Some(1000.25),
         apportionedPersonalAllowance = 1000.25
       ),
       totalTaxableIncome = Some(1000.25)
@@ -433,10 +433,6 @@ object TaxCalculationFixture {
       |      "taxableIncome": 99999999.99,
       |      "supplied": true,
       |      "finalised": true
-      |    },
-      |    "charitableGiving": {
-      |      "taxableIncome": 99999999.99,
-      |      "supplied": true
       |    },
       |    "savings": [{
       |      "savingsAccountId": "Some ID",
