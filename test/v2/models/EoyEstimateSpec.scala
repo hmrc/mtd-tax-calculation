@@ -41,7 +41,6 @@ class EoyEstimateSpec extends UnitSpec with JsonErrorValidators {
     finalised = Some(true)
   )
 
-  val charitableGiving = Some(EoyCharitableGiving(1234567.89, supplied = true))
   val savings = EoySavings("Some ID", 1234567.89, supplied = true)
 
   val validEoyEstimateModel = EoyEstimate(
@@ -49,7 +48,6 @@ class EoyEstimateSpec extends UnitSpec with JsonErrorValidators {
     selfEmployments = Some(Seq(validEoySelfEmploymentModel)),
     ukProperty = Some(validEoyItemModel),
     ukDividends = Some(validEoyItemModel),
-    charitableGiving = charitableGiving,
     savings = Some(Seq(savings)),
     totalTaxableIncome= 123.45,
     incomeTaxAmount= 123.45,
@@ -190,7 +188,7 @@ class EoyEstimateSpec extends UnitSpec with JsonErrorValidators {
     "only mandatory fields exist" in {
       val json = Json.parse(validEoyEstimateJson).as[JsObject] - "incomeSource" + ("incomeSource" -> JsArray.apply())
       val model = validEoyEstimateModel.copy(employments = None, selfEmployments = None, ukProperty = None, ukDividends = None,
-        charitableGiving = None, savings = None)
+        savings = None)
       json.as[EoyEstimate] shouldBe model
     }
 

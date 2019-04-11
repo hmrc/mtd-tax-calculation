@@ -212,10 +212,6 @@ object TaxCalculationFixture {
         supplied = true,
         finalised = Some(true)
       )),
-      charitableGiving = Some(EoyCharitableGiving(
-        taxableIncome = 99999999.99,
-        supplied = true
-      )),
       savings = Some(Seq(EoySavings(
         savingsAccountId = "Some ID",
         taxableIncome = 99999999.99,
