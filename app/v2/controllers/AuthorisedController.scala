@@ -15,7 +15,6 @@
  */
 
 package v2.controllers
-
 import play.api.libs.json.Json
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.Enrolment
@@ -27,15 +26,15 @@ import v2.models.errors.{InvalidNinoError, UnauthorisedError}
 import v2.outcomes.MtdIdLookupOutcome._
 import v2.services.{EnrolmentsAuthService, MtdIdLookupService}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-abstract class AuthorisedController extends BaseController {
+abstract class AuthorisedController(implicit ec: ExecutionContext) extends BaseController {
 
   val authService: EnrolmentsAuthService
   val lookupService: MtdIdLookupService
 
-  case class UserRequest[A](userDetails: UserDetails, request: Request[A]) extends WrappedRequest[A](request)
+  case class UserRequest[A](userDetails: UserDetails, request: Request[A])(implicit ec: ExecutionContext)
+    extends WrappedRequest[A](request)
 
   def authorisedAction(nino: String): ActionBuilder[UserRequest] = new ActionBuilder[UserRequest] {
 

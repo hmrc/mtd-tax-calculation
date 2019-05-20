@@ -33,7 +33,6 @@ import v2.models.errors._
 import v2.outcomes.TaxCalcOutcome.Outcome
 import v2.services.{AuditService, EnrolmentsAuthService, MtdIdLookupService, TaxCalcService}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -42,7 +41,7 @@ class TaxCalcController @Inject()(val authService: EnrolmentsAuthService,
                                   service: TaxCalcService,
                                   appConfig: AppConfig,
                                   auditService: AuditService
-                                 ) extends AuthorisedController {
+                                 )(implicit ec: ExecutionContext) extends AuthorisedController {
 
   private val featureSwitch = FeatureSwitch(appConfig.featureSwitch)
 

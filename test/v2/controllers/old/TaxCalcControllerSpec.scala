@@ -29,6 +29,7 @@ import v2.models.errors._
 import v2.models.old.{TaxCalcMessages, TaxCalculation}
 import v2.outcomes.DesResponse
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class TaxCalcControllerSpec extends ControllerBaseSpec {
