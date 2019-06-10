@@ -17,10 +17,10 @@
 package v2.connectors
 
 import uk.gov.hmrc.http.HttpResponse
-import v2.fixtures.old.{TaxCalcMessagesFixture, TaxCalculationFixture}
+import v2.fixtures.{TaxCalcMessagesFixture, TaxCalculationFixture}
 import v2.mocks.{MockAppConfig, MockHttpClient}
 import v2.models.errors.{ErrorWrapper, MatchingResourceNotFound}
-import v2.models.old.{TaxCalcMessages, TaxCalculation}
+import v2.models.{TaxCalcMessages, TaxCalculation}
 import v2.outcomes.DesResponse
 import v2.outcomes.TaxCalcOutcome.Outcome
 

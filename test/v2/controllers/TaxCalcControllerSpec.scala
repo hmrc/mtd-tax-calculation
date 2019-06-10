@@ -48,8 +48,6 @@ class TaxCalcControllerSpec extends ControllerBaseSpec
     val expected = Right(UserDetails("", "Individual", None))
     val correlationId = "X-123"
 
-    MockedAppConfig.featureSwitch.returns(Some(Configuration("release-2.enabled" -> true)))
-
     lazy val controller = new TaxCalcController(
       authService = mockEnrolmentsAuthService,
       service = mockTaxCalcService,

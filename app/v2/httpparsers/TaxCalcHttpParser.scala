@@ -49,7 +49,6 @@ object TaxCalcHttpParser extends HttpParser {
         val correlationId = retrieveCorrelationId(response)
         taxCalcMessages match {
           case TaxCalcMessages(0, 0, _) => Left(ErrorWrapper(Some(correlationId), NoContentReturned, None))
-          case old.TaxCalcMessages(0, 0, _) => Left(ErrorWrapper(Some(correlationId), NoContentReturned, None))
           case _ => Right(DesResponse(retrieveCorrelationId(response), taxCalcMessages))
         }
       case None => Left(ErrorWrapper(Some(retrieveCorrelationId(response)), InternalServerError, None))

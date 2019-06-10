@@ -22,9 +22,4 @@ case class FeatureSwitch(value: Option[Configuration]) {
 
   val DEFAULT_VALUE = false
 
-  def isRelease2Enabled: Boolean = value match {
-    case Some(config) => config.getBoolean("release-2.enabled").getOrElse(DEFAULT_VALUE)
-    case None => DEFAULT_VALUE
-  }
-
 }

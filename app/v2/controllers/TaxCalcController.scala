@@ -25,7 +25,7 @@ import play.api.libs.json.{Json, Writes}
 import play.api.mvc.{Action, AnyContent, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
-import v2.config.{AppConfig, FeatureSwitch}
+import v2.config.AppConfig
 import v2.models._
 import v2.models.audit._
 import v2.models.auth.UserDetails
@@ -43,28 +43,17 @@ class TaxCalcController @Inject()(val authService: EnrolmentsAuthService,
                                   auditService: AuditService
                                  )(implicit ec: ExecutionContext) extends AuthorisedController {
 
-  private val featureSwitch = FeatureSwitch(appConfig.featureSwitch)
-
   val logger: Logger = Logger(this.getClass)
 
   def getTaxCalculation(nino: String, calcId: String): Action[AnyContent] = authorisedAction(nino).async { implicit request =>
 
-    if (featureSwitch.isRelease2Enabled) {
-      get[TaxCalculation](nino, calcId, request.userDetails, true)(service.getTaxCalculation(_, _))
-    } else {
-      get[old.TaxCalculation](nino, calcId, request.userDetails, false)(service.getTaxCalculation(_, _))
-    }
+    get[TaxCalculation](nino, calcId, request.userDetails, true)(service.getTaxCalculation(_, _))
 
   }
 
   def getTaxCalculationMessages(nino: String, calcId: String): Action[AnyContent] = authorisedAction(nino).async { implicit request =>
 
-    if (featureSwitch.isRelease2Enabled) {
-      get[TaxCalcMessages](nino, calcId, request.userDetails, false)(service.getTaxCalculationMessages(_, _))
-    } else {
-      get[old.TaxCalcMessages](nino, calcId, request.userDetails, false)(service.getTaxCalculationMessages(_, _))
-    }
-
+    get[TaxCalcMessages](nino, calcId, request.userDetails, false)(service.getTaxCalculationMessages(_, _))
 
   }
 

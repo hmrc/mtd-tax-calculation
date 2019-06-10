@@ -23,7 +23,7 @@ import uk.gov.hmrc.http.HttpResponse
 import v2.fixtures.{DESErrorsFixture, TaxCalcMessagesFixture, TaxCalculationFixture}
 import v2.httpparsers.TaxCalcHttpParser.genericHttpReads
 import v2.models.errors._
-import v2.models.{TaxCalcMessages, TaxCalculation, old}
+import v2.models.{TaxCalcMessages, TaxCalculation}
 import v2.outcomes.DesResponse
 
 class TaxCalcHttpParserSpec extends UnitSpec {
@@ -176,15 +176,6 @@ class TaxCalcHttpParserSpec extends UnitSpec {
       "the HttpResponse contains a 200 status and response body warning and error counts of 0" in {
         val response = HttpResponse(OK, Some(TaxCalcMessagesFixture.taxCalcDesNoWarningsAndErrors), Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
-
-        result shouldBe Left(ErrorWrapper(Some(correlationId),NoContentReturned, None))
-      }
-    }
-
-    "return a NoContent response for old tax calc" when {
-      "the HttpResponse contains a 200 status and response body warning and error counts of 0" in {
-        val response = HttpResponse(OK, Some(TaxCalcMessagesFixture.taxCalcDesNoWarningsAndErrors), Map("CorrelationId" -> Seq(correlationId)))
-        val result = genericHttpReads[old.TaxCalcMessages].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),NoContentReturned, None))
       }

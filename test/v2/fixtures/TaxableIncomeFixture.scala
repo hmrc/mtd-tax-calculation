@@ -17,7 +17,7 @@
 package v2.fixtures
 
 import play.api.libs.json.{JsValue, Json}
-import v2.models.{AllowancesAndDeductions, Employment, Employments, SavingsIncome, SelfEmployment, SelfEmployments, TaxableIncome, TaxedSavingsAccount, UKDividends, UKProperty, UntaxedSavingsAccount}
+import v2.models._
 
 trait TaxableIncomeFixture {
 
