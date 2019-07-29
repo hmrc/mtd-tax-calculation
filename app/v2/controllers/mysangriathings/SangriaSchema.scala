@@ -24,7 +24,7 @@ import v2.models.TaxCalculation
 class SangriaSchema {
   private def QueryType(implicit responseData: TaxCalculation) = ObjectType("Query", fields[TaxCalculation, Unit](
     Field("taxCalc", TaxCalculation.TaxCalculationType,
-      description = Some("Returns the tac calculation"),
+      description = Some("Returns the tax calculation"),
       resolve = _.ctx
     )
   ))
