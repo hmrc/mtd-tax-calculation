@@ -21,6 +21,9 @@ import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
 val appName = "mtd-tax-calculation"
 
+libraryDependencies += "org.sangria-graphql" %% "sangria" % "1.4.2"
+libraryDependencies += "org.sangria-graphql" %% "sangria-play-json" % "1.0.5"
+
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
   .settings(
