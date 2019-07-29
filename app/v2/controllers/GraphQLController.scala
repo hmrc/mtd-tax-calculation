@@ -67,7 +67,6 @@ class GraphQLController @Inject()(val authService: EnrolmentsAuthService,
   import sangria.marshalling.playJson._
 
   private def executeGraphQLQuery(query: ast.Document)(implicit responseData: TaxCalculation): Future[Result] = {
-    println(scala.Console.YELLOW + SchemaRenderer.renderSchema(sangriaSchema.schema) + scala.Console.RESET)
     Executor.execute(sangriaSchema.schema, query, responseData)
       .map(Ok(_))
       .recover {
