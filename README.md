@@ -4,13 +4,231 @@
 
 This service retrieves the MTD tax calculation.
 
-sbt "~run 9770"
+`sbt run`
 
 ## GRAPHQL ENDPOINT
 
 Hit `POST /ni/:nino/calculations/:calcId` with your graphql request in the request body.
 
-Schema:
+### Example
+
+All fields (requires Gov-Test-Scenario `ALL_FIELDS_TEST_ONLY` to get data for all fields):
+
+```
+POST http://localhost:9770/2.0/ni/CA009235A/calculations/041f7e4d-87d9-4d4a-a296-3cfbdf92f7e2
+
+{
+  taxCalc {
+    year
+    intentToCrystallise
+    crystallised
+    validationMessageCount
+    incomeTaxAndNicYTD
+    nationalRegime
+    totalBeforeTaxDeducted
+    calculationMessageCount
+    taxableIncome {
+      totalIncomeReceived
+      totalTaxableIncome
+      employments {
+        totalIncome
+        totalPay
+        totalBenefitsAndExpenses
+        totalAllowableExpenses
+        employment {
+          employmentId
+          netPay
+          benefitsAndExpenses
+          allowableExpenses
+        }
+      }
+      selfEmployments {
+        totalIncome
+        selfEmployment {
+          selfEmploymentId
+          taxableIncome
+          finalised
+          losses
+        }
+      }
+      ukProperty {
+        totalIncome
+        nonFurnishedHolidayLettingsTaxableProfit
+        nonFurnishedHolidayLettingsLoss
+        furnishedHolidayLettingsTaxableProfit
+        furnishedHolidayLettingsLoss
+        finalised
+      }
+      ukDividends {
+        totalIncome
+        ukDividends
+        otherUkDividends
+      }
+      savings {
+				totalIncome
+        totalTaxedInterestIncome
+        totalUntaxedInterestIncome
+        taxedAccounts {
+          savingsAccountId
+          name
+          gross
+          net
+          taxDeducted
+        }
+        untaxedAccounts {
+          savingsAccountId
+          name
+          gross
+        }
+      }
+      allowancesAndDeductions {
+        totalAllowancesAndDeductions
+        giftOfInvestmentsAndPropertyToCharity
+        apportionedPersonalAllowance
+      }
+    }
+    incomeTax {
+      taxableIncome
+      totalBeforeReliefs
+      totalAfterReliefs
+      totalAfterGiftAid
+      totalIncomeTax
+      payAndPensionsProfit {
+        totalAmount
+        personalAllowanceUsed
+        taxableIncome
+        band {
+          name
+          rate
+          threshold
+          apportionedThreshold
+          bandLimit
+          apportionedBandLimit
+          income
+          amount
+        }
+      }
+      savingsAndGains {
+        totalAmount
+        personalAllowanceUsed
+        taxableIncome
+        band {
+          name
+          rate
+          threshold
+          apportionedThreshold
+          bandLimit
+          apportionedBandLimit
+          income
+          amount
+        }
+      }
+      dividends {
+        totalAmount
+        personalAllowanceUsed
+        taxableIncome
+        band {
+          name
+          rate
+          threshold
+          apportionedThreshold
+          bandLimit
+          apportionedBandLimit
+          income
+          amount
+        }
+      }
+      allowancesAndReliefs {
+        propertyFinanceRelief
+        totalAllowancesAndReliefs
+      }
+      giftAid {
+        paymentsMade
+        rate
+        taxableAmount
+      }
+      residentialFinanceCosts {
+        amountClaimed
+        allowableAmount
+        rate
+      }
+    }
+    nic {
+      totalNic
+      class2 {
+        amount
+        weeks
+        weekRate
+        limit
+        apportionedLimit
+      }
+      class4 {
+        totalAmount
+        band {
+          name
+  				rate
+  				threshold
+  				apportionedThreshold
+  				income
+  				amount
+        }
+      }
+    }
+    taxDeducted {
+      ukLandAndProperty
+  		savings
+  		totalTaxDeducted
+    }
+    eoyEstimate {
+      totalTaxableIncome
+  		incomeTaxAmount
+      nic2
+  		nic4
+  		totalNicAmount
+  		incomeTaxNicAmount
+  		employments {
+        employmentId
+				taxableIncome
+				supplied
+				finalised
+      }
+  		selfEmployments {
+        selfEmploymentId
+				taxableIncome
+				supplied
+				finalised
+      }
+ 		  ukProperty {
+        taxableIncome
+				supplied
+				finalised
+      }
+  		ukDividends {
+        taxableIncome
+				supplied
+				finalised
+      }
+  		savings {
+        savingsAccountId
+				taxableIncome
+				supplied
+      }
+    }
+    calculationMessages {
+      type
+			text
+    }
+    annualAllowances {
+      personalAllowance
+			personalAllowanceThreshold
+			reducedPersonalAllowance
+			giftAidExtender
+    }
+  }
+}
+```
+
+### Schema
 
 ```
 type AllowancesAndDeductions {
