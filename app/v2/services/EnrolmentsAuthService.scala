@@ -24,10 +24,10 @@ import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrievals._
 import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.http.HeaderCarrier
-import v2.models.auth.UserDetails
-import v2.models.errors.UnauthorisedError
-import v2.outcomes.MtdIdLookupOutcome.DownstreamError
-import v2.outcomes.TaxCalcOutcome.AuthOutcome
+import _root_.v2.models.auth.UserDetails
+import _root_.v2.models.errors.UnauthorisedError
+import _root_.v2.outcomes.MtdIdLookupOutcome.DownstreamError
+import _root_.v2.outcomes.TaxCalcOutcome.AuthOutcome
 
 import scala.concurrent.{ExecutionContext, Future}
 
