@@ -35,7 +35,7 @@ class AuthorisedControllerSpec extends ControllerBaseSpec {
   trait Test extends MockEnrolmentsAuthService with MockMtdIdLookupService {
     val hc = HeaderCarrier()
 
-    class TestController extends AuthorisedController {
+    class TestController extends AuthorisedController(cc) {
       override val authService: EnrolmentsAuthService = mockEnrolmentsAuthService
       override val lookupService: MtdIdLookupService = mockMtdIdLookupService
 

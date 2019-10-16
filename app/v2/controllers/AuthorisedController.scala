@@ -20,7 +20,7 @@ import play.api.mvc._
 import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.controller.BackendController
 import v2.models.auth.UserDetails
 import v2.models.errors.{InvalidNinoError, UnauthorisedError}
 import v2.outcomes.MtdIdLookupOutcome._
@@ -28,7 +28,7 @@ import v2.services.{EnrolmentsAuthService, MtdIdLookupService}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class AuthorisedController(implicit ec: ExecutionContext) extends BaseController {
+abstract class AuthorisedController(cc: ControllerComponents)(implicit ec: ExecutionContext) extends BackendController(cc) {
 
   val authService: EnrolmentsAuthService
   val lookupService: MtdIdLookupService
@@ -36,7 +36,11 @@ abstract class AuthorisedController(implicit ec: ExecutionContext) extends BaseC
   case class UserRequest[A](userDetails: UserDetails, request: Request[A])(implicit ec: ExecutionContext)
     extends WrappedRequest[A](request)
 
-  def authorisedAction(nino: String): ActionBuilder[UserRequest] = new ActionBuilder[UserRequest] {
+  def authorisedAction(nino: String): ActionBuilder[UserRequest, AnyContent] = new ActionBuilder[UserRequest, AnyContent] {
+
+    override def parser: BodyParser[AnyContent] = cc.parsers.defaultBodyParser
+
+    override protected def executionContext: ExecutionContext = cc.executionContext
 
     def predicate(mtdId: String): Predicate = Enrolment("HMRC-MTD-IT")
       .withIdentifier("MTDITID", mtdId)
@@ -61,7 +65,7 @@ abstract class AuthorisedController(implicit ec: ExecutionContext) extends BaseC
         case Right(mtdId) => invokeBlockWithAuthCheck(mtdId, request, block)
         case Left(InvalidNinoError) => Future.successful(BadRequest(Json.toJson(InvalidNinoError)))
         case Left(UnauthorisedError) => Future.successful(Forbidden(Json.toJson(Unauthorised.error)))
-        case Left(DownstreamError) => Future.successful(InternalServerError(Json.toJson(DownstreamError.error)))
+        case Left(_) => Future.successful(InternalServerError(Json.toJson(DownstreamError.error)))
       }
     }
   }

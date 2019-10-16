@@ -16,9 +16,9 @@
 
 package v2
 
-import play.api.data.validation.ValidationError
 import play.api.libs.json._
 
+import scala.annotation.tailrec
 import scala.concurrent.Future
 
 package object models {
@@ -40,8 +40,9 @@ package object models {
     }
 
     def applyTillLastNested(json: JsValue): Either[JsError, JsResult[JsValue]] = {
-      def singleJsError(msg: String) = JsError(Seq(jsPath -> Seq(ValidationError(msg))))
+      def singleJsError(msg: String) = JsError(Seq(jsPath -> Seq(JsonValidationError(msg))))
 
+      @tailrec
       def step(pathNodes: List[PathNode], json: JsValue): Either[JsError, JsResult[JsValue]] = pathNodes match {
         case Nil => Left(singleJsError("error.path.empty"))
         case node :: Nil => node(json) match {
