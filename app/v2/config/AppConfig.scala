@@ -17,7 +17,7 @@
 package v2.config
 
 import javax.inject.{Inject, Singleton}
-import play.api.{Configuration, Environment}
+import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 trait AppConfig {
@@ -29,8 +29,8 @@ trait AppConfig {
 }
 
 @Singleton
-class AppConfigImpl @Inject()(servicesConfig: ServicesConfig, environment: Environment,
-                          config: Configuration) extends AppConfig {
+class AppConfigImpl @Inject()(servicesConfig: ServicesConfig,
+                              config: Configuration) extends AppConfig {
 
   val desBaseUrl: String = servicesConfig.baseUrl("des")
   val mtdIdBaseUrl: String = servicesConfig.baseUrl("mtd-id-lookup")
