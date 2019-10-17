@@ -16,7 +16,6 @@
 
 package v2.controllers
 
-import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc.Result
 import uk.gov.hmrc.http.HeaderCarrier
@@ -53,7 +52,8 @@ class TaxCalcControllerSpec extends ControllerBaseSpec
       service = mockTaxCalcService,
       lookupService = mockMtdIdLookupService,
       appConfig = mockAppConfig,
-      auditService = mockAuditService
+      auditService = mockAuditService,
+      cc = cc
     )
   }
 

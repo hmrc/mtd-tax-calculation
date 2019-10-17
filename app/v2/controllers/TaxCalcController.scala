@@ -22,7 +22,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{Json, Writes}
-import play.api.mvc.{Action, AnyContent, Result}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import v2.config.AppConfig
@@ -40,20 +40,21 @@ class TaxCalcController @Inject()(val authService: EnrolmentsAuthService,
                                   val lookupService: MtdIdLookupService,
                                   service: TaxCalcService,
                                   appConfig: AppConfig,
-                                  auditService: AuditService
-                                 )(implicit ec: ExecutionContext) extends AuthorisedController {
+                                  auditService: AuditService,
+                                  cc: ControllerComponents
+                                 )(implicit ec: ExecutionContext) extends AuthorisedController(cc) {
 
   val logger: Logger = Logger(this.getClass)
 
   def getTaxCalculation(nino: String, calcId: String): Action[AnyContent] = authorisedAction(nino).async { implicit request =>
 
-    get[TaxCalculation](nino, calcId, request.userDetails, true)(service.getTaxCalculation(_, _))
+    get[TaxCalculation](nino, calcId, request.userDetails, isAudit = true)(service.getTaxCalculation(_, _))
 
   }
 
   def getTaxCalculationMessages(nino: String, calcId: String): Action[AnyContent] = authorisedAction(nino).async { implicit request =>
 
-    get[TaxCalcMessages](nino, calcId, request.userDetails, false)(service.getTaxCalculationMessages(_, _))
+    get[TaxCalcMessages](nino, calcId, request.userDetails, isAudit = false)(service.getTaxCalculationMessages(_, _))
 
   }
 
