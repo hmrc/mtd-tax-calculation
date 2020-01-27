@@ -24,11 +24,14 @@ object AppDependencies {
     ws,
     "uk.gov.hmrc"   %% "bootstrap-play-26"    % "1.3.0",
     "uk.gov.hmrc"   %% "domain"               % "5.6.0-play-26",
-    "org.typelevel" %% "cats-core" % "1.6.0"
+    "org.typelevel" %% "cats-core" % "2.1.0",
+    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.4.4" cross CrossVersion.full),
+    "com.github.ghik" % "silencer-lib" % "1.4.4" % Provided cross CrossVersion.full
   )
 
   def test(scope: String = "test, it"): Seq[sbt.ModuleID] = Seq(
-    "org.scalatest" %% "scalatest" % "3.0.5" % scope,
+    "org.scalatest" %% "scalatest" % "3.1.0" % scope,
+    "com.vladsch.flexmark" % "flexmark-all" % "0.35.10" % scope,
     "org.scalamock" %% "scalamock" % "4.1.0" % scope,
     "org.pegdown" % "pegdown" % "1.6.0" % scope,
 
@@ -38,9 +41,9 @@ object AppDependencies {
   )
 
   // Fixes a transitive dependency clash between wiremock and scalatestplus-play
-  val overrides: Set[ModuleID] = {
+  val overrides: Seq[ModuleID] = {
     val jettyFromWiremockVersion = "9.2.24.v20180105"
-    Set(
+    Seq(
       "org.eclipse.jetty"           % "jetty-client"       % jettyFromWiremockVersion,
       "org.eclipse.jetty"           % "jetty-continuation" % jettyFromWiremockVersion,
       "org.eclipse.jetty"           % "jetty-http"         % jettyFromWiremockVersion,

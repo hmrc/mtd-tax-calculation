@@ -33,7 +33,7 @@ abstract class AuthorisedController(cc: ControllerComponents)(implicit ec: Execu
   val authService: EnrolmentsAuthService
   val lookupService: MtdIdLookupService
 
-  case class UserRequest[A](userDetails: UserDetails, request: Request[A])(implicit ec: ExecutionContext)
+  case class UserRequest[A](userDetails: UserDetails, request: Request[A])
     extends WrappedRequest[A](request)
 
   def authorisedAction(nino: String): ActionBuilder[UserRequest, AnyContent] = new ActionBuilder[UserRequest, AnyContent] {

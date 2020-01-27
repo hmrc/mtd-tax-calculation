@@ -16,8 +16,6 @@
 
 package v2.services
 
-import java.util.UUID
-
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.libs.json.Reads
@@ -40,7 +38,7 @@ class TaxCalcService @Inject()(connector: TaxCalcConnector) {
     get[A](nino, calcId)(connector.getTaxCalculationMessages)
 
   private def get[A:Reads](nino: String, calcId: String)
-                            (f: (String,String) => Future[Outcome[A]])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Outcome[A]] = {
+                            (f: (String,String) => Future[Outcome[A]]): Future[Outcome[A]] = {
     if (!calcId.matches(calcIdRegex)) {
       Logger.warn(s"[TaxCalcService] [get] Invalid CalculationID supplied.")
       Future.successful(Left(ErrorWrapper(None, InvalidCalcIDError, None)))
