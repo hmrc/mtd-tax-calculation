@@ -23,21 +23,21 @@ object AppDependencies {
   val compile: Seq[ModuleID] = Seq(
     ws,
     "uk.gov.hmrc"   %% "bootstrap-play-26"    % "1.5.0",
-    "uk.gov.hmrc"   %% "domain"               % "5.6.0-play-26",
-    "org.typelevel" %% "cats-core" % "2.1.0",
-    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.4.4" cross CrossVersion.full),
-    "com.github.ghik" % "silencer-lib" % "1.4.4" % Provided cross CrossVersion.full
+    "uk.gov.hmrc"   %% "domain"               % "5.9.0-play-26",
+    "org.typelevel" %% "cats-core" % "2.2.0",
+    compilerPlugin("com.github.ghik" % "silencer-plugin" % "1.6.0" cross CrossVersion.full),
+    "com.github.ghik" % "silencer-lib" % "1.6.0" % Provided cross CrossVersion.full
   )
 
   def test(scope: String = "test, it"): Seq[sbt.ModuleID] = Seq(
-    "org.scalatest" %% "scalatest" % "3.1.0" % scope,
+    "org.scalatest" %% "scalatest" % "3.2.0" % scope,
     "com.vladsch.flexmark" % "flexmark-all" % "0.35.10" % scope,
-    "org.scalamock" %% "scalamock" % "4.1.0" % scope,
+    "org.scalamock" %% "scalamock" % "5.0.0" % scope,
     "org.pegdown" % "pegdown" % "1.6.0" % scope,
 
     "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
     "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % scope,
-    "com.github.tomakehurst" % "wiremock" % "2.22.0" % scope
+    "com.github.tomakehurst" % "wiremock" % "2.27.2" % scope
   )
 
   // Fixes a transitive dependency clash between wiremock and scalatestplus-play
