@@ -36,7 +36,7 @@ class TaxCalcHttpParserSpec extends UnitSpec {
 
     "return a TaxCalculation model" when {
       "the HttpResponse contains a 200 status and correct response body" in {
-        val response = HttpResponse(OK, Some(TaxCalculationFixture.taxCalcDesJson), Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(OK, TaxCalculationFixture.taxCalcDesJson, Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalculation].read(method, url, response)
 
         result shouldBe Right(DesResponse(correlationId, TaxCalculationFixture.taxCalc))
@@ -45,7 +45,7 @@ class TaxCalcHttpParserSpec extends UnitSpec {
 
     "return a NotReady response" when {
       "the HttpResponse contains a 204 status" in {
-        val response = HttpResponse(NO_CONTENT, None, Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(NO_CONTENT, "", Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalculation].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId), CalculationNotReady, None))
@@ -54,7 +54,7 @@ class TaxCalcHttpParserSpec extends UnitSpec {
 
     "return an Invalid NINO error" when {
       "the HttpResponse contains a 400 status and InvalidNino code" in {
-        val response = HttpResponse(BAD_REQUEST, Some(DESErrorsFixture.invalidIdentifierJson), Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(BAD_REQUEST, DESErrorsFixture.invalidIdentifierJson, Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalculation].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),InvalidNinoError, None))
@@ -63,7 +63,7 @@ class TaxCalcHttpParserSpec extends UnitSpec {
 
     "return an Invalid CalcID error" when {
       "the HttpResponse contains a 400 status and InvalidCalcID code" in {
-        val response = HttpResponse(BAD_REQUEST, Some(DESErrorsFixture.invalidCalcIDJson), Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(BAD_REQUEST, DESErrorsFixture.invalidCalcIDJson, Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalculation].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),InvalidCalcIDError, None))
@@ -72,7 +72,7 @@ class TaxCalcHttpParserSpec extends UnitSpec {
 
     "return a Not Found error" when {
       "the HttpResponse contains a 404 status and NotFound code" in {
-        val response = HttpResponse(NOT_FOUND, Some(DESErrorsFixture.notFoundJson), Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(NOT_FOUND, DESErrorsFixture.notFoundJson, Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalculation].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),MatchingResourceNotFound, None))
@@ -83,7 +83,7 @@ class TaxCalcHttpParserSpec extends UnitSpec {
           "INVALID_IDENTIFIER" -> "some reason",
           "INVALID_CALCID" -> "some reason"
         )
-        val response = HttpResponse(NOT_FOUND, Some(errorListJson), Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(NOT_FOUND, errorListJson, Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalculation].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),MatchingResourceNotFound, None))
@@ -92,35 +92,35 @@ class TaxCalcHttpParserSpec extends UnitSpec {
 
     "return an Internal Server Error" when {
       "the HttpResponse contains a 403 status" in {
-        val response = HttpResponse(FORBIDDEN, None, Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(FORBIDDEN, "", Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalculation].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),InternalServerError, None))
       }
 
       "the HttpResponse contains a 500 status and ServerError code" in {
-        val response = HttpResponse(INTERNAL_SERVER_ERROR, Some(DESErrorsFixture.serverErrorJson), Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(INTERNAL_SERVER_ERROR, DESErrorsFixture.serverErrorJson, Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalculation].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),InternalServerError, None))
       }
 
       "the HttpResponse contains a 500 status and ServiceUnavailable code" in {
-        val response = HttpResponse(INTERNAL_SERVER_ERROR, Some(DESErrorsFixture.serviceUnavailableJson), Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(INTERNAL_SERVER_ERROR, DESErrorsFixture.serviceUnavailableJson, Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalculation].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),InternalServerError, None))
       }
 
       "the HttpResponse contains a 200 status and invalid json" in {
-        val response = HttpResponse(OK, Some(null), Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(OK, "", Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalculation].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),InternalServerError, None))
       }
 
       "the HttpResponse contains a 200 status and no json" in {
-        val response = HttpResponse(OK, null, Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(OK, "", Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalculation].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),InternalServerError, None))
@@ -129,7 +129,7 @@ class TaxCalcHttpParserSpec extends UnitSpec {
       "the HttpResponse contains a 500 status and with invalid json" in {
         val json = Json.obj("code1" -> "code", "reason" -> "reason")
 
-        val response = HttpResponse(INTERNAL_SERVER_ERROR , Some(json), Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(INTERNAL_SERVER_ERROR , json, Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),InternalServerError, None))
@@ -137,7 +137,7 @@ class TaxCalcHttpParserSpec extends UnitSpec {
 
       "the HttpResponse contains a 500 status and with no json body" in {
 
-        val response = HttpResponse(INTERNAL_SERVER_ERROR, null, Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(INTERNAL_SERVER_ERROR, "", Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),InternalServerError, None))
@@ -145,7 +145,7 @@ class TaxCalcHttpParserSpec extends UnitSpec {
 
       "the HttpResponse contains a 500 status and with invalid DES error code" in {
 
-        val response = HttpResponse(INTERNAL_SERVER_ERROR, Some(DESErrorsFixture.invalidErrorCodeJson),
+        val response = HttpResponse(INTERNAL_SERVER_ERROR, DESErrorsFixture.invalidErrorCodeJson,
           Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
 
@@ -154,7 +154,7 @@ class TaxCalcHttpParserSpec extends UnitSpec {
 
       "the HttpResponse contains a 502 status" in {
         val json = Json.obj("code" -> "code", "reason" -> "reason")
-        val response = HttpResponse(BAD_GATEWAY , Some(json), Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(BAD_GATEWAY , json, Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),InternalServerError, None))
@@ -165,7 +165,7 @@ class TaxCalcHttpParserSpec extends UnitSpec {
   "read taxCalcMessages" should {
     "return a TaxCalculationMessages model" when {
       "the HttpResponse contains a 200 status and correct response body" in {
-        val response = HttpResponse(OK, Some(TaxCalcMessagesFixture.taxCalcDesWarningsAndErrors), Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(OK, TaxCalcMessagesFixture.taxCalcDesWarningsAndErrors, Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
 
         result shouldBe Right(DesResponse(correlationId, TaxCalcMessagesFixture.taxCalcMessages))
@@ -174,7 +174,7 @@ class TaxCalcHttpParserSpec extends UnitSpec {
 
     "return a NoContent response" when {
       "the HttpResponse contains a 200 status and response body warning and error counts of 0" in {
-        val response = HttpResponse(OK, Some(TaxCalcMessagesFixture.taxCalcDesNoWarningsAndErrors), Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(OK, TaxCalcMessagesFixture.taxCalcDesNoWarningsAndErrors, Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),NoContentReturned, None))
@@ -183,7 +183,7 @@ class TaxCalcHttpParserSpec extends UnitSpec {
 
     "return a NotReady response" when {
       "the HttpResponse contains a 204 status" in {
-        val response = HttpResponse(NO_CONTENT, None, Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(NO_CONTENT, "", Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),CalculationNotReady, None))
@@ -192,7 +192,7 @@ class TaxCalcHttpParserSpec extends UnitSpec {
 
     "return an Invalid NINO error" when {
       "the HttpResponse contains a 400 status and InvalidNino code" in {
-        val response = HttpResponse(BAD_REQUEST, Some(DESErrorsFixture.invalidIdentifierJson), Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(BAD_REQUEST, DESErrorsFixture.invalidIdentifierJson, Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),InvalidNinoError, None))
@@ -201,7 +201,7 @@ class TaxCalcHttpParserSpec extends UnitSpec {
 
     "return an Invalid CalcID error" when {
       "the HttpResponse contains a 400 status and InvalidCalcID code" in {
-        val response = HttpResponse(BAD_REQUEST, Some(DESErrorsFixture.invalidCalcIDJson), Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(BAD_REQUEST, DESErrorsFixture.invalidCalcIDJson, Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),InvalidCalcIDError, None))
@@ -211,7 +211,7 @@ class TaxCalcHttpParserSpec extends UnitSpec {
 
     "return a Not Found error" when {
       "the HttpResponse contains a 404 status and NotFound code" in {
-        val response = HttpResponse(NOT_FOUND, Some(DESErrorsFixture.notFoundJson), Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(NOT_FOUND, DESErrorsFixture.notFoundJson, Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),MatchingResourceNotFound, None))
@@ -222,7 +222,7 @@ class TaxCalcHttpParserSpec extends UnitSpec {
           "INVALID_IDENTIFIER" -> "some reason",
           "INVALID_CALCID" -> "some reason"
         )
-        val response = HttpResponse(NOT_FOUND, Some(errorListJson), Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(NOT_FOUND, errorListJson, Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),MatchingResourceNotFound, None))
@@ -231,21 +231,21 @@ class TaxCalcHttpParserSpec extends UnitSpec {
 
     "return an Internal Server Error" when {
       "the HttpResponse contains a 403 status" in {
-        val response = HttpResponse(FORBIDDEN, None, Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(FORBIDDEN, "", Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),InternalServerError, None))
       }
 
       "the HttpResponse contains a 500 status and ServerError code" in {
-        val response = HttpResponse(INTERNAL_SERVER_ERROR, Some(DESErrorsFixture.serverErrorJson), Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(INTERNAL_SERVER_ERROR, DESErrorsFixture.serverErrorJson, Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),InternalServerError, None))
       }
 
       "the HttpResponse contains a 503 status and ServiceUnavailable code" in {
-        val response = HttpResponse(SERVICE_UNAVAILABLE, Some(DESErrorsFixture.serviceUnavailableJson), Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(SERVICE_UNAVAILABLE, DESErrorsFixture.serviceUnavailableJson, Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),InternalServerError, None))
@@ -254,7 +254,7 @@ class TaxCalcHttpParserSpec extends UnitSpec {
       "the HttpResponse contains a 500 status and with invalid json" in {
         val errorListJson = Json.obj("code1" -> "code", "reason" -> "reason")
 
-        val response = HttpResponse(INTERNAL_SERVER_ERROR , Some(errorListJson), Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(INTERNAL_SERVER_ERROR , errorListJson, Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),InternalServerError, None))
@@ -262,7 +262,7 @@ class TaxCalcHttpParserSpec extends UnitSpec {
 
       "the HttpResponse contains a 500 status and with non json body" in {
 
-        val response = HttpResponse(INTERNAL_SERVER_ERROR , null, Map("CorrelationId" -> Seq(correlationId)))
+        val response = HttpResponse(INTERNAL_SERVER_ERROR , "", Map("CorrelationId" -> Seq(correlationId)))
         val result = genericHttpReads[TaxCalcMessages].read(method, url, response)
 
         result shouldBe Left(ErrorWrapper(Some(correlationId),InternalServerError, None))
