@@ -32,22 +32,21 @@ class TaxCalcServiceSpec extends ServiceSpec {
   }
 
   val mtdId = "test-mtdId"
-  val correlationId = "X-123"
 
   "getTaxCalculation" should {
     "return an InvalidCalcId error" when {
       "the supplied calculation ID does not match the internally defined calcID format" in new Test {
-        val invalidCalcId = "invalid-calc-id"
+        val invalidCalcId: String = "invalid-calc-id"
 
         private val result = await(service.getTaxCalculation[TaxCalculation](mtdId, invalidCalcId))
-          result shouldBe Left(ErrorWrapper(None, InvalidCalcIDError, None))
+          result shouldBe Left(ErrorWrapper(correlationId, InvalidCalcIDError, None))
       }
     }
 
     "return a TaxCalculation" when {
       import v2.fixtures.{TaxCalculationFixture => TestData}
       "a valid calcId is passed and the connector returns a tax calculation" in new Test {
-        val calcId = "67918878"
+        val calcId: String = "67918878"
 
         MockedTaxCalcConnector.getTaxCalculation[TaxCalculation](mtdId, calcId)
           .returns(Future.successful(Right(DesResponse(correlationId, TestData.taxCalc))))
@@ -61,17 +60,18 @@ class TaxCalcServiceSpec extends ServiceSpec {
   "getTaxCalculationMessages" should {
     "return an InvalidCalcId error" when {
       "the supplied calculation ID does not match the internally defined calcID format" in new Test {
-        val invalidCalcId = "invalid-calc-id"
+        val invalidCalcId: String = "invalid-calc-id"
 
         private val result = await(service.getTaxCalculationMessages[TaxCalcMessages](mtdId, invalidCalcId))
-        result shouldBe Left(ErrorWrapper(None, InvalidCalcIDError, None))
+        result shouldBe Left(ErrorWrapper(correlationId, InvalidCalcIDError, None))
       }
     }
 
     "return a TaxCalculationMessage" when {
       import v2.fixtures.{TaxCalcMessagesFixture => TestData}
       "a valid calcId is passed and the connector returns tax calculation messages" in new Test {
-        val calcId = "67918878"
+        val calcId: String = "67918878"
+
         MockedTaxCalcConnector.getTaxCalculationMessages[TaxCalcMessages](mtdId, calcId)
           .returns(Future.successful(Right(DesResponse(correlationId, TestData.taxCalcMessages))))
 

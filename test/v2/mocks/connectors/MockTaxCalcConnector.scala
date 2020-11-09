@@ -31,13 +31,13 @@ trait MockTaxCalcConnector extends MockFactory {
 
   object MockedTaxCalcConnector {
     def getTaxCalculation[A: Reads](mtdid: String, calcId: String): CallHandler[Future[Outcome[A]]] = {
-      (mockTaxCalcConnector.getTaxCalculation(_: String, _: String)(_: Reads[A], _: HeaderCarrier, _: ExecutionContext))
-        .expects(mtdid, calcId, *, *, *)
+      (mockTaxCalcConnector.getTaxCalculation(_: String, _: String)(_: Reads[A], _: HeaderCarrier, _: ExecutionContext, _: String))
+        .expects(mtdid, calcId, *, *, *, *)
     }
 
     def getTaxCalculationMessages[A: Reads](mtdid: String, calcId: String): CallHandler[Future[Outcome[A]]] = {
-      (mockTaxCalcConnector.getTaxCalculationMessages(_: String, _: String)(_: Reads[A], _: HeaderCarrier, _: ExecutionContext))
-        .expects(mtdid, calcId, *, *, *)
+      (mockTaxCalcConnector.getTaxCalculationMessages(_: String, _: String)(_: Reads[A], _: HeaderCarrier, _: ExecutionContext, _: String))
+        .expects(mtdid, calcId, *, *, *, *)
     }
   }
 

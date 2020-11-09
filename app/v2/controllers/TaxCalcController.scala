@@ -16,10 +16,7 @@
 
 package v2.controllers
 
-import java.util.UUID
-
 import javax.inject.{Inject, Singleton}
-import play.api.Logger
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{Json, Writes}
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
@@ -32,6 +29,7 @@ import v2.models.auth.UserDetails
 import v2.models.errors._
 import v2.outcomes.TaxCalcOutcome.Outcome
 import v2.services.{AuditService, EnrolmentsAuthService, MtdIdLookupService, TaxCalcService}
+import v2.utils.{IdGenerator, Logging}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -41,12 +39,22 @@ class TaxCalcController @Inject()(val authService: EnrolmentsAuthService,
                                   service: TaxCalcService,
                                   appConfig: AppConfig,
                                   auditService: AuditService,
-                                  cc: ControllerComponents
-                                 )(implicit ec: ExecutionContext) extends AuthorisedController(cc) {
+                                  cc: ControllerComponents,
+                                  val idGenerator: IdGenerator)(implicit ec: ExecutionContext)
+  extends AuthorisedController(cc) with Logging {
 
-  val logger: Logger = Logger(this.getClass)
+  implicit val endpointLogContext: EndpointLogContext =
+    EndpointLogContext(
+      controllerName = "TaxCalcController",
+      endpointName = "retrieveTaxCalculation"
+    )
 
   def getTaxCalculation(nino: String, calcId: String): Action[AnyContent] = authorisedAction(nino).async { implicit request =>
+
+    implicit val correlationId: String = idGenerator.generateCorrelationId
+    logger.info(
+      s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
+        s"with CorrelationId: $correlationId")
 
     get[TaxCalculation](nino, calcId, request.userDetails, isAudit = true)(service.getTaxCalculation(_, _))
 
@@ -54,25 +62,42 @@ class TaxCalcController @Inject()(val authService: EnrolmentsAuthService,
 
   def getTaxCalculationMessages(nino: String, calcId: String): Action[AnyContent] = authorisedAction(nino).async { implicit request =>
 
+    implicit val endpointLogContext: EndpointLogContext =
+      EndpointLogContext(
+        controllerName = "TaxCalcController",
+        endpointName = "retrieveTaxCalculationMessages"
+      )
+
+    implicit val correlationId: String = idGenerator.generateCorrelationId
+    logger.info(
+      s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] " +
+        s"with CorrelationId: $correlationId")
+
     get[TaxCalcMessages](nino, calcId, request.userDetails, isAudit = false)(service.getTaxCalculationMessages(_, _))
 
   }
 
   private def get[M:Writes](nino: String, calcId: String, userDetails: UserDetails, isAudit: Boolean)
                            (f: (String, String) => Future[Outcome[M]])(implicit hc: HeaderCarrier): Future[Result] = {
+
     f(nino,calcId).map {
-      case Right(v2.outcomes.DesResponse(correlationId, responseData)) =>
+      case Right(v2.outcomes.DesResponse(resultCorrelationId, responseData)) =>
+        logger.info(s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}]" +
+          s" - Success response received with CorrelationId: $resultCorrelationId")
         if (isAudit) {
           auditSubmission(RetrieveTaxCalcAuditDetail(userDetails.userType, userDetails.agentReferenceNumber,
-            nino, calcId, correlationId, RetrieveTaxCalcAuditResponse(OK, None, Some(toJson(responseData)))))
+            nino, calcId, resultCorrelationId, RetrieveTaxCalcAuditResponse(OK, None, Some(toJson(responseData)))))
         }
-        Ok(toJson(responseData)).withHeaders("X-CorrelationId" -> correlationId)
+        Ok(toJson(responseData)).withHeaders("X-CorrelationId" -> resultCorrelationId)
       case Left(errorWrapper) =>
-        val correlationId = getCorrelationId(errorWrapper)
-        val result = processError(errorWrapper).withHeaders("X-CorrelationId" -> correlationId)
+        val resCorrelationId = errorWrapper.correlationId
+        val result = processError(errorWrapper).withHeaders("X-CorrelationId" -> resCorrelationId)
+        logger.info(
+          s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] - " +
+            s"Error response received with CorrelationId: $resCorrelationId")
         if (isAudit) {
           auditSubmission(RetrieveTaxCalcAuditDetail(userDetails.userType, userDetails.agentReferenceNumber,
-            nino, calcId, correlationId,
+            nino, calcId, resCorrelationId,
             RetrieveTaxCalcAuditResponse(result.header.status, Some(errorWrapper.allErrors.map(error => AuditError(error.code))), None)))
         }
         result
@@ -85,19 +110,6 @@ class TaxCalcController @Inject()(val authService: EnrolmentsAuthService,
       case CalculationNotReady | NoContentReturned => NoContent
       case MatchingResourceNotFound => NotFound(Json.toJson(errorWrapper))
       case _ => InternalServerError(Json.toJson(errorWrapper))
-    }
-  }
-
-  private def getCorrelationId(errorWrapper: ErrorWrapper): String = {
-    errorWrapper.correlationId match {
-      case Some(correlationId) => logger.info("[TaxCalcController][getCorrelationId] - " +
-        s"Error received from DES ${Json.toJson(errorWrapper)} with CorrelationId: $correlationId")
-        correlationId
-      case None =>
-        val correlationId = UUID.randomUUID().toString
-        logger.info("[TaxCalcController][getCorrelationId] - " +
-          s"Validation error: ${Json.toJson(errorWrapper)} with CorrelationId: $correlationId")
-        correlationId
     }
   }
 

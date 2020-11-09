@@ -14,24 +14,17 @@
  * limitations under the License.
  */
 
-package v2.connectors
+package v2.mocks
 
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.logging.Authorization
-import v2.config.AppConfig
+import org.scalamock.handlers.CallHandler
+import org.scalamock.scalatest.MockFactory
+import v2.utils.IdGenerator
 
-trait DesConnector {
+trait MockIdGenerator extends MockFactory {
 
-  implicit class DesHeaders(hc: HeaderCarrier)(implicit appConfig: AppConfig, correlationId: String) {
-    def withDesHeaders(): HeaderCarrier = {
-      hc
-        .copy(authorization = Some(Authorization(s"Bearer ${appConfig.desToken}")))
-        .withExtraHeaders(
-          "Environment" -> appConfig.desEnv,
-          "Accept" -> "application/json",
-          "Originator-Id" -> "DA_SDI",
-          "CorrelationId" -> correlationId
-      )
-    }
+  val mockIdGenerator: IdGenerator = mock[IdGenerator]
+
+  object MockIdGenerator {
+    def generateCorrelationId: CallHandler[String] = (mockIdGenerator.generateCorrelationId _).expects()
   }
 }

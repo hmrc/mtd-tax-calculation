@@ -34,10 +34,9 @@ class TaxCalcConnectorSpec extends ConnectorSpec {
   val mtdId = "123456789012345"
   val calculationId = "test-calc-id"
   val url = s"$desBaseUrl/income-tax/calculation-data/$mtdId/calcId/$calculationId"
-  val correlationId = "X-123"
 
-  val httpResponseOk = HttpResponse(OK)
-  val httpResponseNotFound = HttpResponse(NOT_FOUND)
+  val httpResponseOk: HttpResponse = HttpResponse(OK, None.orNull)
+  val httpResponseNotFound: HttpResponse = HttpResponse(NOT_FOUND, None.orNull)
 
   class Test extends MockHttpClient with MockAppConfig {
 
@@ -65,10 +64,10 @@ class TaxCalcConnectorSpec extends ConnectorSpec {
     "return an NotFound error" when {
       "the http parser returns a NotFound error" in new Test {
         MockedHttpClient.get[Outcome[TaxCalculation]](url)
-          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), MatchingResourceNotFound, None))))
+          .returns(Future.successful(Left(ErrorWrapper(correlationId, MatchingResourceNotFound, None))))
 
         private val result = await(connector.getTaxCalculation[TaxCalculation](mtdId, calculationId))
-        result shouldBe Left(ErrorWrapper(Some(correlationId), MatchingResourceNotFound, None))
+        result shouldBe Left(ErrorWrapper(correlationId, MatchingResourceNotFound, None))
       }
     }
   }
@@ -87,10 +86,10 @@ class TaxCalcConnectorSpec extends ConnectorSpec {
     "return an NotFound error" when {
       "the http parser returns a NotFound error" in new Test {
         MockedHttpClient.get[Outcome[TaxCalcMessages]](url)
-          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), MatchingResourceNotFound, None))))
+          .returns(Future.successful(Left(ErrorWrapper(correlationId, MatchingResourceNotFound, None))))
 
         private val result = await(connector.getTaxCalculationMessages[TaxCalcMessages](mtdId, calculationId))
-        result shouldBe Left(ErrorWrapper(Some(correlationId), MatchingResourceNotFound, None))
+        result shouldBe Left(ErrorWrapper(correlationId, MatchingResourceNotFound, None))
       }
     }
   }

@@ -31,17 +31,23 @@ class TaxCalcService @Inject()(connector: TaxCalcConnector) {
 
   private val calcIdRegex = "^[0-9]{8}$|^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
 
-  def getTaxCalculation[A:Reads](nino: String, calcId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Outcome[A]] =
+  def getTaxCalculation[A:Reads](nino: String, calcId: String)(
+    implicit hc: HeaderCarrier,
+    ec: ExecutionContext,
+    correlationId: String): Future[Outcome[A]] =
     get[A](nino,calcId)(connector.getTaxCalculation)
 
-  def getTaxCalculationMessages[A:Reads](nino: String, calcId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Outcome[A]] =
+  def getTaxCalculationMessages[A:Reads](nino: String, calcId: String)(
+    implicit hc: HeaderCarrier,
+    ec: ExecutionContext,
+    correlationId: String): Future[Outcome[A]] =
     get[A](nino, calcId)(connector.getTaxCalculationMessages)
 
   private def get[A:Reads](nino: String, calcId: String)
-                            (f: (String,String) => Future[Outcome[A]]): Future[Outcome[A]] = {
+                            (f: (String,String) => Future[Outcome[A]])(implicit correlationId: String): Future[Outcome[A]] = {
     if (!calcId.matches(calcIdRegex)) {
       Logger.warn(s"[TaxCalcService] [get] Invalid CalculationID supplied.")
-      Future.successful(Left(ErrorWrapper(None, InvalidCalcIDError, None)))
+      Future.successful(Left(ErrorWrapper(correlationId, InvalidCalcIDError, None)))
     } else {
       f(nino,calcId)
     }

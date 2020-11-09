@@ -36,7 +36,7 @@ class MtdIdLookupHttpParserSpec extends UnitSpec {
   "read" should {
     "return an MtdId" when {
       "the HttpResponse contains a 200 status and a correct response body" in {
-        val response = HttpResponse(OK, Some(mtdIdJson))
+        val response: HttpResponse = HttpResponse(OK, mtdIdJson.toString())
         val result: MtdIdLookupOutcome = mtdIdLookupHttpReads.read(method, url, response)
 
         result shouldBe Right(mtdId)
@@ -45,7 +45,7 @@ class MtdIdLookupHttpParserSpec extends UnitSpec {
 
     "returns a success response without MtdId" when {
       "backend doesn't have a valid data" in {
-        val response = HttpResponse(OK, None)
+        val response: HttpResponse = HttpResponse(OK, None.orNull)
         val result: MtdIdLookupOutcome = mtdIdLookupHttpReads.read(method, url, response)
 
         result shouldBe Left(DownstreamError)
@@ -54,7 +54,7 @@ class MtdIdLookupHttpParserSpec extends UnitSpec {
 
     "return an InvalidNino error" when {
       "the HttpResponse contains a 403 status" in {
-        val response = HttpResponse(FORBIDDEN)
+        val response: HttpResponse = HttpResponse(FORBIDDEN, None.orNull)
         val result: MtdIdLookupOutcome = mtdIdLookupHttpReads.read(method, url, response)
 
         result shouldBe Left(InvalidNinoError)
@@ -63,7 +63,7 @@ class MtdIdLookupHttpParserSpec extends UnitSpec {
 
     "return a DownstreamError" when {
       "the HttpResponse contains any other status" in {
-        val response = HttpResponse(INTERNAL_SERVER_ERROR)
+        val response: HttpResponse = HttpResponse(INTERNAL_SERVER_ERROR, None.orNull)
         val result: MtdIdLookupOutcome = mtdIdLookupHttpReads.read(method, url, response)
 
         result shouldBe Left(DownstreamError)

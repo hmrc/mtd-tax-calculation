@@ -16,17 +16,17 @@
 
 package v2.models.errors
 
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import support.UnitSpec
 
 class ErrorWrapperSpec extends UnitSpec {
 
-  val correlationId = "X-123"
+  val correlationId: String = "X-123"
 
   "Rendering a error response with one error" should {
-    val error = ErrorWrapper(Some(correlationId), InvalidNinoError, Some(Seq.empty))
+    val error: ErrorWrapper = ErrorWrapper(correlationId, InvalidNinoError, Some(Seq.empty))
 
-    val json = Json.parse(
+    val json: JsValue = Json.parse(
       """
         |{
         |   "code": "FORMAT_NINO",
@@ -41,9 +41,9 @@ class ErrorWrapperSpec extends UnitSpec {
   }
 
   "Rendering a error response with one error and an empty sequence of errors" should {
-    val error = ErrorWrapper(None, InvalidNinoError, Some(Seq.empty))
+    val error: ErrorWrapper = ErrorWrapper(correlationId, InvalidNinoError, Some(Seq.empty))
 
-    val json = Json.parse(
+    val json: JsValue = Json.parse(
       """
         |{
         |   "code": "FORMAT_NINO",
@@ -58,7 +58,7 @@ class ErrorWrapperSpec extends UnitSpec {
   }
 
   "Rendering a error response with two errors" should {
-    val error = ErrorWrapper(Some(correlationId), Error("INVALID_REQUEST", "Invalid request"),
+    val error: ErrorWrapper = ErrorWrapper(correlationId, Error("INVALID_REQUEST", "Invalid request"),
       Some (
         Seq(
           InvalidNinoError,
@@ -67,7 +67,7 @@ class ErrorWrapperSpec extends UnitSpec {
       )
     )
 
-    val json = Json.parse(
+    val json: JsValue = Json.parse(
       """
         |{
         |   "code": "INVALID_REQUEST",

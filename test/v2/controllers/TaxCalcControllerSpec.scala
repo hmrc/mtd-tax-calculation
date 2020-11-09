@@ -20,7 +20,7 @@ import play.api.libs.json.Json
 import play.api.mvc.Result
 import uk.gov.hmrc.http.HeaderCarrier
 import v2.fixtures.{TaxCalcMessagesFixture, TaxCalculationFixture}
-import v2.mocks.MockAppConfig
+import v2.mocks.{MockAppConfig, MockIdGenerator}
 import v2.mocks.services.{MockAuditService, MockEnrolmentsAuthService, MockMtdIdLookupService, MockTaxCalcService}
 import v2.models.audit._
 import v2.models.auth.UserDetails
@@ -36,11 +36,12 @@ class TaxCalcControllerSpec extends ControllerBaseSpec
   with MockMtdIdLookupService
   with MockTaxCalcService
   with MockAppConfig
-  with MockAuditService {
+  with MockAuditService
+  with MockIdGenerator {
 
   trait Test {
 
-    val hc = HeaderCarrier()
+    val hc: HeaderCarrier = HeaderCarrier()
 
     val mtdId = "test-mtd-id"
     val calcId = "12345678"
@@ -53,12 +54,12 @@ class TaxCalcControllerSpec extends ControllerBaseSpec
       lookupService = mockMtdIdLookupService,
       appConfig = mockAppConfig,
       auditService = mockAuditService,
-      cc = cc
+      cc = cc,
+      idGenerator = mockIdGenerator
     )
   }
 
-  val nino = "test-nino"
-
+  val nino: String = "test-nino"
 
   "getTaxCalculation" should {
     "return a 200 with the correct body" in new Test {
@@ -67,6 +68,8 @@ class TaxCalcControllerSpec extends ControllerBaseSpec
         .returns(Future.successful(Right(mtdId)))
 
       MockedEnrolmentsAuthService.authoriseUser().returns(Future.successful(expected))
+
+      MockIdGenerator.generateCorrelationId.returns(correlationId)
 
       MockedTaxCalcService.getTaxCalculation[TaxCalculation](nino, calcId)
         .returns(Future.successful(Right(DesResponse(correlationId, TaxCalculationFixture.taxCalc))))
@@ -77,11 +80,13 @@ class TaxCalcControllerSpec extends ControllerBaseSpec
       contentAsJson(result) shouldBe TaxCalculationFixture.taxCalcClientJson
       header("X-CorrelationId", result) shouldBe Some(correlationId)
 
-      val detail = RetrieveTaxCalcAuditDetail("Individual", None, nino, calcId, "X-123",
-        RetrieveTaxCalcAuditResponse(OK, None, Some(TaxCalculationFixture.taxCalcClientJson)))
+      val detail: RetrieveTaxCalcAuditDetail =
+        RetrieveTaxCalcAuditDetail("Individual", None, nino, calcId, "X-123",
+          RetrieveTaxCalcAuditResponse(OK, None, Some(TaxCalculationFixture.taxCalcClientJson)))
 
-      val event = AuditEvent("retrieveTaxCalculation",
-        "mtd-tax-calculation", detail)
+      val event: AuditEvent[RetrieveTaxCalcAuditDetail] =
+        AuditEvent("retrieveTaxCalculation", "mtd-tax-calculation", detail)
+
       MockedAuditService.verifyAuditEvent(event).once
     }
 
@@ -90,12 +95,15 @@ class TaxCalcControllerSpec extends ControllerBaseSpec
 
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
+
         MockedEnrolmentsAuthService.authoriseUser().returns(Future.successful(expected))
 
-        MockedTaxCalcService.getTaxCalculation[TaxCalculation](nino, calcId)
-          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), CalculationNotReady, None))))
+        MockIdGenerator.generateCorrelationId.returns(correlationId)
 
-        private val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
+        MockedTaxCalcService.getTaxCalculation[TaxCalculation](nino, calcId)
+          .returns(Future.successful(Left(ErrorWrapper(correlationId, CalculationNotReady, None))))
+
+        private val result = controller.getTaxCalculation(nino, calcId)(fakeRequest)
 
         status(result) shouldBe NO_CONTENT
         header("X-CorrelationId", result) shouldBe Some(correlationId)
@@ -113,12 +121,16 @@ class TaxCalcControllerSpec extends ControllerBaseSpec
       }
 
       "the service returns an Invalid Identifier error" in new Test {
+
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
+
         MockedEnrolmentsAuthService.authoriseUser().returns(Future.successful(expected))
 
+        MockIdGenerator.generateCorrelationId.returns(correlationId)
+
         MockedTaxCalcService.getTaxCalculation[TaxCalculation](nino, calcId)
-          .returns(Future.successful(Left(ErrorWrapper(None, InvalidNinoError, None))))
+          .returns(Future.successful(Left(ErrorWrapper(correlationId, InvalidNinoError, None))))
 
         val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
 
@@ -126,19 +138,27 @@ class TaxCalcControllerSpec extends ControllerBaseSpec
         contentAsJson(result) shouldBe Json.toJson(InvalidNinoError)
         header("X-CorrelationId", result).nonEmpty shouldBe true
 
-        val detail = RetrieveTaxCalcAuditDetail("Individual", None, nino, calcId, header("X-CorrelationId", result).get,
-          RetrieveTaxCalcAuditResponse(BAD_REQUEST, Some(Seq(AuditError(InvalidNinoError.code))), None))
-        val event = AuditEvent("retrieveTaxCalculation",
-          "mtd-tax-calculation", detail)
+        val detail: RetrieveTaxCalcAuditDetail =
+          RetrieveTaxCalcAuditDetail("Individual", None, nino, calcId, header("X-CorrelationId", result).get,
+            RetrieveTaxCalcAuditResponse(BAD_REQUEST, Some(Seq(AuditError(InvalidNinoError.code))), None))
+
+        val event: AuditEvent[RetrieveTaxCalcAuditDetail] =
+          AuditEvent("retrieveTaxCalculation", "mtd-tax-calculation", detail)
+
         MockedAuditService.verifyAuditEvent(event).once
       }
 
       "the service returns an Invalid CalcID error" in new Test {
+
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
+
         MockedEnrolmentsAuthService.authoriseUser().returns(Future.successful(expected))
+
+        MockIdGenerator.generateCorrelationId.returns(correlationId)
+
         MockedTaxCalcService.getTaxCalculation[TaxCalculation](nino, calcId)
-          .returns(Future.successful(Left(ErrorWrapper(None, InvalidCalcIDError, None))))
+          .returns(Future.successful(Left(ErrorWrapper(correlationId, InvalidCalcIDError, None))))
 
         val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
 
@@ -146,23 +166,29 @@ class TaxCalcControllerSpec extends ControllerBaseSpec
         contentAsJson(result) shouldBe Json.toJson(InvalidCalcIDError)
         header("X-CorrelationId", result).nonEmpty shouldBe true
 
-        val detail = RetrieveTaxCalcAuditDetail("Individual", None, nino, calcId, header("X-CorrelationId", result).get,
-          RetrieveTaxCalcAuditResponse(BAD_REQUEST, Some(Seq(AuditError(InvalidCalcIDError.code))), None))
-        val event = AuditEvent("retrieveTaxCalculation",
-          "mtd-tax-calculation", detail)
+        val detail: RetrieveTaxCalcAuditDetail =
+          RetrieveTaxCalcAuditDetail("Individual", None, nino, calcId, header("X-CorrelationId", result).get,
+            RetrieveTaxCalcAuditResponse(BAD_REQUEST, Some(Seq(AuditError(InvalidCalcIDError.code))), None))
+
+        val event: AuditEvent[RetrieveTaxCalcAuditDetail] =
+          AuditEvent("retrieveTaxCalculation", "mtd-tax-calculation", detail)
+
         MockedAuditService.verifyAuditEvent(event).once
       }
     }
 
     "return a 404" when {
       "the service returns a NotFound error" in new Test {
+
         MockedEnrolmentsAuthService.authoriseUser().returns(Future.successful(expected))
 
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
 
+        MockIdGenerator.generateCorrelationId.returns(correlationId)
+
         MockedTaxCalcService.getTaxCalculation[TaxCalculation](nino, calcId)
-          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), MatchingResourceNotFound, None))))
+          .returns(Future.successful(Left(ErrorWrapper(correlationId, MatchingResourceNotFound, None))))
 
         val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
 
@@ -170,10 +196,13 @@ class TaxCalcControllerSpec extends ControllerBaseSpec
         contentAsJson(result) shouldBe Json.toJson(MatchingResourceNotFound)
         header("X-CorrelationId", result) shouldBe Some(correlationId)
 
-        val detail = RetrieveTaxCalcAuditDetail("Individual", None, nino, calcId, correlationId,
-          RetrieveTaxCalcAuditResponse(NOT_FOUND, Some(Seq(AuditError(MatchingResourceNotFound.code))), None))
-        val event = AuditEvent("retrieveTaxCalculation",
-          "mtd-tax-calculation", detail)
+        val detail: RetrieveTaxCalcAuditDetail =
+          RetrieveTaxCalcAuditDetail("Individual", None, nino, calcId, correlationId,
+            RetrieveTaxCalcAuditResponse(NOT_FOUND, Some(Seq(AuditError(MatchingResourceNotFound.code))), None))
+
+        val event: AuditEvent[RetrieveTaxCalcAuditDetail] =
+          AuditEvent("retrieveTaxCalculation", "mtd-tax-calculation", detail)
+
         MockedAuditService.verifyAuditEvent(event).once
       }
     }
@@ -189,11 +218,16 @@ class TaxCalcControllerSpec extends ControllerBaseSpec
       }
 
       "the service returns an InternalServerError response" in new Test {
+
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
+
         MockedEnrolmentsAuthService.authoriseUser().returns(Future.successful(expected))
+
+        MockIdGenerator.generateCorrelationId.returns(correlationId)
+
         MockedTaxCalcService.getTaxCalculation[TaxCalculation](nino, calcId)
-          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), InternalServerError, None))))
+          .returns(Future.successful(Left(ErrorWrapper(correlationId, InternalServerError, None))))
 
         val result: Future[Result] = controller.getTaxCalculation(nino, calcId)(fakeRequest)
 
@@ -201,10 +235,13 @@ class TaxCalcControllerSpec extends ControllerBaseSpec
         contentAsJson(result) shouldBe Json.toJson(InternalServerError)
         header("X-CorrelationId", result) shouldBe Some(correlationId)
 
-        val detail = RetrieveTaxCalcAuditDetail("Individual", None, nino, calcId, "X-123",
-          RetrieveTaxCalcAuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(InternalServerError.code))), None))
-        val event = AuditEvent("retrieveTaxCalculation",
-          "mtd-tax-calculation", detail)
+        val detail: RetrieveTaxCalcAuditDetail =
+          RetrieveTaxCalcAuditDetail("Individual", None, nino, calcId, "X-123",
+            RetrieveTaxCalcAuditResponse(INTERNAL_SERVER_ERROR, Some(Seq(AuditError(InternalServerError.code))), None))
+
+        val event: AuditEvent[RetrieveTaxCalcAuditDetail] =
+          AuditEvent("retrieveTaxCalculation", "mtd-tax-calculation", detail)
+
         MockedAuditService.verifyAuditEvent(event).once
       }
     }
@@ -212,9 +249,14 @@ class TaxCalcControllerSpec extends ControllerBaseSpec
 
   "getTaxCalculationMessages" should {
     "return a 200 with the correct body" in new Test {
+
       MockedMtdIdLookupService.lookup(nino)
         .returns(Future.successful(Right(mtdId)))
+
       MockedEnrolmentsAuthService.authoriseUser().returns(Future.successful(expected))
+
+      MockIdGenerator.generateCorrelationId.returns(correlationId)
+
       MockedTaxCalcService.getTaxCalculationMessages[TaxCalcMessages](nino, calcId)
         .returns(Future.successful(Right(DesResponse(correlationId, TaxCalcMessagesFixture.taxCalcMessages))))
 
@@ -230,11 +272,15 @@ class TaxCalcControllerSpec extends ControllerBaseSpec
 
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
-        MockedEnrolmentsAuthService.authoriseUser().returns(Future.successful(expected))
-        MockedTaxCalcService.getTaxCalculationMessages[TaxCalcMessages](nino, calcId)
-          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), CalculationNotReady, None))))
 
-        private val result: Future[Result] = controller.getTaxCalculationMessages(nino, calcId)(fakeRequest)
+        MockedEnrolmentsAuthService.authoriseUser().returns(Future.successful(expected))
+
+        MockIdGenerator.generateCorrelationId.returns(correlationId)
+
+        MockedTaxCalcService.getTaxCalculationMessages[TaxCalcMessages](nino, calcId)
+          .returns(Future.successful(Left(ErrorWrapper(correlationId, CalculationNotReady, None))))
+
+        private val result = controller.getTaxCalculationMessages(nino, calcId)(fakeRequest)
 
         status(result) shouldBe NO_CONTENT
         header("X-CorrelationId", result) shouldBe Some(correlationId)
@@ -243,11 +289,15 @@ class TaxCalcControllerSpec extends ControllerBaseSpec
 
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
-        MockedEnrolmentsAuthService.authoriseUser().returns(Future.successful(expected))
-        MockedTaxCalcService.getTaxCalculationMessages[TaxCalcMessages](nino, calcId)
-          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), NoContentReturned, None))))
 
-        private val result: Future[Result] = controller.getTaxCalculationMessages(nino, calcId)(fakeRequest)
+        MockedEnrolmentsAuthService.authoriseUser().returns(Future.successful(expected))
+
+        MockIdGenerator.generateCorrelationId.returns(correlationId)
+
+        MockedTaxCalcService.getTaxCalculationMessages[TaxCalcMessages](nino, calcId)
+          .returns(Future.successful(Left(ErrorWrapper(correlationId, NoContentReturned, None))))
+
+        private val result = controller.getTaxCalculationMessages(nino, calcId)(fakeRequest)
 
         status(result) shouldBe NO_CONTENT
         header("X-CorrelationId", result) shouldBe Some(correlationId)
@@ -265,11 +315,16 @@ class TaxCalcControllerSpec extends ControllerBaseSpec
       }
 
       "the service returns an Invalid Identifier error" in new Test {
+
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
+
         MockedEnrolmentsAuthService.authoriseUser().returns(Future.successful(expected))
+
+        MockIdGenerator.generateCorrelationId.returns(correlationId)
+
         MockedTaxCalcService.getTaxCalculationMessages[TaxCalcMessages](nino, calcId)
-          .returns(Future.successful(Left(ErrorWrapper(None, InvalidNinoError, None))))
+          .returns(Future.successful(Left(ErrorWrapper(correlationId, InvalidNinoError, None))))
 
         val result: Future[Result] = controller.getTaxCalculationMessages(nino, calcId)(fakeRequest)
 
@@ -279,11 +334,16 @@ class TaxCalcControllerSpec extends ControllerBaseSpec
       }
 
       "the service returns an Invalid CalcID error" in new Test {
+
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
+
         MockedEnrolmentsAuthService.authoriseUser().returns(Future.successful(expected))
+
+        MockIdGenerator.generateCorrelationId.returns(correlationId)
+
         MockedTaxCalcService.getTaxCalculationMessages[TaxCalcMessages](nino, calcId)
-          .returns(Future.successful(Left(ErrorWrapper(None, InvalidCalcIDError, None))))
+          .returns(Future.successful(Left(ErrorWrapper(correlationId, InvalidCalcIDError, None))))
 
         val result: Future[Result] = controller.getTaxCalculationMessages(nino, calcId)(fakeRequest)
 
@@ -295,12 +355,16 @@ class TaxCalcControllerSpec extends ControllerBaseSpec
 
     "return a 404" when {
       "the service returns a NotFound error" in new Test {
+
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
 
         MockedEnrolmentsAuthService.authoriseUser().returns(Future.successful(expected))
+
+        MockIdGenerator.generateCorrelationId.returns(correlationId)
+
         MockedTaxCalcService.getTaxCalculationMessages[TaxCalcMessages](nino, calcId)
-          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), MatchingResourceNotFound, None))))
+          .returns(Future.successful(Left(ErrorWrapper(correlationId, MatchingResourceNotFound, None))))
 
         val result: Future[Result] = controller.getTaxCalculationMessages(nino, calcId)(fakeRequest)
 
@@ -321,12 +385,16 @@ class TaxCalcControllerSpec extends ControllerBaseSpec
       }
 
       "the service returns an InternalServerError response" in new Test {
+
         MockedMtdIdLookupService.lookup(nino)
           .returns(Future.successful(Right(mtdId)))
 
         MockedEnrolmentsAuthService.authoriseUser().returns(Future.successful(expected))
+
+        MockIdGenerator.generateCorrelationId.returns(correlationId)
+
         MockedTaxCalcService.getTaxCalculationMessages[TaxCalcMessages](nino, calcId)
-          .returns(Future.successful(Left(ErrorWrapper(Some(correlationId), InternalServerError, None))))
+          .returns(Future.successful(Left(ErrorWrapper(correlationId, InternalServerError, None))))
 
         val result: Future[Result] = controller.getTaxCalculationMessages(nino, calcId)(fakeRequest)
 

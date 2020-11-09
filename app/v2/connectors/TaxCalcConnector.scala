@@ -29,12 +29,20 @@ import scala.concurrent.{ExecutionContext, Future}
 class TaxCalcConnector @Inject()(http: HttpClient,
                                  implicit val appConfig: AppConfig) extends DesConnector {
 
-  def getTaxCalculation[A: Reads](nino: String, calculationId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Outcome[A]] = {
+  def getTaxCalculation[A: Reads](nino: String, calculationId: String)(
+    implicit hc: HeaderCarrier,
+    ec: ExecutionContext,
+    correlationId: String): Future[Outcome[A]] = {
+
   import v2.httpparsers.TaxCalcHttpParser.genericHttpReads
     http.GET[Outcome[A]](s"${appConfig.desBaseUrl}/income-tax/calculation-data/$nino/calcId/$calculationId")(implicitly, hc.withDesHeaders(), ec)
   }
 
-  def getTaxCalculationMessages[A:Reads](nino: String, calculationId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Outcome[A]] = {
+  def getTaxCalculationMessages[A:Reads](nino: String, calculationId: String)(
+    implicit hc: HeaderCarrier,
+    ec: ExecutionContext,
+    correlationId: String): Future[Outcome[A]] = {
+
     import v2.httpparsers.TaxCalcHttpParser.genericHttpReads
     http.GET[Outcome[A]](s"${appConfig.desBaseUrl}/income-tax/calculation-data/$nino/calcId/$calculationId")(implicitly, hc.withDesHeaders(), ec)
   }

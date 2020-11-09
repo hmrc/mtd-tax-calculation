@@ -28,14 +28,14 @@ object TaxCalcHttpParser extends HttpParser {
 
   implicit def genericHttpReads[A: Reads]: HttpReads[Outcome[A]] = reads[A]
 
-  private def reads[A: Reads] = new HttpReads[Outcome[A]] {
+  private def reads[A: Reads]: HttpReads[Outcome[A]] = new HttpReads[Outcome[A]] {
     override def read(method: String, url: String, response: HttpResponse): Outcome[A] = {
       response.status match {
         case OK => parseResponse(response)
-        case NO_CONTENT => Left(ErrorWrapper(Some(retrieveCorrelationId(response)), CalculationNotReady, None))
+        case NO_CONTENT => Left(ErrorWrapper(retrieveCorrelationId(response), CalculationNotReady, None))
         case BAD_REQUEST => Left(parseError(response))
-        case FORBIDDEN => Left(ErrorWrapper(Some(retrieveCorrelationId(response)), InternalServerError, None))
-        case NOT_FOUND => Left(ErrorWrapper(Some(retrieveCorrelationId(response)), MatchingResourceNotFound, None))
+        case FORBIDDEN => Left(ErrorWrapper(retrieveCorrelationId(response), InternalServerError, None))
+        case NOT_FOUND => Left(ErrorWrapper(retrieveCorrelationId(response), MatchingResourceNotFound, None))
         case INTERNAL_SERVER_ERROR | SERVICE_UNAVAILABLE =>
           Left(parseError(response))
         case _ => logger.info(s"Unexpected error received from DES with status ${response.status} and body ${response.body}")
@@ -48,18 +48,18 @@ object TaxCalcHttpParser extends HttpParser {
       case Some(taxCalcMessages) if taxCalcMessages.isInstanceOf[ITaxCalcMessages] =>
         val correlationId = retrieveCorrelationId(response)
         taxCalcMessages match {
-          case TaxCalcMessages(0, 0, _) => Left(ErrorWrapper(Some(correlationId), NoContentReturned, None))
+          case TaxCalcMessages(0, 0, _) => Left(ErrorWrapper(correlationId, NoContentReturned, None))
           case _ => Right(DesResponse(retrieveCorrelationId(response), taxCalcMessages))
         }
-      case None => Left(ErrorWrapper(Some(retrieveCorrelationId(response)), InternalServerError, None))
+      case None => Left(ErrorWrapper(retrieveCorrelationId(response), InternalServerError, None))
     }
 
     private def parseError(response: HttpResponse): ErrorWrapper = {
       val errorReads: Reads[Option[String]] = (__ \ "code").readNullable[String]
-      val default = ErrorWrapper(Some(retrieveCorrelationId(response)), InternalServerError, None)
+      val default = ErrorWrapper(retrieveCorrelationId(response), InternalServerError, None)
 
       response.validateJson(errorReads).fold(default) {
-        case Some(error) => ErrorWrapper(Some(retrieveCorrelationId(response)), desErrorToMtdErrorCreate(error), None)
+        case Some(error) => ErrorWrapper(retrieveCorrelationId(response), desErrorToMtdErrorCreate(error), None)
         case _ => default
       }
     }
