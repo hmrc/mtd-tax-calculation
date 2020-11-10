@@ -28,7 +28,6 @@ trait DesConnector {
         .copy(authorization = Some(Authorization(s"Bearer ${appConfig.desToken}")))
         .withExtraHeaders(
           "Environment" -> appConfig.desEnv,
-          "Accept" -> "application/json",
           "Originator-Id" -> "DA_SDI",
           "CorrelationId" -> correlationId
       )
