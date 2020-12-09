@@ -1,12 +1,28 @@
-# MTD Tax Calualation Service
+mtd-tax-calculation
+========================
 
-[![Build Status](https://travis-ci.org/hmrc/mtd-tax-calculation.svg)](https://travis-ci.org/hmrc/mtd-tax-calculation) [ ![Download](https://api.bintray.com/packages/hmrc/releases/mtd-tax-calculation/images/download.svg) ](https://bintray.com/hmrc/releases/mtd-tax-calculation/_latestVersion)
+[![Apache-2.0 license](http://img.shields.io/badge/license-Apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
-This service retrieves the MTD tax calculation.
+The MTD Tax Calculation microservice allows a developer to retrieve the result of a previously triggered tax calculation.
 
-sbt "~run 9770"
+## Requirements
+- Scala 2.12.x
+- Java 8
+- sbt 1.3.13
+- [Service Manager](https://github.com/hmrc/service-manager)
 
-### License 
+## Development Setup
+Run the microservice from the console using: `sbt run` (starts on port 9770 by default)
 
+Start the service manager profile: `sm --start MTDFB_SA_TAXC`
+ 
+## Run Tests
+Run unit tests: `sbt test`
+
+Run integration tests: `sbt it:test`
+
+## Reporting Issues
+You can create a GitHub issue [here](https://github.com/hmrc/mtd-tax-calculation/issues)
+
+## License
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html")
-
