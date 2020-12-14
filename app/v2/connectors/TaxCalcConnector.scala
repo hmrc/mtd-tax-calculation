@@ -19,7 +19,7 @@ package v2.connectors
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Reads
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.HttpClient
 import v2.config.AppConfig
 import v2.outcomes.TaxCalcOutcome.Outcome
 

@@ -20,7 +20,7 @@ import play.api.mvc._
 import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.controller.BackendController
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import v2.models.auth.UserDetails
 import v2.models.errors.{InvalidNinoError, UnauthorisedError}
 import v2.outcomes.MtdIdLookupOutcome._
