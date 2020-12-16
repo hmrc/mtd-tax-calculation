@@ -37,27 +37,6 @@ object AppDependencies {
 
     "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
     "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.3" % scope,
-    "com.github.tomakehurst" % "wiremock" % "2.27.2" % scope
+    "com.github.tomakehurst" % "wiremock-jre8" % "2.27.2" % scope
   )
-
-  // Fixes a transitive dependency clash between wiremock and scalatestplus-play
-  val overrides: Seq[ModuleID] = {
-    val jettyFromWiremockVersion = "9.4.35.v20201120"
-    Seq(
-      "org.eclipse.jetty"           % "jetty-client"       % jettyFromWiremockVersion,
-      "org.eclipse.jetty"           % "jetty-continuation" % jettyFromWiremockVersion,
-      "org.eclipse.jetty"           % "jetty-http"         % jettyFromWiremockVersion,
-      "org.eclipse.jetty"           % "jetty-io"           % jettyFromWiremockVersion,
-      "org.eclipse.jetty"           % "jetty-security"     % jettyFromWiremockVersion,
-      "org.eclipse.jetty"           % "jetty-server"       % jettyFromWiremockVersion,
-      "org.eclipse.jetty"           % "jetty-servlet"      % jettyFromWiremockVersion,
-      "org.eclipse.jetty"           % "jetty-servlets"     % jettyFromWiremockVersion,
-      "org.eclipse.jetty"           % "jetty-util"         % jettyFromWiremockVersion,
-      "org.eclipse.jetty"           % "jetty-webapp"       % jettyFromWiremockVersion,
-      "org.eclipse.jetty"           % "jetty-xml"          % jettyFromWiremockVersion,
-      "org.eclipse.jetty.websocket" % "websocket-api"      % jettyFromWiremockVersion,
-      "org.eclipse.jetty.websocket" % "websocket-client"   % jettyFromWiremockVersion,
-      "org.eclipse.jetty.websocket" % "websocket-common"   % jettyFromWiremockVersion
-    )
-  }
 }
