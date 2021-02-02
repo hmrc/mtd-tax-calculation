@@ -92,7 +92,7 @@ class TaxCalcController @Inject()(val authService: EnrolmentsAuthService,
       case Left(errorWrapper) =>
         val resCorrelationId = errorWrapper.correlationId
         val result = processError(errorWrapper).withHeaders("X-CorrelationId" -> resCorrelationId)
-        logger.info(
+        logger.warn(
           s"[${endpointLogContext.controllerName}][${endpointLogContext.endpointName}] - " +
             s"Error response received with CorrelationId: $resCorrelationId")
         if (isAudit) {

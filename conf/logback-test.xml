@@ -57,7 +57,7 @@
     <root level="INFO">
         <appender-ref ref="FILE"/>
     </root>
-    <logger name="application" level="DEBUG"/>
+    <logger name="application" level="INFO"/>
     <logger name="uk.gov.hmrc.audit" level="OFF"/>
     <logger name="scala.Predef" thread = "akka" level="ERROR"/>
 

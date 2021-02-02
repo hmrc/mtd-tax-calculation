@@ -38,7 +38,7 @@ object TaxCalcHttpParser extends HttpParser {
         case NOT_FOUND => Left(ErrorWrapper(retrieveCorrelationId(response), MatchingResourceNotFound, None))
         case INTERNAL_SERVER_ERROR | SERVICE_UNAVAILABLE =>
           Left(parseError(response))
-        case _ => logger.info(s"Unexpected error received from DES with status ${response.status} and body ${response.body}")
+        case _ => logger.warn(s"Unexpected error received from DES with status ${response.status} and body ${response.body}")
           Left(parseError(response))
       }
     }
@@ -71,7 +71,7 @@ object TaxCalcHttpParser extends HttpParser {
     "SERVER_ERROR" -> InternalServerError,
     "SERVICE_UNAVAILABLE" -> InternalServerError
   ).withDefault { error =>
-    logger.info(s"[TaxCalcHttpParser] [desErrorToMtdErrorCreate] - No mapping found for error code $error")
+    logger.warn(s"[TaxCalcHttpParser] [desErrorToMtdErrorCreate] - No mapping found for error code $error")
     InternalServerError
   }
 }
