@@ -22,10 +22,16 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 trait AppConfig {
   def desBaseUrl: String
+
   def mtdIdBaseUrl: String
+
   def desEnv: String
+
   def desToken: String
+
   def featureSwitch: Option[Configuration]
+
+  def authServiceValidationEnabled: Boolean
 }
 
 @Singleton
@@ -38,5 +44,7 @@ class AppConfigImpl @Inject()(servicesConfig: ServicesConfig,
   val desToken: String = servicesConfig.getString("microservice.services.des.token")
 
   def featureSwitch: Option[Configuration] = config.getOptional[Configuration](s"feature-switch")
+
+  val authServiceValidationEnabled: Boolean = servicesConfig.getBoolean(s"api.confidence-level-check.auth-validation.enabled")
 
 }

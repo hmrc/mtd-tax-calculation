@@ -31,5 +31,6 @@ trait MockAppConfig extends MockFactory {
     def desToken: CallHandler[String] = (mockAppConfig.desToken _: () => String).expects()
     def mtdIdBaseUrl: CallHandler[String] = (mockAppConfig.mtdIdBaseUrl _: () => String).expects()
     def featureSwitch: CallHandler[Option[Configuration]] = (mockAppConfig.featureSwitch _: () => Option[Configuration]).expects()
+    def authServiceValidationEnabled: CallHandler[Boolean] = (mockAppConfig.authServiceValidationEnabled _: () => Boolean).expects()
   }
 }

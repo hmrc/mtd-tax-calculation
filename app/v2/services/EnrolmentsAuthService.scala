@@ -29,11 +29,12 @@ import v2.models.errors.UnauthorisedError
 import v2.outcomes.MtdIdLookupOutcome.DownstreamError
 import v2.outcomes.TaxCalcOutcome.AuthOutcome
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
+import v2.config.AppConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class EnrolmentsAuthService @Inject()(val connector: AuthConnector) {
+class EnrolmentsAuthService @Inject()(val connector: AuthConnector, val appConfig: AppConfig) {
 
   private val authFunction: AuthorisedFunctions = new AuthorisedFunctions {
     override def authConnector: AuthConnector = connector
@@ -44,27 +45,32 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) {
     .flatMap(_.getIdentifier("AgentReferenceNumber"))
     .map(_.value)
 
+  def buildPredicate(predicate: Predicate): Predicate =
+    if (appConfig.authServiceValidationEnabled) {
+      predicate and ((Individual and ConfidenceLevel.L200) or Organisation or Agent)
+    } else predicate
+
   def authorised(predicate: Predicate)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[AuthOutcome] = {
-    authFunction.authorised(predicate).retrieve(affinityGroup and authorisedEnrolments) {
-      case Some(Individual) ~ _ =>
+    authFunction.authorised(buildPredicate(predicate)).retrieve(affinityGroup and authorisedEnrolments) {
+      case Some(Individual) ~ _   =>
         val user = UserDetails("", "Individual", None)
         Future.successful(Right(user))
       case Some(Organisation) ~ _ =>
         val user = UserDetails("", "Organisation", None)
         Future.successful(Right(user))
-      case Some(Agent) ~ _ =>
+      case Some(Agent) ~ _        =>
         retrieveAgentDetails() map {
           case arn@Some(_) =>
             val user: AuthOutcome = Right(UserDetails("", "Agent", arn))
             user
-          case None =>
+          case None        =>
             Logger.warn(s"[EnrolmentsAuthService][authorised] No AgentReferenceNumber defined on agent enrolment.")
             Left(DownstreamError)
         }
     } recoverWith {
-      case _: MissingBearerToken => Future.successful(Left(UnauthorisedError))
+      case _: MissingBearerToken     => Future.successful(Left(UnauthorisedError))
       case _: AuthorisationException => Future.successful(Left(UnauthorisedError))
-      case error =>
+      case error                     =>
         Logger.warn(s"[EnrolmentsAuthService][authorised] An unexpected error occurred: $error")
         Future.successful(Left(DownstreamError))
     }
@@ -75,7 +81,7 @@ class EnrolmentsAuthService @Inject()(val connector: AuthConnector) {
       .retrieve(Retrievals.agentCode and Retrievals.authorisedEnrolments) { // If the user is an agent are they enrolled in Agent Services?
         case _ ~ enrolments =>
           Future.successful(getAgentReferenceFromEnrolments(enrolments))
-        case _ => Future.successful(None)
+        case _              => Future.successful(None)
       }
 
 }
